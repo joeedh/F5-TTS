@@ -40,6 +40,7 @@ Paths under `src/f5_tts/`. Overview in `docs/architecture.md`; doc list in `docs
 | Plans | `docs/plans/` |
 | Debugging guide | `docs/debugging.md` |
 | Index of all docs | `docs/index.md` (update when adding a doc) |
+| Tensor shape ledger | `docs/shape-ledger.md` |
 | Architecture | `docs/architecture.md` |
 
 ## Writing plans and docs
@@ -51,3 +52,7 @@ Paths under `src/f5_tts/`. Overview in `docs/architecture.md`; doc list in `docs
 ## Debugging guide
 
 `docs/debugging.md` is a running log. When a bug is found and fixed, or a debugging technique proves useful, add an entry: symptom, cause, fix or how to diagnose. Append new entries; edit old ones only to correct them.
+
+## Tensor shapes
+
+Shape annotations use `jaxtyping`, e.g. `Float[Tensor, "b n d"]`. Pyright does not check the shapes, only that the value is a `Tensor`. Whenever a bug, a long debugging session or a near miss comes from a wrong tensor shape or dtype that a shape-aware checker would have caught, add an entry to `docs/shape-ledger.md` in the same commit as the fix. Do this even if the cost was small; the ledger is how we decide whether to extend pyright.

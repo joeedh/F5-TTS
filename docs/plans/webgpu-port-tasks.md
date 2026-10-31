@@ -19,7 +19,7 @@ Approach decided: pyright, and port many files at once, then drive the error cou
 ### Decisions to make first
 - [x] Formatter: keep `ruff format` (decided).
 - [x] Linter: keep `ruff` lint (decided). Still open inside it: whether to turn on extra rule sets (for example bugbear, pyupgrade, unused arguments) or keep the current set.
-- [ ] How to annotate tensor shapes now that the ein strings are invalid types. Options: `jaxtyping` (new dependency), plain `Tensor` plus comments, or type aliases (`Float = Annotated[Tensor, ...]`). Pick one before the bulk pass, since it touches most of `model/`. Tested 2026-10-31 with jaxtyping 0.3.11 on numpy arrays (torch could not be installed in the container, so torch itself is untested): pyright reads `Float[np.ndarray, "b n d"]` as a plain `ndarray`. It checks the array class but ignores dtype and shape, so wrong shapes are not caught statically. Ruff reports F722 on shape strings and F821 on single-name dims like `"b"`, so the `F722`/`F821` ignore the repo uses today stays needed (set it per file in `ruff.toml`). Runtime shape checking is optional (beartype or typeguard import hook) and off by default.
+- [x] Tensor shape annotations: `jaxtyping` (decided). Tested 2026-10-31 with jaxtyping 0.3.11 on numpy arrays (torch could not be installed in the container, so torch itself is untested): pyright reads `Float[np.ndarray, "b n d"]` as a plain `ndarray`, so shapes and dtypes are not checked statically. Ruff reports F722 on shape strings and F821 on single-name dims like `"b"`; keep the `F722`/`F821` ignore, set per file in `ruff.toml`. Runtime shape checking (beartype or typeguard import hook) is optional and off by default. If missing shape checks cost enough, extend pyright itself; evidence is tracked in [../shape-ledger.md](../shape-ledger.md).
 - [ ] Pyright mode to end at: `basic`, `standard` or `strict`, and for which paths. Strict only for new code (web-port tooling) is one option.
 - [ ] Which paths are out of scope: `src/f5_tts/runtime/triton_trtllm/` (TensorRT-LLM APIs), `src/third_party/`, notebooks or data prep scripts.
 - [ ] Policy on suppressions: only `# pyright: ignore[ruleName]` with the rule name, never bare `# type: ignore`. Comments that are temporary start with `CLAUDENOTE:` per `CLAUDE.md`.
@@ -32,7 +32,7 @@ Approach decided: pyright, and port many files at once, then drive the error cou
 
 ### Bulk conversion (many files at once)
 - [ ] Group files into a few batches by area: `model/` (cfm, backbones, modules, utils, dataset, trainer), `infer/` plus `api.py` and the socket files, `train/`, `eval/`, `scripts/`.
-- [ ] Apply the shape-annotation decision across `model/` in one pass.
+- [ ] Add `jaxtyping` as a dependency and convert the ein-notation annotations in `model/` to it in one pass.
 - [ ] Add parameter and return annotations across each batch without stopping to fix every error on the way. Behaviour must not change; run the existing inference path before and after (golden output from plan 00's harness, or a fixed-seed run).
 - [ ] Commit per batch so a bad batch can be reverted alone.
 
