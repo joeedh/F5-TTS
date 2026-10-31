@@ -30,39 +30,45 @@ No separate duration model. Total length is estimated from the ratio of referenc
 
 ## Model
 
-- `model/cfm.py` `CFM`: wraps a backbone. `forward` is the training loss (random mask span, conditional flow matching, audio/text condition dropout). `sample` is inference (ODE integration with classifier-free guidance, sway sampling, optional EPSS timesteps).
+- `model/cfm.py` `CFM`: wraps a backbone. `forward` is the training loss: a random span covering 70-100% of each sequence (`frac_lengths_mask`) is blanked in the conditioning mel, the model predicts `x1 - x0` along a linear noise-to-mel path, and the MSE is taken only inside the blanked span. The audio condition is dropped with probability 0.3, and audio plus text together with probability 0.2. `sample` is inference (ODE integration with classifier-free guidance, sway sampling, EPSS timesteps on by default when starting from t=0). Raw-waveform conditioning is converted to mel inside `sample`. Duration is clamped to at least prompt length, text length, plus one.
 - Backbones, picked by `model.backbone` in the YAML and resolved with `hydra.utils.get_class("f5_tts.model.<name>")`:
   - `DiT` (`backbones/dit.py`): used by F5-TTS. Text is embedded with a ConvNeXt stack and concatenated with noisy mel plus masked reference mel; AdaLN timestep conditioning.
-  - `MMDiT` (`backbones/mmdit.py`): two-stream joint attention, text and audio streams.
+  - `MMDiT` (`backbones/mmdit.py`): separate text and audio embeddings fed through `MMDiTBlock`s with joint attention (`JointAttnProcessor` in `modules.py`).
   - `UNetT` (`backbones/unett.py`): transformer with U-Net style skip connections (`skip_connect_type` concat/add/none); used by the `E2TTS_*` configs.
 - `model/modules.py`: shared blocks. Mel spectrogram, rotary embeddings, attention, feed-forward, ConvNeXt V2, AdaLN, sinusoidal time embedding.
 - `model/__init__.py` exports `CFM`, `DiT`, `MMDiT`, `UNetT`, `Trainer`.
 
 ## Configs
 
-`configs/<name>.yaml`, one per model: `F5TTS_v1_Base`, `F5TTS_v1_Small`, `F5TTS_Base`, `F5TTS_Small`, `E2TTS_Base`, `E2TTS_Small`. Sections: `datasets`, `optim`, `model` (backbone, arch, mel_spec, vocoder, tokenizer), `ckpts`, `hydra`. The same file drives training (`train/train.py`, via `@hydra.main`) and inference (`api.py` loads it with OmegaConf).
+`configs/<name>.yaml`, one per model: `F5TTS_v1_Base`, `F5TTS_v1_Small`, `F5TTS_Base`, `F5TTS_Small`, `E2TTS_Base`, `E2TTS_Small`. Sections: `datasets`, `optim`, `model` (backbone, arch, mel_spec, vocoder, tokenizer), `ckpts`, `hydra`. `arch` also carries `attn_backend` (`torch` or `flash_attn`) and `checkpoint_activations`. Training output goes to `ckpts/<model>_<mel>_<tokenizer>_<dataset>/`. The same file drives training (`train/train.py`, via `@hydra.main`) and inference (`api.py` loads it with OmegaConf).
 
 ## Inference path
 
 1. `api.F5TTS` loads the YAML, vocoder (`load_vocoder`) and checkpoint (`load_model`, downloaded from Hugging Face via `cached_path` unless `ckpt_file` is given).
 2. `preprocess_ref_audio_text`: trims/clips reference audio, transcribes with `openai/whisper-large-v3-turbo` (transformers pipeline) if no `ref_text` is given. Processed audio and transcripts are cached by MD5 of the input file. Reference audio is clipped to about 12 s, and `ref_text` is forced to end in sentence punctuation.
-3. `infer_process`: derives a per-chunk character budget from reference speaking rate, calls `chunk_text` to split `gen_text`.
-4. `infer_batch_process`: per chunk, runs `CFM.sample`, decodes with the vocoder, then cross-fades chunks together.
+3. `infer_process`: derives a per-chunk budget in UTF-8 bytes from the reference speaking rate, calls `chunk_text` to split `gen_text` at sentence punctuation (ASCII and CJK).
+4. `infer_batch_process`: reference audio is made mono, raised to RMS 0.1 if quieter, and resampled to 24 kHz. Per chunk it builds `ref_text + gen_text`, converts to pinyin, runs `CFM.sample`, drops the reference frames from the output, and decodes with the vocoder. Chunks under 10 bytes get speed x0.3. Non-streaming runs chunks in a `ThreadPoolExecutor` and cross-fades them (0.15 s default); streaming mode runs them in order and yields slices. With `fix_duration` and several chunks, the total is split across chunks by byte weight.
+
+Inference precision: fp16 on CUDA devices with compute capability 7+, else fp32; BigVGAN always fp32. Vocos is fetched from `charactr/vocos-mel-24khz`. BigVGAN (`nvidia/bigvgan_v2_24khz_100band_256x`) needs the `src/third_party/BigVGAN` git submodule, which is empty in this checkout.
 5. Optional: `remove_silence_for_generated_wav`, `save_spectrogram`.
 
-Other inference front ends reuse steps 2-5: `infer/infer_cli.py` (TOML config + flags), `infer/infer_gradio.py` (web UI, multi-speaker and chat tabs), `infer/speech_edit.py` (replace a span of existing audio), `socket_server.py` / `socket_client.py` (streaming over TCP).
+Other inference front ends reuse steps 2-5: `infer/infer_cli.py` (TOML config, CLI flags override it; named `[voices.<name>]` tables, selected in the text with `[name]` tags, `gen_file` for text from a file), `infer/infer_gradio.py` (tabs Basic-TTS, Multi-Speech, Voice-Chat, Credits; chat replies come from a Qwen2.5 model through `transformers`; custom checkpoint loading), `infer/speech_edit.py` (a script, not a CLI: settings and the edit regions are constants edited in the file, passed to `CFM.sample` as `edit_mask`; checkpoint comes from Hugging Face), `socket_server.py` / `socket_client.py`.
+
+`socket_server.py`: plain TCP, default port 9998, one client at a time. The client sends UTF-8 text; the server replies with raw float32 samples at 24 kHz and a final `END` marker. The first request is split into smaller chunks to cut time to first audio. Output is also written to `output.wav` by a background thread. `socket_client.py` plays the stream with PyAudio.
+
+`api.F5TTS.infer` wraps steps 2-3 with a seed (random if unset), then optional wav and spectrogram export.
 
 ## Training path
 
 1. Data prep scripts in `train/datasets/prepare_*.py` write an Arrow dataset plus `duration.json` and `vocab.txt` under `data/<dataset>_<tokenizer>/`.
 2. `train/train.py` builds `CFM(transformer=backbone(...))`, a `Trainer`, and the dataset from `model/dataset.py`.
-3. `model/dataset.py`: `HFDataset` / `CustomDataset` read samples; `DynamicBatchSampler` packs batches by total frames; `collate_fn` pads.
-4. `model/trainer.py` `Trainer`: Accelerate for multi-GPU, EMA copy, linear warmup then linear decay LR (`SequentialLR`), optional bitsandbytes 8-bit AdamW, wandb/tensorboard logging, periodic checkpoints to `ckpts/`.
-5. Fine-tuning: `train/finetune_cli.py` and `train/finetune_gradio.py` start from a pretrained checkpoint (`--pretrain`, default downloaded from Hugging Face per model) on a custom dataset.
+3. `model/dataset.py`: `load_dataset` returns `CustomDataset` (reads `data/<name>_<tokenizer>/raw.arrow` or `raw/`, or `mel.arrow` for precomputed mels, plus `duration.json`), or `HFDataset` for Hugging Face sources. `DynamicBatchSampler` sorts by frame length and packs batches under a per-GPU frame threshold, capped by `max_samples`. `collate_fn` zero-pads mels and keeps text as a list.
+4. `model/trainer.py` `Trainer`: Accelerate for multi-GPU, EMA copy, linear warmup then linear decay LR (`SequentialLR`), optional bitsandbytes 8-bit AdamW, wandb/tensorboard logging, checkpoints `model_<update>.pt` and `model_last.pt` (model, optimizer, EMA, scheduler, update count). Resume prefers `model_last.pt`, then the newest `model_*`, then a `pretrained_*` file.
+5. Fine-tuning: `train/finetune_cli.py` with `--finetune` copies a pretrained checkpoint (`--pretrain`, default downloaded from Hugging Face per model) into `ckpts/<dataset>/pretrained_<name>` and trains from it. `train/finetune_gradio.py` is a UI over the whole flow: Whisper transcription of uploaded audio, metadata/Arrow/vocab creation, vocab extension (`expand_model_embeddings` adds randomly initialised rows), launching `accelerate launch finetune_cli.py` as a subprocess, and checkpoint pruning.
 
 ## Tokenizer
 
-`model/utils.py` `get_tokenizer(dataset_name, tokenizer)`: `pinyin` (Chinese to pinyin, `convert_char_to_pinyin`), `char`, `byte`, or `custom` (path to a `vocab.txt`). Vocab file lives next to the dataset. `vocab.txt` must have space at index 0 (asserted); index 0 also stands in for any unknown character. Text batches are padded with `-1`. `byte` tokenizer has no vocab file and uses 256 ids.
+`model/utils.py` `get_tokenizer(dataset_name, tokenizer)`: `pinyin` (Chinese to pinyin, `convert_char_to_pinyin`), `char`, `byte`, or `custom` (path to a `vocab.txt`). Vocab file lives next to the dataset. Inference does not use these paths: `load_model` always uses tokenizer `custom` with a vocab file (default `infer/examples/vocab.txt`, same content as `data/Emilia_ZH_EN_pinyin/vocab.txt` apart from line endings) and always runs text through `convert_char_to_pinyin`. `vocab.txt` must have space at index 0 (asserted); index 0 also stands in for any unknown character. Text batches are padded with `-1`. `byte` tokenizer has no vocab file and uses 256 ids.
 
 ## Evaluation
 
