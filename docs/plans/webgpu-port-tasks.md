@@ -1,12 +1,56 @@
-# WebGPU port: task list
+# Task list: Python tooling, then the WebGPU port
 
-Goal: run F5-TTS inference (voice cloning from a reference clip) in a browser on WebGPU. Inference only, no training.
+Two bodies of work. Plan P (Python typing and tooling) comes first and is independent of the port. Plans 00 to 07 are the WebGPU port: run F5-TTS inference (voice cloning from a reference clip) in a browser on WebGPU, inference only, no training.
 
-Background and op inventory: see the WebGPU discussion summarized in section "Starting assumptions" below; model details in [../architecture.md](../architecture.md).
+Model details: [../architecture.md](../architecture.md). WebGPU in the cloud container: [../research/webgpu-environment.md](../research/webgpu-environment.md).
 
 Status values: `plan not written`, `plan drafted`, `plan pressure-tested`, `in progress`, `done`.
 
 Every plan, once written, is saved in this folder and pressure-tested by a fresh agent (given only the plan file) before work starts. Findings get folded into the plan.
+
+## Plan P: Python typing, formatter and linter
+
+Plan file (not written): [python-pyright-tooling.md](python-pyright-tooling.md). Status: `plan not written`. Depends on: nothing. Blocks: nothing, but the port's Python export scripts (plans 01, 02, 05) should be written under it.
+
+Where things stand (checked 2026-10-31): no type checker is configured. Ruff does lint, format and import sorting through pre-commit and the `pre-commit` GitHub workflow. Pyright 1.1.414 and mypy 2.3.1 are installed in the cloud container, but not torch. First pyright run without torch: 672 errors, 23 warnings over 47 files. Largest groups: missing imports 239, possibly-unbound variables 130, attribute access 109, invalid type arguments 69 (the ein-notation strings like `float["b n d"]`), argument types 60.
+
+Approach decided: pyright, and port many files at once, then drive the error count to zero afterwards. Not file by file, and not gated in CI until the count is zero.
+
+### Decisions to make first
+- [ ] Formatter. Ruff format is already in use. Candidate answer: keep it. Alternative is Black. Decide and write it down.
+- [ ] Linter. Ruff lint is already in use with default rules plus isort. Candidate answer: keep ruff and decide which extra rule sets to turn on (for example bugbear, pyupgrade, unused arguments), or keep the current set. Alternatives (flake8, pylint) add a second tool for little gain.
+- [ ] How to annotate tensor shapes now that the ein strings are invalid types. Options: `jaxtyping` (real shape types, new dependency), plain `Tensor` plus comments, or type aliases (`Float = Annotated[Tensor, ...]`). Pick one before the bulk pass, since it touches most of `model/`.
+- [ ] Pyright mode to end at: `basic`, `standard` or `strict`, and for which paths. Strict only for new code (web-port tooling) is one option.
+- [ ] Which paths are out of scope: `src/f5_tts/runtime/triton_trtllm/` (TensorRT-LLM APIs), `src/third_party/`, notebooks or data prep scripts.
+- [ ] Policy on suppressions: only `# pyright: ignore[ruleName]` with the rule name, never bare `# type: ignore`. Comments that are temporary start with `CLAUDENOTE:` per `CLAUDE.md`.
+
+### Setup
+- [ ] Make a reproducible environment with torch, torchaudio and the other runtime dependencies installed, so errors are real and not missing-import noise. Record how in `docs/debugging.md`.
+- [ ] Pin the pyright version (pre-commit, dev dependency, or both). Pyright updates often add errors.
+- [ ] Add `[tool.pyright]` to `pyproject.toml`: python version 3.10, include/exclude, start in `basic` mode, report missing imports as errors only after the environment is fixed.
+- [ ] Record the real baseline count with torch installed, by rule. This replaces the 672 figure.
+
+### Bulk conversion (many files at once)
+- [ ] Group files into a few batches by area: `model/` (cfm, backbones, modules, utils, dataset, trainer), `infer/` plus `api.py` and the socket files, `train/`, `eval/`, `scripts/`.
+- [ ] Apply the shape-annotation decision across `model/` in one pass.
+- [ ] Add parameter and return annotations across each batch without stopping to fix every error on the way. Behaviour must not change; run the existing inference path before and after (golden output from plan 00's harness, or a fixed-seed run).
+- [ ] Commit per batch so a bad batch can be reverted alone.
+
+### Drive errors to zero
+- [ ] Burn down by rule category, biggest first (possibly-unbound, attribute access, argument types, then the rest), fixing real bugs separately from annotation fixes.
+- [ ] Any real bug found goes into `docs/debugging.md` with its fix.
+- [ ] Review every suppression added; each needs a rule name and a reason.
+- [ ] Reach zero errors in the chosen mode and paths.
+
+### Lock it in
+- [ ] Add pyright to pre-commit and to the GitHub workflow, failing on errors.
+- [ ] Add the chosen formatter and linter settings to `pyproject.toml` or `ruff.toml` and run them across the repo once, as a single formatting commit.
+- [ ] Update `CLAUDE.md` with the commands to run (type check, lint, format) and the suppression policy.
+- [ ] Decide when to ratchet strictness (for example `standard` then `strict` per directory).
+
+# WebGPU port
+
+Goal as above. Plans 00 to 07 below.
 
 ## Starting assumptions
 
