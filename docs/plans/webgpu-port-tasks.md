@@ -17,9 +17,9 @@ Where things stand (checked 2026-10-31): no type checker is configured. Ruff doe
 Approach decided: pyright, and port many files at once, then drive the error count to zero afterwards. Not file by file, and not gated in CI until the count is zero.
 
 ### Decisions to make first
-- [ ] Formatter. Ruff format is already in use. Candidate answer: keep it. Alternative is Black. Decide and write it down.
-- [ ] Linter. Ruff lint is already in use with default rules plus isort. Candidate answer: keep ruff and decide which extra rule sets to turn on (for example bugbear, pyupgrade, unused arguments), or keep the current set. Alternatives (flake8, pylint) add a second tool for little gain.
-- [ ] How to annotate tensor shapes now that the ein strings are invalid types. Options: `jaxtyping` (real shape types, new dependency), plain `Tensor` plus comments, or type aliases (`Float = Annotated[Tensor, ...]`). Pick one before the bulk pass, since it touches most of `model/`.
+- [x] Formatter: keep `ruff format` (decided).
+- [x] Linter: keep `ruff` lint (decided). Still open inside it: whether to turn on extra rule sets (for example bugbear, pyupgrade, unused arguments) or keep the current set.
+- [ ] How to annotate tensor shapes now that the ein strings are invalid types. Options: `jaxtyping` (new dependency), plain `Tensor` plus comments, or type aliases (`Float = Annotated[Tensor, ...]`). Pick one before the bulk pass, since it touches most of `model/`. Tested 2026-10-31 with jaxtyping 0.3.11 on numpy arrays (torch could not be installed in the container, so torch itself is untested): pyright reads `Float[np.ndarray, "b n d"]` as a plain `ndarray`. It checks the array class but ignores dtype and shape, so wrong shapes are not caught statically. Ruff reports F722 on shape strings and F821 on single-name dims like `"b"`, so the `F722`/`F821` ignore the repo uses today stays needed (set it per file in `ruff.toml`). Runtime shape checking is optional (beartype or typeguard import hook) and off by default.
 - [ ] Pyright mode to end at: `basic`, `standard` or `strict`, and for which paths. Strict only for new code (web-port tooling) is one option.
 - [ ] Which paths are out of scope: `src/f5_tts/runtime/triton_trtllm/` (TensorRT-LLM APIs), `src/third_party/`, notebooks or data prep scripts.
 - [ ] Policy on suppressions: only `# pyright: ignore[ruleName]` with the rule name, never bare `# type: ignore`. Comments that are temporary start with `CLAUDENOTE:` per `CLAUDE.md`.
