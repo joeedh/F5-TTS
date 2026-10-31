@@ -34,7 +34,7 @@ No separate duration model. Total length is estimated from the ratio of referenc
 - Backbones, picked by `model.backbone` in the YAML and resolved with `hydra.utils.get_class("f5_tts.model.<name>")`:
   - `DiT` (`backbones/dit.py`): used by F5-TTS. Text is embedded with a ConvNeXt stack and concatenated with noisy mel plus masked reference mel; AdaLN timestep conditioning.
   - `MMDiT` (`backbones/mmdit.py`): two-stream joint attention, text and audio streams.
-  - `UNetT` (`backbones/unett.py`): U-Net style with skip connections; used by E2-TTS.
+  - `UNetT` (`backbones/unett.py`): transformer with U-Net style skip connections (`skip_connect_type` concat/add/none); used by the `E2TTS_*` configs.
 - `model/modules.py`: shared blocks. Mel spectrogram, rotary embeddings, attention, feed-forward, ConvNeXt V2, AdaLN, sinusoidal time embedding.
 - `model/__init__.py` exports `CFM`, `DiT`, `MMDiT`, `UNetT`, `Trainer`.
 
@@ -45,7 +45,7 @@ No separate duration model. Total length is estimated from the ratio of referenc
 ## Inference path
 
 1. `api.F5TTS` loads the YAML, vocoder (`load_vocoder`) and checkpoint (`load_model`, downloaded from Hugging Face via `cached_path` unless `ckpt_file` is given).
-2. `preprocess_ref_audio_text`: trims/clips reference audio, transcribes with Whisper if no `ref_text` is given.
+2. `preprocess_ref_audio_text`: trims/clips reference audio, transcribes with `openai/whisper-large-v3-turbo` (transformers pipeline) if no `ref_text` is given. Processed audio and transcripts are cached by MD5 of the input file. Reference audio is clipped to about 12 s, and `ref_text` is forced to end in sentence punctuation.
 3. `infer_process`: derives a per-chunk character budget from reference speaking rate, calls `chunk_text` to split `gen_text`.
 4. `infer_batch_process`: per chunk, runs `CFM.sample`, decodes with the vocoder, then cross-fades chunks together.
 5. Optional: `remove_silence_for_generated_wav`, `save_spectrogram`.
@@ -57,23 +57,23 @@ Other inference front ends reuse steps 2-5: `infer/infer_cli.py` (TOML config + 
 1. Data prep scripts in `train/datasets/prepare_*.py` write an Arrow dataset plus `duration.json` and `vocab.txt` under `data/<dataset>_<tokenizer>/`.
 2. `train/train.py` builds `CFM(transformer=backbone(...))`, a `Trainer`, and the dataset from `model/dataset.py`.
 3. `model/dataset.py`: `HFDataset` / `CustomDataset` read samples; `DynamicBatchSampler` packs batches by total frames; `collate_fn` pads.
-4. `model/trainer.py` `Trainer`: Accelerate for multi-GPU, EMA copy, warmup+linear decay LR, optional bitsandbytes 8-bit AdamW, wandb/tensorboard logging, periodic checkpoints to `ckpts/`.
-5. Fine-tuning: `train/finetune_cli.py` and `train/finetune_gradio.py` start from a pretrained checkpoint on a custom dataset.
+4. `model/trainer.py` `Trainer`: Accelerate for multi-GPU, EMA copy, linear warmup then linear decay LR (`SequentialLR`), optional bitsandbytes 8-bit AdamW, wandb/tensorboard logging, periodic checkpoints to `ckpts/`.
+5. Fine-tuning: `train/finetune_cli.py` and `train/finetune_gradio.py` start from a pretrained checkpoint (`--pretrain`, default downloaded from Hugging Face per model) on a custom dataset.
 
 ## Tokenizer
 
-`model/utils.py` `get_tokenizer(dataset_name, tokenizer)`: `pinyin` (Chinese to pinyin, `convert_char_to_pinyin`), `char`, `byte`, or `custom` (path to a `vocab.txt`). Vocab file lives next to the dataset. Index 0 is the filler/space token; text is padded with `-1`.
+`model/utils.py` `get_tokenizer(dataset_name, tokenizer)`: `pinyin` (Chinese to pinyin, `convert_char_to_pinyin`), `char`, `byte`, or `custom` (path to a `vocab.txt`). Vocab file lives next to the dataset. `vocab.txt` must have space at index 0 (asserted); index 0 also stands in for any unknown character. Text batches are padded with `-1`. `byte` tokenizer has no vocab file and uses 256 ids.
 
 ## Evaluation
 
-`eval/`: batch inference over LibriSpeech-PC test-clean and Seed-TTS test sets, then WER (Whisper / FunASR), speaker similarity (`ecapa_tdnn.py`), and UTMOS. Needs the `eval` extra.
+`eval/`: batch inference over LibriSpeech-PC test-clean and Seed-TTS test sets, then WER (faster-whisper large-v3 for English, FunASR paraformer-zh for Chinese), speaker similarity (ECAPA-TDNN on WavLM-large features, `ecapa_tdnn.py`), and UTMOS. Checkpoints are expected under `../checkpoints/`. Needs the `eval` extra.
 
 ## Deployment
 
-`runtime/triton_trtllm/`: TensorRT-LLM engine conversion (`scripts/convert_checkpoint.py`), vocoder ONNX export, Triton model repo, gRPC/HTTP clients, benchmarks, Docker files. Contains patched copies of model code under `patch/`; keep those in sync by hand when `model/` changes.
+`runtime/triton_trtllm/`: TensorRT-LLM engine conversion (`scripts/convert_checkpoint.py`), vocoder ONNX export, Triton model repo, gRPC/HTTP clients, benchmarks, Docker files. `patch/` is not a copy of `model/`. It holds F5-TTS model definitions written against the TensorRT-LLM API, and `run.sh` copies it into the installed `tensorrt_llm/models` package before `trtllm-build`.
 
 ## Misc
 
-- `device_utils.py` `get_default_device`: cuda, then xpu, mps, npu, else cpu.
+- `device_utils.py` `get_default_device`: `torch.accelerator.current_accelerator()` if the torch build has it, otherwise probes cuda, npu, xpu, mps in that order, else cpu.
 - `scripts/`: parameter/FLOP counting and epoch math helpers.
 - `data/`: tokenizer vocab and eval lists. `ckpts/`: checkpoint output dir.
