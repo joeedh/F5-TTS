@@ -17,6 +17,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - ODE loop, chunking, cross-fade and text front end live in JS/TS.
 - Language scope: English and Chinese, as the pretrained model supports.
 - No in-browser ASR in the first version; the user supplies the reference text.
+- App code stays MIT for now. Revisit the app licence when the weights are published (decided).
 - We publish the converted ONNX weights in our own Hugging Face repo (decided); the browser downloads from there. Not LFS in a GitHub repo: bandwidth quota, and Pages does not serve LFS content.
 
 ## Plans
@@ -86,6 +87,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 
 ### 05 Weight delivery, precision and quantization
 - [ ] Hugging Face hosting (decided). The browser needs converted ONNX files, so we publish them in our own repo (decided). Derivative of CC-BY-NC weights: repo owner, CC-BY-NC licence tag, model card crediting the F5-TTS authors and the Emilia dataset, link to the original `SWivid/F5-TTS` repo, and a statement that use is non-commercial.
+- [ ] Keep weights out of the app repo and its licence: the app downloads them from the Hugging Face repo, and the app README states the weights carry their own licence.
 - [ ] Script that converts the original safetensors to the published ONNX files and uploads them, so the repo can be rebuilt.
 - [ ] Download plan for roughly 0.7 to 1.3 GB: CORS check on the chosen URLs, progress UI, resume, file sharding.
 - [ ] Cache in OPFS or IndexedDB; versioning and eviction.
@@ -110,6 +112,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 ## Open questions
 
 - Is exact numerical match with PyTorch required, or only equal audio quality?
-- Exact attribution wording for the model card, and confirming the app stays non-commercial. Gate for plan 05: nothing is published until this is settled.
+- Exact attribution wording for the model card. Gate for plan 05: nothing is published until this is settled.
+- App licence at publish time. MIT code with separately licensed CC-BY-NC weights is how upstream does it, so the code may not need to change as long as the weights are downloaded separately and not bundled in the app repo. If the app is hosted as a product and non-commercial use is intended, decide whether the app should say so. Revisit when plan 05 publishes.
 - Which browsers are in scope.
 - Whether the Python package should gain a `webgpu/` export script entry point or this stays a separate project.
