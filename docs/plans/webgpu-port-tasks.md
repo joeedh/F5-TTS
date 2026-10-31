@@ -17,7 +17,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - ODE loop, chunking, cross-fade and text front end live in JS/TS.
 - Language scope: English and Chinese, as the pretrained model supports.
 - No in-browser ASR in the first version; the user supplies the reference text.
-- Weights are downloaded by the browser from Hugging Face (decided). Not LFS in a GitHub repo: bandwidth quota, and Pages does not serve LFS content.
+- We publish the converted ONNX weights in our own Hugging Face repo (decided); the browser downloads from there. Not LFS in a GitHub repo: bandwidth quota, and Pages does not serve LFS content.
 
 ## Plans
 
@@ -85,7 +85,8 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] End-to-end test against golden wav with injected noise.
 
 ### 05 Weight delivery, precision and quantization
-- [ ] Hugging Face hosting (decided). Open point: the browser needs converted ONNX files, not the original `SWivid/F5-TTS` safetensors, so the converted files need their own Hugging Face repo (a derivative of CC-BY-NC weights). Decide the repo owner, model card and attribution, or decide to convert in the browser from the original safetensors instead.
+- [ ] Hugging Face hosting (decided). The browser needs converted ONNX files, so we publish them in our own repo (decided). Derivative of CC-BY-NC weights: repo owner, CC-BY-NC licence tag, model card crediting the F5-TTS authors and the Emilia dataset, link to the original `SWivid/F5-TTS` repo, and a statement that use is non-commercial.
+- [ ] Script that converts the original safetensors to the published ONNX files and uploads them, so the repo can be rebuilt.
 - [ ] Download plan for roughly 0.7 to 1.3 GB: CORS check on the chosen URLs, progress UI, resume, file sharding.
 - [ ] Cache in OPFS or IndexedDB; versioning and eviction.
 - [ ] fp16 path with `shader-f16` detection; fp32 fallback.
@@ -109,6 +110,6 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 ## Open questions
 
 - Is exact numerical match with PyTorch required, or only equal audio quality?
-- Licence terms for publishing converted weights on Hugging Face (CC-BY-NC applies; confirm attribution wording and that the app is non-commercial). Gate for plan 05.
+- Exact attribution wording for the model card, and confirming the app stays non-commercial. Gate for plan 05: nothing is published until this is settled.
 - Which browsers are in scope.
 - Whether the Python package should gain a `webgpu/` export script entry point or this stays a separate project.
