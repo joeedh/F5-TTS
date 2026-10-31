@@ -10,7 +10,7 @@ Every plan, once written, is saved in this folder and pressure-tested by a fresh
 
 ## Plan P: Python typing, formatter and linter
 
-Plan file (not written): [python-pyright-tooling.md](python-pyright-tooling.md). Status: `plan not written`. Depends on: nothing. Blocks: nothing, but the port's Python export scripts (plans 01, 02, 05) should be written under it.
+Plan file: [python-pyright-tooling.md](python-pyright-tooling.md). Status: `plan pressure-tested`. Depends on: nothing. Blocks: nothing, but the port's Python export scripts (plans 01, 02, 05) should be written under it.
 
 Where things stand (checked 2026-10-31): no type checker is configured. Ruff does lint, format and import sorting through pre-commit and the `pre-commit` GitHub workflow. Pyright 1.1.414 and mypy 2.3.1 are installed in the cloud container, but not torch. First pyright run without torch: 672 errors, 23 warnings over 47 files. Largest groups: missing imports 239, possibly-unbound variables 130, attribute access 109, invalid type arguments 69 (the ein-notation strings like `float["b n d"]`), argument types 60.
 
