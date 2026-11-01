@@ -122,7 +122,8 @@ Batches, in this order. Each batch is one commit and is followed by the guard fr
 
 Progress:
 - Batch A done 2026-11-01. Pyright errors 457 to 215 (all 69 ein-string errors gone, no undefined names). Guard passes. `tools/typing_guard/annotation_only.py` confirms all six files differ from HEAD only by annotations, imports and the two new aliases (`Rope`, `_T`). Details below the list.
-- Batches B to E: not started.
+- Batch B done 2026-11-01 (`model/dataset.py`, `model/trainer.py`). Errors 215 to 211. Annotation-only check and guard pass. Found for step 5, not fixed here: `preprocessed_mel` is unbound in the `CustomDatasetPath` branch of `load_dataset` (`dataset.py`, passed to `CustomDataset`); that branch raises `UnboundLocalError` when used.
+- Batches C to E: not started.
 
 Batch A notes:
 - Both bare `# type: ignore` in `modules.py` were removed outright; pyright reports nothing on those lines, so no replacement was needed.

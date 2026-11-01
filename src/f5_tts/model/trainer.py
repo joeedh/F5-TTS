@@ -3,6 +3,7 @@ from __future__ import annotations
 import gc
 import math
 import os
+from typing import Any
 
 import torch
 import torchaudio
@@ -27,33 +28,33 @@ class Trainer:
     def __init__(
         self,
         model: CFM,
-        epochs,
-        learning_rate,
-        num_warmup_updates=20000,
-        save_per_updates=1000,
+        epochs: int,
+        learning_rate: float,
+        num_warmup_updates: int = 20000,
+        save_per_updates: int = 1000,
         keep_last_n_checkpoints: int = -1,  # -1 to keep all, 0 to not save intermediate, > 0 to keep last N checkpoints
-        checkpoint_path=None,
-        batch_size_per_gpu=32,
+        checkpoint_path: str | None = None,
+        batch_size_per_gpu: int = 32,
         batch_size_type: str = "sample",
-        max_samples=32,
-        grad_accumulation_steps=1,
-        max_grad_norm=1.0,
+        max_samples: int = 32,
+        grad_accumulation_steps: int = 1,
+        max_grad_norm: float = 1.0,
         noise_scheduler: str | None = None,
         duration_predictor: torch.nn.Module | None = None,
         logger: str | None = "wandb",  # "wandb" | "tensorboard" | None
-        wandb_project="test_f5-tts",
-        wandb_run_name="test_run",
-        wandb_resume_id: str = None,
+        wandb_project: str = "test_f5-tts",
+        wandb_run_name: str = "test_run",
+        wandb_resume_id: str | None = None,
         log_samples: bool = False,
-        last_per_updates=None,
-        accelerate_kwargs: dict = dict(),
-        ema_kwargs: dict = dict(),
+        last_per_updates: int | None = None,
+        accelerate_kwargs: dict[str, Any] = dict(),  # Any: forwarded to Accelerator
+        ema_kwargs: dict[str, Any] = dict(),  # Any: forwarded to EMA
         bnb_optimizer: bool = False,
         mel_spec_type: str = "vocos",  # "vocos" | "bigvgan"
         is_local_vocoder: bool = False,  # use local path vocoder
         local_vocoder_path: str = "",  # local vocoder path
-        model_cfg_dict: dict = dict(),  # training config
-    ):
+        model_cfg_dict: dict[str, Any] = dict(),  # training config; Any: values of mixed types, logged as is
+    ) -> None:
         ddp_kwargs = DistributedDataParallelKwargs(find_unused_parameters=True)
 
         if logger == "wandb" and not wandb.api.api_key:
@@ -144,10 +145,10 @@ class Trainer:
         self.model, self.optimizer = self.accelerator.prepare(self.model, self.optimizer)
 
     @property
-    def is_main(self):
+    def is_main(self) -> bool:
         return self.accelerator.is_main_process
 
-    def save_checkpoint(self, update, last=False):
+    def save_checkpoint(self, update: int, last: bool = False) -> None:
         self.accelerator.wait_for_everyone()
         if self.is_main:
             checkpoint = dict(
@@ -182,7 +183,7 @@ class Trainer:
                         os.remove(os.path.join(self.checkpoint_path, oldest_checkpoint))
                         print(f"Removed old checkpoint: {oldest_checkpoint}")
 
-    def load_checkpoint(self):
+    def load_checkpoint(self) -> int:
         if (
             not exists(self.checkpoint_path)
             or not os.path.exists(self.checkpoint_path)
@@ -262,7 +263,7 @@ class Trainer:
         gc.collect()
         return update
 
-    def train(self, train_dataset: Dataset, num_workers=16, resumable_with_seed: int = None):
+    def train(self, train_dataset: Dataset, num_workers: int = 16, resumable_with_seed: int | None = None) -> None:
         if self.log_samples:
             from f5_tts.infer.utils_infer import cfg_strength, load_vocoder, nfe_step, sway_sampling_coef
 

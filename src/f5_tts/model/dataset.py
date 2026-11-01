@@ -1,12 +1,14 @@
 import json
+from collections.abc import Iterator
 from importlib.resources import files
+from typing import Any
 
 import torch
 import torch.nn.functional as F
 import torchaudio
 from datasets import Dataset as Dataset_
 from datasets import load_from_disk
-from torch import nn
+from torch import Tensor, nn
 from torch.utils.data import Dataset, Sampler
 from tqdm import tqdm
 
@@ -18,13 +20,13 @@ class HFDataset(Dataset):
     def __init__(
         self,
         hf_dataset: Dataset,
-        target_sample_rate=24_000,
-        n_mel_channels=100,
-        hop_length=256,
-        n_fft=1024,
-        win_length=1024,
-        mel_spec_type="vocos",
-    ):
+        target_sample_rate: int = 24_000,
+        n_mel_channels: int = 100,
+        hop_length: int = 256,
+        n_fft: int = 1024,
+        win_length: int = 1024,
+        mel_spec_type: str = "vocos",
+    ) -> None:
         self.data = hf_dataset
         self.target_sample_rate = target_sample_rate
         self.hop_length = hop_length
@@ -39,16 +41,16 @@ class HFDataset(Dataset):
         )
         self._resamplers = {}
 
-    def get_frame_len(self, index):
+    def get_frame_len(self, index: int) -> float:
         row = self.data[index]
         audio = row["audio"]["array"]
         sample_rate = row["audio"]["sampling_rate"]
         return audio.shape[-1] / sample_rate * self.target_sample_rate / self.hop_length
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.data)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> dict[str, Tensor | str]:
         row = self.data[index]
         audio = row["audio"]["array"]
 
@@ -83,16 +85,16 @@ class CustomDataset(Dataset):
     def __init__(
         self,
         custom_dataset: Dataset,
-        durations=None,
-        target_sample_rate=24_000,
-        hop_length=256,
-        n_mel_channels=100,
-        n_fft=1024,
-        win_length=1024,
-        mel_spec_type="vocos",
-        preprocessed_mel=False,
+        durations: list[float] | None = None,
+        target_sample_rate: int = 24_000,
+        hop_length: int = 256,
+        n_mel_channels: int = 100,
+        n_fft: int = 1024,
+        win_length: int = 1024,
+        mel_spec_type: str = "vocos",
+        preprocessed_mel: bool = False,
         mel_spec_module: nn.Module | None = None,
-    ):
+    ) -> None:
         self.data = custom_dataset
         self.durations = durations
         self.target_sample_rate = target_sample_rate
@@ -116,17 +118,17 @@ class CustomDataset(Dataset):
             )
         self._resamplers = {}
 
-    def get_frame_len(self, index):
+    def get_frame_len(self, index: int) -> float:
         if (
             self.durations is not None
         ):  # Please make sure the separately provided durations are correct, otherwise 99.99% OOM
             return self.durations[index] * self.target_sample_rate / self.hop_length
         return self.data[index]["duration"] * self.target_sample_rate / self.hop_length
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.data)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> dict[str, Tensor | str]:
         while True:
             row = self.data[index]
             audio_path = row["audio_path"]
@@ -177,8 +179,13 @@ class DynamicBatchSampler(Sampler[list[int]]):
     """
 
     def __init__(
-        self, sampler: Sampler[int], frames_threshold: int, max_samples=0, random_seed=None, drop_residual: bool = False
-    ):
+        self,
+        sampler: Sampler[int],
+        frames_threshold: int,
+        max_samples: int = 0,
+        random_seed: int | None = None,
+        drop_residual: bool = False,
+    ) -> None:
         self.sampler = sampler
         self.frames_threshold = frames_threshold
         self.max_samples = max_samples
@@ -225,7 +232,7 @@ class DynamicBatchSampler(Sampler[list[int]]):
         """Sets the epoch for this sampler."""
         self.epoch = epoch
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[list[int]]:
         # Use both random_seed and epoch for deterministic but different shuffling per epoch
         if self.random_seed is not None:
             g = torch.Generator()
@@ -237,7 +244,7 @@ class DynamicBatchSampler(Sampler[list[int]]):
             batches = self.batches
         return iter(batches)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.batches)
 
 
@@ -250,7 +257,7 @@ def load_dataset(
     dataset_type: str = "CustomDataset",
     audio_type: str = "raw",
     mel_spec_module: nn.Module | None = None,
-    mel_spec_kwargs: dict = dict(),
+    mel_spec_kwargs: dict[str, Any] = dict(),  # Any: forwarded to CustomDataset / MelSpec
 ) -> CustomDataset | HFDataset:
     """
     dataset_type    - "CustomDataset" if you want to use tokenizer name and default data path to load for train_dataset
@@ -310,7 +317,7 @@ def load_dataset(
 # collation
 
 
-def collate_fn(batch):
+def collate_fn(batch: list[dict[str, Tensor | str]]) -> dict[str, Tensor | list[str]]:
     mel_specs = [item["mel_spec"].squeeze(0) for item in batch]
     mel_lengths = torch.LongTensor([spec.shape[-1] for spec in mel_specs])
     max_mel_length = mel_lengths.amax()
