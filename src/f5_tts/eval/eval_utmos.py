@@ -9,7 +9,7 @@ from tqdm import tqdm
 from f5_tts.device_utils import get_default_device
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="UTMOS Evaluation")
     parser.add_argument("--audio_dir", type=str, required=True, help="Audio file path.")
     parser.add_argument("--ext", type=str, default="wav", help="Audio extension.")

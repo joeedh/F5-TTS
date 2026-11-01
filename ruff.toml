@@ -17,3 +17,5 @@ lines-after-imports = 2
 "src/f5_tts/model/backbones/dit.py" = ["F722", "F821"]
 "src/f5_tts/model/backbones/mmdit.py" = ["F722", "F821"]
 "src/f5_tts/model/backbones/unett.py" = ["F722", "F821"]
+"src/f5_tts/eval/ecapa_tdnn.py" = ["F722", "F821"]
+"src/f5_tts/eval/utils_eval.py" = ["F722", "F821"]

@@ -3,10 +3,13 @@ import os
 import random
 import string
 from pathlib import Path
+from typing import Any
 
 import torch
 import torch.nn.functional as F
 import torchaudio
+from jaxtyping import Float
+from torch import Tensor
 from tqdm import tqdm
 
 from f5_tts.eval.ecapa_tdnn import ECAPA_TDNN_SMALL
@@ -15,7 +18,7 @@ from f5_tts.model.utils import convert_char_to_pinyin
 
 
 # seedtts testset metainfo: utt, prompt_text, prompt_wav, gt_text, gt_wav
-def get_seedtts_testset_metainfo(metalst):
+def get_seedtts_testset_metainfo(metalst: str) -> list[tuple[str, str, str, str, str]]:
     f = open(metalst)
     lines = f.readlines()
     f.close()
@@ -33,7 +36,9 @@ def get_seedtts_testset_metainfo(metalst):
 
 
 # librispeech test-clean metainfo: gen_utt, ref_txt, ref_wav, gen_txt, gen_wav
-def get_librispeech_test_clean_metainfo(metalst, librispeech_test_clean_path):
+def get_librispeech_test_clean_metainfo(
+    metalst: str, librispeech_test_clean_path: str
+) -> list[tuple[str, str, str, str, str]]:
     f = open(metalst)
     lines = f.readlines()
     f.close()
@@ -55,7 +60,7 @@ def get_librispeech_test_clean_metainfo(metalst, librispeech_test_clean_path):
 
 
 # padded to max length mel batch
-def padded_mel_batch(ref_mels):
+def padded_mel_batch(ref_mels: list[Float[Tensor, "d t"]]) -> Float[Tensor, "b t d"]:
     max_mel_length = torch.LongTensor([mel.shape[-1] for mel in ref_mels]).amax()
     padded_ref_mels = []
     for mel in ref_mels:
@@ -70,23 +75,23 @@ def padded_mel_batch(ref_mels):
 
 
 def get_inference_prompt(
-    metainfo,
-    speed=1.0,
-    tokenizer="pinyin",
-    polyphone=True,
-    target_sample_rate=24000,
-    n_fft=1024,
-    win_length=1024,
-    n_mel_channels=100,
-    hop_length=256,
-    mel_spec_type="vocos",
-    target_rms=0.1,
-    use_truth_duration=False,
-    infer_batch_size=1,
-    num_buckets=200,
-    min_secs=3,
-    max_secs=40,
-):
+    metainfo: list[tuple[str, str, str, str, str]],
+    speed: float = 1.0,
+    tokenizer: str = "pinyin",
+    polyphone: bool = True,
+    target_sample_rate: int = 24000,
+    n_fft: int = 1024,
+    win_length: int = 1024,
+    n_mel_channels: int = 100,
+    hop_length: int = 256,
+    mel_spec_type: str = "vocos",
+    target_rms: float = 0.1,
+    use_truth_duration: bool = False,
+    infer_batch_size: int = 1,
+    num_buckets: int = 200,
+    min_secs: int = 3,
+    max_secs: int = 40,
+) -> list[tuple[list[str], list[Tensor], Float[Tensor, "b t d"], list[int], list[int], list[list[str]] | list[str]]]:
     prompts_all = []
 
     min_tokens = min_secs * target_sample_rate // hop_length
@@ -209,7 +214,7 @@ def get_inference_prompt(
 # https://github.com/BytedanceSpeech/seed-tts-eval
 
 
-def get_seed_tts_test(metalst, gen_wav_dir, gpus):
+def get_seed_tts_test(metalst: str, gen_wav_dir: str, gpus: list[int]) -> list[tuple[int, list[tuple[str, str, str]]]]:
     f = open(metalst)
     lines = f.readlines()
     f.close()
@@ -244,7 +249,9 @@ def get_seed_tts_test(metalst, gen_wav_dir, gpus):
 # get librispeech test-clean cross sentence test
 
 
-def get_librispeech_test(metalst, gen_wav_dir, gpus, librispeech_test_clean_path, eval_ground_truth=False):
+def get_librispeech_test(
+    metalst: str, gen_wav_dir: str, gpus: list[int], librispeech_test_clean_path: str, eval_ground_truth: bool = False
+) -> list[tuple[int, list[tuple[str, str, str]]]]:
     f = open(metalst)
     lines = f.readlines()
     f.close()
@@ -281,7 +288,7 @@ def get_librispeech_test(metalst, gen_wav_dir, gpus, librispeech_test_clean_path
 # load asr model
 
 
-def load_asr_model(lang, ckpt_dir=""):
+def load_asr_model(lang: str, ckpt_dir: str = "") -> Any:  # Any: funasr AutoModel or faster_whisper WhisperModel
     if lang == "zh":
         from funasr import AutoModel
 
@@ -305,7 +312,7 @@ def load_asr_model(lang, ckpt_dir=""):
 # WER Evaluation, the way Seed-TTS does
 
 
-def run_asr_wer(args):
+def run_asr_wer(args: tuple[int, str, list[tuple[str, str, str]], str]) -> list[dict[str, str | float]]:
     rank, lang, test_set, ckpt_dir = args
 
     if lang == "zh":
@@ -379,7 +386,7 @@ def run_asr_wer(args):
 # SIM Evaluation
 
 
-def run_sim(args):
+def run_sim(args: tuple[int, list[tuple[str, str, str]], str]) -> list[dict[str, str | float]]:
     rank, test_set, ckpt_dir = args
     device = f"cuda:{rank}"
 

@@ -20,7 +20,7 @@ from f5_tts.eval.utils_eval import get_seed_tts_test, run_asr_wer, run_sim
 rel_path = str(files("f5_tts").joinpath("../../"))
 
 
-def get_args():
+def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--eval_task", type=str, default="wer", choices=["sim", "wer"])
     parser.add_argument("-l", "--lang", type=str, default="en", choices=["zh", "en"])
@@ -32,7 +32,7 @@ def get_args():
     return parser.parse_args()
 
 
-def parse_gpu_nums(gpu_nums_str):
+def parse_gpu_nums(gpu_nums_str: str) -> list[int]:
     try:
         if gpu_nums_str.startswith("[") and gpu_nums_str.endswith("]"):
             gpu_list = ast.literal_eval(gpu_nums_str)
@@ -45,7 +45,7 @@ def parse_gpu_nums(gpu_nums_str):
         )
 
 
-def main():
+def main() -> None:
     args = get_args()
     eval_task = args.eval_task
     lang = args.lang

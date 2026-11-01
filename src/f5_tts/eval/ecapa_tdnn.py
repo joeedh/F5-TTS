@@ -8,6 +8,8 @@ import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from jaxtyping import Float
+from torch import Tensor
 
 
 """ Res2Conv1d + BatchNorm1d + ReLU
@@ -19,7 +21,16 @@ class Res2Conv1dReluBn(nn.Module):
     in_channels == out_channels == channels
     """
 
-    def __init__(self, channels, kernel_size=1, stride=1, padding=0, dilation=1, bias=True, scale=4):
+    def __init__(
+        self,
+        channels: int,
+        kernel_size: int = 1,
+        stride: int = 1,
+        padding: int = 0,
+        dilation: int = 1,
+        bias: bool = True,
+        scale: int = 4,
+    ) -> None:
         super().__init__()
         assert channels % scale == 0, "{} % {} != 0".format(channels, scale)
         self.scale = scale
@@ -34,7 +45,7 @@ class Res2Conv1dReluBn(nn.Module):
         self.convs = nn.ModuleList(self.convs)
         self.bns = nn.ModuleList(self.bns)
 
-    def forward(self, x):
+    def forward(self, x: Float[Tensor, "b c t"]) -> Float[Tensor, "b c t2"]:
         out = []
         spx = torch.split(x, self.width, 1)
         for i in range(self.nums):
@@ -58,12 +69,21 @@ class Res2Conv1dReluBn(nn.Module):
 
 
 class Conv1dReluBn(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size=1, stride=1, padding=0, dilation=1, bias=True):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int = 1,
+        stride: int = 1,
+        padding: int = 0,
+        dilation: int = 1,
+        bias: bool = True,
+    ) -> None:
         super().__init__()
         self.conv = nn.Conv1d(in_channels, out_channels, kernel_size, stride, padding, dilation, bias=bias)
         self.bn = nn.BatchNorm1d(out_channels)
 
-    def forward(self, x):
+    def forward(self, x: Float[Tensor, "b ci t"]) -> Float[Tensor, "b co t2"]:
         return self.bn(F.relu(self.conv(x)))
 
 
@@ -72,12 +92,12 @@ class Conv1dReluBn(nn.Module):
 
 
 class SE_Connect(nn.Module):
-    def __init__(self, channels, se_bottleneck_dim=128):
+    def __init__(self, channels: int, se_bottleneck_dim: int = 128) -> None:
         super().__init__()
         self.linear1 = nn.Linear(channels, se_bottleneck_dim)
         self.linear2 = nn.Linear(se_bottleneck_dim, channels)
 
-    def forward(self, x):
+    def forward(self, x: Float[Tensor, "b c t"]) -> Float[Tensor, "b c t"]:
         out = x.mean(dim=2)
         out = F.relu(self.linear1(out))
         out = torch.sigmoid(self.linear2(out))
@@ -99,7 +119,17 @@ class SE_Connect(nn.Module):
 
 
 class SE_Res2Block(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride, padding, dilation, scale, se_bottleneck_dim):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        stride: int,
+        padding: int,
+        dilation: int,
+        scale: int,
+        se_bottleneck_dim: int,
+    ) -> None:
         super().__init__()
         self.Conv1dReluBn1 = Conv1dReluBn(in_channels, out_channels, kernel_size=1, stride=1, padding=0)
         self.Res2Conv1dReluBn = Res2Conv1dReluBn(out_channels, kernel_size, stride, padding, dilation, scale=scale)
@@ -114,7 +144,7 @@ class SE_Res2Block(nn.Module):
                 kernel_size=1,
             )
 
-    def forward(self, x):
+    def forward(self, x: Float[Tensor, "b ci t"]) -> Float[Tensor, "b co t"]:
         residual = x
         if self.shortcut:
             residual = self.shortcut(x)
@@ -132,7 +162,7 @@ class SE_Res2Block(nn.Module):
 
 
 class AttentiveStatsPool(nn.Module):
-    def __init__(self, in_dim, attention_channels=128, global_context_att=False):
+    def __init__(self, in_dim: int, attention_channels: int = 128, global_context_att: bool = False) -> None:
         super().__init__()
         self.global_context_att = global_context_att
 
@@ -143,7 +173,7 @@ class AttentiveStatsPool(nn.Module):
             self.linear1 = nn.Conv1d(in_dim, attention_channels, kernel_size=1)  # equals W and b in the paper
         self.linear2 = nn.Conv1d(attention_channels, in_dim, kernel_size=1)  # equals V and k in the paper
 
-    def forward(self, x):
+    def forward(self, x: Float[Tensor, "b c t"]) -> Float[Tensor, "b c2"]:
         if self.global_context_att:
             context_mean = torch.mean(x, dim=-1, keepdim=True).expand_as(x)
             context_std = torch.sqrt(torch.var(x, dim=-1, keepdim=True) + 1e-10).expand_as(x)
@@ -164,16 +194,16 @@ class AttentiveStatsPool(nn.Module):
 class ECAPA_TDNN(nn.Module):
     def __init__(
         self,
-        feat_dim=80,
-        channels=512,
-        emb_dim=192,
-        global_context_att=False,
-        feat_type="wavlm_large",
-        sr=16000,
-        feature_selection="hidden_states",
-        update_extract=False,
-        config_path=None,
-    ):
+        feat_dim: int = 80,
+        channels: int = 512,
+        emb_dim: int = 192,
+        global_context_att: bool = False,
+        feat_type: str = "wavlm_large",
+        sr: int = 16000,
+        feature_selection: str = "hidden_states",
+        update_extract: bool = False,
+        config_path: str | None = None,
+    ) -> None:
         super().__init__()
 
         self.feat_type = feat_type
@@ -257,7 +287,7 @@ class ECAPA_TDNN(nn.Module):
         self.bn = nn.BatchNorm1d(self.channels[-1] * 2)
         self.linear = nn.Linear(self.channels[-1] * 2, emb_dim)
 
-    def get_feat_num(self):
+    def get_feat_num(self) -> int:
         self.feature_extract.eval()
         wav = [torch.randn(self.sr).to(next(self.feature_extract.parameters()).device)]
         with torch.no_grad():
@@ -268,7 +298,7 @@ class ECAPA_TDNN(nn.Module):
         else:
             return 1
 
-    def get_feat(self, x):
+    def get_feat(self, x: Float[Tensor, "b nw"]) -> Float[Tensor, "b d t"]:
         if self.update_extract:
             x = self.feature_extract([sample for sample in x])
         else:
@@ -294,7 +324,7 @@ class ECAPA_TDNN(nn.Module):
         x = self.instance_norm(x)
         return x
 
-    def forward(self, x):
+    def forward(self, x: Float[Tensor, "b nw"]) -> Float[Tensor, "b e"]:
         x = self.get_feat(x)
 
         out1 = self.layer1(x)
@@ -311,14 +341,14 @@ class ECAPA_TDNN(nn.Module):
 
 
 def ECAPA_TDNN_SMALL(
-    feat_dim,
-    emb_dim=256,
-    feat_type="wavlm_large",
-    sr=16000,
-    feature_selection="hidden_states",
-    update_extract=False,
-    config_path=None,
-):
+    feat_dim: int,
+    emb_dim: int = 256,
+    feat_type: str = "wavlm_large",
+    sr: int = 16000,
+    feature_selection: str = "hidden_states",
+    update_extract: bool = False,
+    config_path: str | None = None,
+) -> ECAPA_TDNN:
     return ECAPA_TDNN(
         feat_dim=feat_dim,
         channels=512,

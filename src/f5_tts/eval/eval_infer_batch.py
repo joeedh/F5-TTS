@@ -36,7 +36,7 @@ target_rms = 0.1
 rel_path = str(files("f5_tts").joinpath("../../"))
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="batch inference")
 
     parser.add_argument("-s", "--seed", default=None, type=int)
