@@ -96,7 +96,7 @@ class CFM(nn.Module):
     def sample(
         self,
         cond: Float[Tensor, "b n d"] | Float[Tensor, "b nw"],
-        text: Int[Tensor, "b nt"] | list[str],
+        text: Int[Tensor, "b nt"] | list[str] | list[list[str]],
         duration: int | Int[Tensor, "b"],
         *,
         lens: Int[Tensor, "b"] | None = None,
@@ -243,7 +243,7 @@ class CFM(nn.Module):
     def forward(
         self,
         inp: Float[Tensor, "b n d"] | Float[Tensor, "b nw"],  # mel or raw wave
-        text: Int[Tensor, "b nt"] | list[str],
+        text: Int[Tensor, "b nt"] | list[str] | list[list[str]],
         *,
         lens: Int[Tensor, "b"] | None = None,
         noise_scheduler: str | None = None,

@@ -4,7 +4,7 @@ import os
 import sys
 from collections.abc import Callable, Iterator, Mapping
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any
+from typing import Any, cast
 
 
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"  # for MPS device compatibility
@@ -41,7 +41,7 @@ _ref_text_cache = {}
 
 device = get_default_device()
 
-tempfile_kwargs = {"delete_on_close": False} if sys.version_info >= (3, 12) else {"delete": False}
+tempfile_kwargs: dict[str, Any] = {"delete_on_close": False} if sys.version_info >= (3, 12) else {"delete": False}
 
 # -----------------------------------------
 
@@ -102,7 +102,7 @@ def chunk_text(text: str, max_chars: int = 135) -> list[str]:
 def load_vocoder(
     vocoder_name: str = "vocos",
     is_local: bool = False,
-    local_path: str = "",
+    local_path: str | None = "",
     device: str = device,
     hf_cache_dir: str | None = None,
 ) -> Any:  # Any: a Vocos or a BigVGAN, which share no base class
@@ -136,6 +136,7 @@ def load_vocoder(
             print("You need to follow the README to init submodule and change the BigVGAN source code.")
         if is_local:
             # download generator from https://huggingface.co/nvidia/bigvgan_v2_24khz_100band_256x/tree/main
+            assert local_path is not None
             vocoder = bigvgan.BigVGAN.from_pretrained(local_path, use_cuda_kernel=False)
         else:
             vocoder = bigvgan.BigVGAN.from_pretrained(
@@ -149,7 +150,7 @@ def load_vocoder(
 
 # load asr pipeline
 
-asr_pipe = None
+asr_pipe: Any = None  # Any: a transformers pipeline, created on first use
 
 
 def initialize_asr_pipeline(device: str = device, dtype: torch.dtype | None = None) -> None:
@@ -177,6 +178,7 @@ def transcribe(ref_audio: str, language: str | None = None) -> str:
     global asr_pipe
     if asr_pipe is None:
         initialize_asr_pipeline(device=device)
+    assert asr_pipe is not None  # set by initialize_asr_pipeline
     return asr_pipe(
         ref_audio,
         chunk_length_s=30,
@@ -203,6 +205,7 @@ def load_checkpoint(
     model = model.to(dtype)
 
     ckpt_type = ckpt_path.split(".")[-1]
+    checkpoint: dict[str, Any]
     if ckpt_type == "safetensors":
         from safetensors.torch import load_file
 
@@ -283,13 +286,13 @@ def load_model(
 def remove_silence_edges(audio: AudioSegment, silence_threshold: float = -42) -> AudioSegment:
     # Remove silence from the start
     non_silent_start_idx = silence.detect_leading_silence(audio, silence_threshold=silence_threshold)
-    audio = audio[non_silent_start_idx:]
+    audio = cast(AudioSegment, audio[non_silent_start_idx:])  # slicing an AudioSegment gives an AudioSegment
 
     # Remove silence from the end
     reversed_audio = audio.reverse()
     non_silent_end_idx = silence.detect_leading_silence(reversed_audio, silence_threshold=silence_threshold)
     if non_silent_end_idx > 0:
-        trimmed_audio = audio[: len(audio) - non_silent_end_idx]
+        trimmed_audio = cast(AudioSegment, audio[: len(audio) - non_silent_end_idx])
     else:
         trimmed_audio = audio
 
@@ -348,7 +351,7 @@ def preprocess_ref_audio_text(
 
         # 3. if no proper silence found for clipping
         if len(aseg) > 12000:
-            aseg = aseg[:12000]
+            aseg = cast(AudioSegment, aseg[:12000])
             show_info("Audio is over 12s, clipping short. (3)")
 
         aseg = remove_silence_edges(aseg) + AudioSegment.silent(duration=50)
@@ -419,7 +422,8 @@ def infer_process(
         show_info("No text batches to generate.")
         return None, target_sample_rate, None
 
-    return next(
+    # not streaming, so each item is the (wave, sample rate, spectrogram) triple
+    return next(  # pyright: ignore[reportReturnType]  # infer_batch_process is typed for both modes
         infer_batch_process(
             (audio, sr),
             ref_text,

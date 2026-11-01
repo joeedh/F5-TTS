@@ -41,7 +41,7 @@ parser.add_argument(
     "-c",
     "--config",
     type=str,
-    default=os.path.join(files("f5_tts").joinpath("infer/examples/basic"), "basic.toml"),
+    default=os.path.join(str(files("f5_tts").joinpath("infer/examples/basic")), "basic.toml"),
     help="The configuration file, default see infer/examples/basic/basic.toml",
 )
 
@@ -357,6 +357,7 @@ def main() -> None:
             fix_duration=fix_duration,
             device=device,
         )
+        assert audio_segment is not None
         generated_audio_segments.append(audio_segment)
 
         if save_chunk:

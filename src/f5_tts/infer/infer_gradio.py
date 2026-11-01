@@ -10,7 +10,8 @@ from collections import OrderedDict
 from collections.abc import Callable, Mapping
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any, TypeVar
+from pathlib import Path
+from typing import Any, TypeVar, cast
 
 import click
 import gradio as gr
@@ -23,7 +24,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedModel, P
 
 
 try:
-    import spaces
+    import spaces  # pyright: ignore[reportMissingImports]  # only installed on Hugging Face Spaces
 
     USING_SPACES = True
 except ImportError:
@@ -86,18 +87,20 @@ def load_custom(ckpt_path: str, vocab_path: str = "", model_cfg: Mapping[str, ob
     if vocab_path.startswith("hf://"):
         vocab_path = str(cached_path(vocab_path))
     if model_cfg is None:
-        model_cfg = json.loads(DEFAULT_TTS_MODEL_CFG[2])
+        cfg = json.loads(DEFAULT_TTS_MODEL_CFG[2])
     elif isinstance(model_cfg, str):
-        model_cfg = json.loads(model_cfg)
-    return load_model(DiT, model_cfg, ckpt_path, vocab_file=vocab_path)
+        cfg = json.loads(model_cfg)
+    else:
+        cfg = model_cfg
+    return load_model(DiT, cfg, ckpt_path, vocab_file=vocab_path)
 
 
 F5TTS_ema_model = load_f5tts()
 E2TTS_ema_model = load_e2tts() if USING_SPACES else None
 custom_ema_model, pre_custom_path = None, ""
 
-chat_model_state = None
-chat_tokenizer_state = None
+chat_model_state: Any = None  # Any: a transformers model, loaded on demand
+chat_tokenizer_state: Any = None  # Any: its tokenizer
 
 
 @gpu_decorator
@@ -107,14 +110,17 @@ def chat_model_inference(
     tokenizer: PreTrainedTokenizerBase,
 ) -> str:
     """Generate response using Qwen"""
-    text = tokenizer.apply_chat_template(
-        messages,
-        tokenize=False,
-        add_generation_prompt=True,
+    text = cast(
+        str,
+        tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+        ),
     )
 
     model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
-    generated_ids = model.generate(
+    generated_ids = cast(Any, model).generate(  # Any: PreTrainedModel does not declare generate()
         **model_inputs,
         max_new_tokens=512,
         temperature=0.7,
@@ -200,6 +206,7 @@ def infer(
         show_info=show_info,
         progress=gr.Progress(),
     )
+    assert final_wave is not None and combined_spectrogram is not None  # gen_text is not blank
 
     # Remove silence
     if remove_silence:
@@ -459,7 +466,7 @@ with gr.Blocks() as app_multistyle:
     speech_type_ref_text_files = [regular_ref_text_file]
     speech_type_seeds = [regular_seed_slider]
     speech_type_speeds = [regular_speed_slider]
-    speech_type_delete_btns = [None]
+    speech_type_delete_btns: list[gr.Button | None] = [None]
     speech_type_insert_btns = [regular_insert]
 
     # Additional speech types (99 more)
@@ -530,7 +537,7 @@ with gr.Blocks() as app_multistyle:
 
     # Update delete button clicks and ref text file changes
     for i in range(1, len(speech_type_delete_btns)):
-        speech_type_delete_btns[i].click(
+        cast(gr.Button, speech_type_delete_btns[i]).click(
             delete_speech_type_fn,
             outputs=[
                 speech_type_rows[i],
@@ -627,7 +634,7 @@ with gr.Blocks() as app_multistyle:
     def generate_multistyle_speech(
         gen_text: str,
         *args: str | bool | None,
-    ) -> list[object]:
+    ) -> list[Any]:  # Any: the outputs mix audio, strings and None
         speech_type_names_list = args[:max_speech_types]
         speech_type_audios_list = args[max_speech_types : 2 * max_speech_types]
         speech_type_ref_texts_list = args[2 * max_speech_types : 3 * max_speech_types]
@@ -1005,7 +1012,7 @@ If you're having issues, try converting your reference audio to WAV or MP3, clip
 """
     )
 
-    last_used_custom = files("f5_tts").joinpath("infer/.cache/last_used_custom_model_info_v1.txt")
+    last_used_custom = Path(str(files("f5_tts").joinpath("infer/.cache/last_used_custom_model_info_v1.txt")))
 
     def load_last_used_custom() -> list[str]:
         try:

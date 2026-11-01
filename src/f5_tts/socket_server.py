@@ -7,8 +7,9 @@ import struct
 import threading
 import traceback
 import wave
+from collections.abc import Iterator
 from importlib.resources import files
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import torch
@@ -164,7 +165,8 @@ class TTSStreamingProcessor:
         self.file_writer_thread = AudioFileWriterThread("output.wav", self.sampling_rate)
         self.file_writer_thread.start()
 
-        for audio_chunk, _ in audio_stream:
+        # streaming mode yields (chunk, sample rate) pairs
+        for audio_chunk, _ in cast(Iterator[tuple[np.ndarray, int]], audio_stream):
             if len(audio_chunk) > 0:
                 logger.info(f"Generated audio chunk of size: {len(audio_chunk)}")
 

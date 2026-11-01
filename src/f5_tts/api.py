@@ -135,9 +135,11 @@ class F5TTS:
         )
 
         if file_wave is not None:
+            assert wav is not None
             self.export_wav(wav, file_wave, remove_silence)
 
         if file_spec is not None:
+            assert spec is not None
             self.export_spectrogram(spec, file_spec)
 
         return wav, sr, spec
