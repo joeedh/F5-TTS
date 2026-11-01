@@ -45,7 +45,7 @@ Non-goals: changing runtime behaviour, adding unit tests for model quality, runt
 
 Done 2026-11-01 (commands and versions in [../debugging.md](../debugging.md)). What differed from the plan:
 - The venv is Python 3.15.1 with torch 2.15.0+cpu, not the container's 3.13. It is a local Windows machine, not the cloud container.
-- `pip install -e ".[eval]"` fails on Python 3.15 (`av` has no wheel). The eval packages are installed one by one, with `faster_whisper` using `--no-deps`.
+- `pip install -e ".[eval]"` fails on Python 3.15 (`av` has no wheel). The eval packages are installed one by one, with `faster_whisper` and `funasr` using `--no-deps` (`sentencepiece` has no 3.15 wheel).
 - `src/third_party/BigVGAN` is checked out here, so `ruff check src` reports 75 errors from it. Run ruff on `src/f5_tts tools` only. That passes with 0.11.2, and `ruff format --check src/f5_tts` reports 47 files formatted.
 - Torch wheels: Python 3.10 has at most torch 2.14.1; Python 3.12 has 2.15.0. For step 6.1, Python 3.12 with torch 2.15.0 matches this venv. `pythonVersion` stays "3.10".
 
@@ -83,6 +83,30 @@ What the guard does not cover: Gradio apps, trainer, dataset code, eval code, so
 4. Do not change ruff rules, and do not run `ruff check --fix` or a reformat: the tree already passes under the pinned version.
 5. Run pyright with this config and record the real baseline here: total, per rule, per file. Replace the 672 figure in this plan.
 6. Commit config separately from any code change.
+
+Done 2026-11-01. Config is in `pyproject.toml` (`[tool.pyright]`, `jaxtyping>=0.3.0` dependency) and `ruff.toml` (`[lint.per-file-ignores]` for F722/F821 on the 6 files; the inline `# ruff: noqa: F722 F821` lines are gone). Ruff 0.11.2 and the guard still pass. Run pyright with `.venv\Scripts\pyright.exe --pythonpath .venv\Scripts\python.exe`.
+
+Real baseline (pyright 1.1.414, basic mode, torch 2.15.0+cpu, 36 files): **457 errors, 1 warning**. This replaces the 672 figure measured without torch.
+
+| Errors | Rule |
+|---|---|
+| 135 | reportAttributeAccessIssue |
+| 132 | reportArgumentType |
+| 69 | reportInvalidTypeArguments (the ein strings; conversion in batch A removes these) |
+| 43 | reportAssignmentType |
+| 26 | reportCallIssue |
+| 12 each | reportOperatorIssue, reportIndexIssue |
+| 7 | reportOptionalCall |
+| 5 each | reportMissingImports, reportOptionalMemberAccess |
+| 4 | reportReturnType |
+| 3 | reportGeneralTypeIssues |
+| 1 each | reportUnboundVariable, reportOptionalOperand, reportPrivateImportUsage, reportOptionalIterable |
+
+Warning: reportMissingModuleSource for `pyaudio` in `socket_client.py`.
+
+Most affected files: `model/modules.py` 72, `model/cfm.py` 66, `model/backbones/dit.py` 54, `mmdit.py` 45, `unett.py` 43, `model/utils.py` 37, `infer/infer_gradio.py` 28, `model/trainer.py` 20, `infer/utils_infer.py` 15, `eval/ecapa_tdnn.py` 14, `train/finetune_gradio.py` 13, `model/dataset.py` 11, `eval/utils_eval.py` 10. The rest have 8 or fewer. The `model/` backbones and `cfm.py` account for about half, mostly the ein strings and untyped arguments.
+
+Differences from the 2026-10-31 numbers: possibly-unbound errors (130 then) are now 1 real unbound variable (`model/dataset.py:294`), so those were mostly missing-import noise. The 5 remaining missing imports are optional or hardware-specific packages that are not installed on purpose: `torch_npu`, `spaces`, `flash_attn` (2 lines), `thop`. Step 5 decides how to treat them (one narrow ignore each). The `pyaudio` warning is the same kind.
 
 ## Step 4: bulk conversion
 

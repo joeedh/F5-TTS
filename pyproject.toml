@@ -22,6 +22,7 @@ dependencies = [
     "ema_pytorch>=0.5.2",
     "gradio>=6.15.0",
     "hydra-core>=1.3.0",
+    "jaxtyping>=0.3.0",
     "librosa",
     "matplotlib",
     "numpy<=1.26.4; python_version<='3.10'",
@@ -62,3 +63,9 @@ Homepage = "https://github.com/SWivid/F5-TTS"
 "f5-tts_infer-gradio" = "f5_tts.infer.infer_gradio:main"
 "f5-tts_finetune-cli" = "f5_tts.train.finetune_cli:main"
 "f5-tts_finetune-gradio" = "f5_tts.train.finetune_gradio:main"
+
+[tool.pyright]
+pythonVersion = "3.10"
+typeCheckingMode = "basic"
+include = ["src/f5_tts", "tools/typing_guard"]
+exclude = ["**/__pycache__", "src/f5_tts/runtime/triton_trtllm", "src/third_party"]

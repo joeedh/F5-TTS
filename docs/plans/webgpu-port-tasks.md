@@ -27,12 +27,12 @@ Approach decided: pyright, and port many files at once, then drive the error cou
 ### Setup
 - [x] Make a reproducible environment with torch, torchaudio and the other runtime dependencies installed, so errors are real and not missing-import noise. Record how in `docs/debugging.md`. (Done 2026-11-01, `.venv` on Python 3.15.1 with torch 2.15.0+cpu.)
 - [ ] Pin the pyright version (pre-commit, dev dependency, or both). Pyright updates often add errors.
-- [ ] Add `[tool.pyright]` to `pyproject.toml`: python version 3.10, include/exclude, start in `basic` mode, report missing imports as errors only after the environment is fixed.
-- [ ] Record the real baseline count with torch installed, by rule. This replaces the 672 figure.
+- [x] Add `[tool.pyright]` to `pyproject.toml`: python version 3.10, include/exclude, start in `basic` mode, report missing imports as errors only after the environment is fixed. (Done 2026-11-01.)
+- [x] Record the real baseline count with torch installed, by rule. This replaces the 672 figure. (Done 2026-11-01: 457 errors, 1 warning; see the plan, step 3.)
 
 ### Bulk conversion (many files at once)
 - [ ] Group files into a few batches by area: `model/` (cfm, backbones, modules, utils, dataset, trainer), `infer/` plus `api.py` and the socket files, `train/`, `eval/`, `scripts/`.
-- [ ] Add `jaxtyping` as a dependency and convert the ein-notation annotations in `model/` to it in one pass.
+- [ ] Add `jaxtyping` as a dependency (done 2026-11-01, `jaxtyping>=0.3.0`) and convert the ein-notation annotations in `model/` to it in one pass.
 - [ ] Add parameter and return annotations across each batch without stopping to fix every error on the way. Behaviour must not change; run the existing inference path before and after (golden output from plan 00's harness, or a fixed-seed run).
 - [ ] Commit per batch so a bad batch can be reverted alone.
 

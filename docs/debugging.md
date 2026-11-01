@@ -9,8 +9,8 @@ How the venv used for pyright and ruff was built, on Windows with Python 3.15.1.
 ```
 python -m venv .venv
 .venv\Scripts\python.exe -m pip install -e . ruff==0.11.2 pyright
-.venv\Scripts\python.exe -m pip install funasr jiwer modelscope zhconv zhon
-.venv\Scripts\python.exe -m pip install --no-deps faster_whisper==0.10.1
+.venv\Scripts\python.exe -m pip install jiwer modelscope zhconv zhon "jaxtyping>=0.3.0"
+.venv\Scripts\python.exe -m pip install --no-deps faster_whisper==0.10.1 funasr
 ```
 
 Versions that resulted: torch 2.15.0+cpu, torchaudio 2.11.1, numpy 2.5.4, accelerate 1.15.0, x-transformers 2.31.11, vocos 0.1.0, ema-pytorch 0.8.3, gradio 6.31.0, ruff 0.11.2, pyright 1.1.414.
@@ -19,6 +19,7 @@ Versions that resulted: torch 2.15.0+cpu, torchaudio 2.11.1, numpy 2.5.4, accele
 - Symptom: `Failed to build 'av' when getting requirements to build wheel` (a Cython `CompileError` on `av\logging.pyx`).
 - Cause: the `eval` extra pins `faster_whisper==0.10.1`, which needs `av`. PyAV has no wheel for Python 3.15 and its source build fails.
 - Workaround: install the rest of the extra normally and install `faster_whisper` with `--no-deps`. Pyright only needs its source to read, so type checking is unaffected. Do not run the eval scripts from this venv.
+- `funasr` fails the same way (`sentencepiece` has no 3.15 wheel), so it is also installed with `--no-deps`; importing it prints "Please install torch_complex firstly". An earlier version of this entry said `funasr` installed normally. It did not: the pip output was cut to its last lines and only the exit code was checked, so pyright reported its imports as unresolved. After any pip install, check `pip list`, not the exit code.
 
 ### Ruff must be scoped to `src/f5_tts tools`
 - Symptom: `ruff check src` reports 75 errors, all in `src/third_party/BigVGAN`.

@@ -8,3 +8,12 @@ dummy-variable-rgx = "^_.*$"
 [lint.isort]
 force-single-line = false
 lines-after-imports = 2
+
+[lint.per-file-ignores]
+# jaxtyping shape strings such as "b n d" read as undefined names or bad annotations
+"src/f5_tts/model/utils.py" = ["F722", "F821"]
+"src/f5_tts/model/modules.py" = ["F722", "F821"]
+"src/f5_tts/model/cfm.py" = ["F722", "F821"]
+"src/f5_tts/model/backbones/dit.py" = ["F722", "F821"]
+"src/f5_tts/model/backbones/mmdit.py" = ["F722", "F821"]
+"src/f5_tts/model/backbones/unett.py" = ["F722", "F821"]

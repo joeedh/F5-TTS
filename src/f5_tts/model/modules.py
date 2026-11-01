@@ -6,7 +6,6 @@ nt - text sequence
 nw - raw wave length
 d - dimension
 """
-# ruff: noqa: F722 F821
 
 from __future__ import annotations
 
