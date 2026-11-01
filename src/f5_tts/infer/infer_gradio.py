@@ -7,8 +7,10 @@ import os
 import re
 import tempfile
 from collections import OrderedDict
+from collections.abc import Callable, Mapping
 from functools import lru_cache
 from importlib.resources import files
+from typing import Any, TypeVar
 
 import click
 import gradio as gr
@@ -17,7 +19,7 @@ import soundfile as sf
 import torch
 import torchaudio
 from cached_path import cached_path
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedModel, PreTrainedTokenizerBase
 
 
 try:
@@ -28,7 +30,10 @@ except ImportError:
     USING_SPACES = False
 
 
-def gpu_decorator(func):
+_T = TypeVar("_T", bound=Callable[..., object])
+
+
+def gpu_decorator(func: _T) -> _T:
     if USING_SPACES:
         return spaces.GPU(func)
     else:
@@ -44,7 +49,7 @@ from f5_tts.infer.utils_infer import (
     save_spectrogram,
     tempfile_kwargs,
 )
-from f5_tts.model import DiT, UNetT
+from f5_tts.model import CFM, DiT, UNetT
 
 
 DEFAULT_TTS_MODEL = "F5-TTS_v1"
@@ -62,19 +67,19 @@ DEFAULT_TTS_MODEL_CFG = [
 vocoder = load_vocoder()
 
 
-def load_f5tts():
+def load_f5tts() -> CFM:
     ckpt_path = str(cached_path(DEFAULT_TTS_MODEL_CFG[0]))
     F5TTS_model_cfg = json.loads(DEFAULT_TTS_MODEL_CFG[2])
     return load_model(DiT, F5TTS_model_cfg, ckpt_path)
 
 
-def load_e2tts():
+def load_e2tts() -> CFM:
     ckpt_path = str(cached_path("hf://SWivid/E2-TTS/E2TTS_Base/model_1200000.safetensors"))
     E2TTS_model_cfg = dict(dim=1024, depth=24, heads=16, ff_mult=4, text_mask_padding=False, pe_attn_head=1)
     return load_model(UNetT, E2TTS_model_cfg, ckpt_path)
 
 
-def load_custom(ckpt_path: str, vocab_path="", model_cfg=None):
+def load_custom(ckpt_path: str, vocab_path: str = "", model_cfg: Mapping[str, object] | str | None = None) -> CFM:
     ckpt_path, vocab_path = ckpt_path.strip(), vocab_path.strip()
     if ckpt_path.startswith("hf://"):
         ckpt_path = str(cached_path(ckpt_path))
@@ -96,7 +101,11 @@ chat_tokenizer_state = None
 
 
 @gpu_decorator
-def chat_model_inference(messages, model, tokenizer):
+def chat_model_inference(
+    messages: list[dict[str, Any]],  # Any: message content is a str or a list of parts
+    model: PreTrainedModel,
+    tokenizer: PreTrainedTokenizerBase,
+) -> str:
     """Generate response using Qwen"""
     text = tokenizer.apply_chat_template(
         messages,
@@ -119,7 +128,7 @@ def chat_model_inference(messages, model, tokenizer):
 
 
 @gpu_decorator
-def load_text_from_file(file):
+def load_text_from_file(file: str | None) -> dict[str, object]:
     if file:
         with open(file, "r", encoding="utf-8") as f:
             text = f.read().strip()
@@ -131,16 +140,19 @@ def load_text_from_file(file):
 @lru_cache(maxsize=1000)  # NOTE. need to ensure params of infer() hashable
 @gpu_decorator
 def infer(
-    ref_audio_orig,
-    ref_text,
-    gen_text,
-    model,
-    remove_silence,
-    seed,
-    cross_fade_duration=0.15,
-    nfe_step=32,
-    speed=1,
-    show_info=gr.Info,
+    ref_audio_orig: str | None,
+    ref_text: str,
+    gen_text: str,
+    model: str | tuple[str, str, str, str],
+    remove_silence: bool,
+    seed: int,
+    cross_fade_duration: float = 0.15,
+    nfe_step: int = 32,
+    speed: float = 1,
+    show_info: Callable[[str], object] = gr.Info,
+) -> (
+    tuple[tuple[int, np.ndarray | None] | dict[str, object], str | dict[str, object], str]
+    | tuple[tuple[int, np.ndarray | None], str, str, int]
 ):
     if not ref_audio_orig:
         gr.Warning("Please provide reference audio.")
@@ -269,7 +281,7 @@ with gr.Blocks() as app_tts:
             info="Set the duration of the cross-fade between audio clips.",
         )
 
-    def collapse_accordion():
+    def collapse_accordion() -> gr.Accordion:
         return gr.Accordion(open=False)
 
     # Workaround for https://github.com/SWivid/F5-TTS/issues/1239#issuecomment-3677987413
@@ -285,16 +297,16 @@ with gr.Blocks() as app_tts:
 
     @gpu_decorator
     def basic_tts(
-        ref_audio_input,
-        ref_text_input,
-        gen_text_input,
-        remove_silence,
-        randomize_seed,
-        seed_input,
-        cross_fade_duration_slider,
-        nfe_slider,
-        speed_slider,
-    ):
+        ref_audio_input: str | None,
+        ref_text_input: str,
+        gen_text_input: str,
+        remove_silence: bool,
+        randomize_seed: bool,
+        seed_input: int,
+        cross_fade_duration_slider: float,
+        nfe_slider: int,
+        speed_slider: float,
+    ) -> tuple[tuple[int, np.ndarray | None] | dict[str, object], str | dict[str, object], str, int]:
         if randomize_seed:
             seed_input = np.random.randint(0, 2**31 - 1)
 
@@ -346,7 +358,9 @@ with gr.Blocks() as app_tts:
     )
 
 
-def parse_speechtypes_text(gen_text):
+def parse_speechtypes_text(
+    gen_text: str,
+) -> list[dict[str, Any]]:  # Any: values are str/int/float, or whatever the user's JSON holds
     # Pattern to find {str} or {"name": str, "seed": int, "speed": float}
     pattern = r"(\{.*?\})"
 
@@ -498,7 +512,7 @@ with gr.Blocks() as app_multistyle:
     speech_type_count = 1
 
     # Function to add a speech type
-    def add_speech_type_fn():
+    def add_speech_type_fn() -> list[dict[str, object]]:
         row_updates = [gr.update() for _ in range(max_speech_types)]
         global speech_type_count
         if speech_type_count < max_speech_types:
@@ -511,7 +525,7 @@ with gr.Blocks() as app_multistyle:
     add_speech_type_btn.click(add_speech_type_fn, outputs=speech_type_rows)
 
     # Function to delete a speech type
-    def delete_speech_type_fn():
+    def delete_speech_type_fn() -> tuple[dict[str, object], None, None, None, None]:
         return gr.update(visible=False), None, None, None, None
 
     # Update delete button clicks and ref text file changes
@@ -538,8 +552,10 @@ with gr.Blocks() as app_multistyle:
         )
         gen_text_file_multistyle = gr.File(label="Load Text to Generate from File (.txt)", file_types=[".txt"], scale=1)
 
-    def make_insert_speech_type_fn(index):
-        def insert_speech_type_fn(current_text, speech_type_name, speech_type_seed, speech_type_speed):
+    def make_insert_speech_type_fn(index: int) -> Callable[[str | None, str | None, float, float], str]:
+        def insert_speech_type_fn(
+            current_text: str | None, speech_type_name: str | None, speech_type_seed: float, speech_type_speed: float
+        ) -> str:
             current_text = current_text or ""
             if not speech_type_name:
                 gr.Warning("Please enter speech type name before insert.")
@@ -609,9 +625,9 @@ with gr.Blocks() as app_multistyle:
 
     @gpu_decorator
     def generate_multistyle_speech(
-        gen_text,
-        *args,
-    ):
+        gen_text: str,
+        *args: str | bool | None,
+    ) -> list[object]:
         speech_type_names_list = args[:max_speech_types]
         speech_type_audios_list = args[max_speech_types : 2 * max_speech_types]
         speech_type_ref_texts_list = args[2 * max_speech_types : 3 * max_speech_types]
@@ -704,7 +720,7 @@ with gr.Blocks() as app_multistyle:
     )
 
     # Validation function to disable Generate button if speech types are missing
-    def validate_speech_types(gen_text, regular_name, *args):
+    def validate_speech_types(gen_text: str, regular_name: str | None, *args: str | None) -> dict[str, object]:
         speech_type_names_list = args
 
         # Collect the speech types names
@@ -754,7 +770,7 @@ Have a conversation with an AI using your reference voice!
     ]
 
     @gpu_decorator
-    def load_chat_model(chat_model_name):
+    def load_chat_model(chat_model_name: str) -> tuple[dict[str, object], dict[str, object]]:
         show_info = gr.Info
         global chat_model_state, chat_tokenizer_state
         if chat_model_state is not None:
@@ -848,7 +864,11 @@ Have a conversation with an AI using your reference voice!
 
         # Modify process_audio_input to generate user input
         @gpu_decorator
-        def process_audio_input(conv_state, audio_path, text):
+        def process_audio_input(
+            conv_state: list[dict[str, Any]],  # Any: message content is a str or a list of parts
+            audio_path: str | None,
+            text: str,
+        ) -> list[dict[str, Any]]:  # Any: message content is a str or a list of parts
             """Handle audio or text input from user"""
 
             if not audio_path and not text.strip():
@@ -864,7 +884,10 @@ Have a conversation with an AI using your reference voice!
 
         # Use model and tokenizer from state to get text response
         @gpu_decorator
-        def generate_text_response(conv_state, system_prompt):
+        def generate_text_response(
+            conv_state: list[dict[str, Any]],  # Any: message content is a str or a list of parts
+            system_prompt: str,
+        ) -> list[dict[str, Any]]:  # Any: message content is a str or a list of parts
             """Generate text response from AI"""
             for single_state in conv_state:
                 if isinstance(single_state["content"], list):
@@ -878,7 +901,14 @@ Have a conversation with an AI using your reference voice!
             return conv_state
 
         @gpu_decorator
-        def generate_audio_response(conv_state, ref_audio, ref_text, remove_silence, randomize_seed, seed_input):
+        def generate_audio_response(
+            conv_state: list[dict[str, Any]],  # Any: message content is a str or a list of parts
+            ref_audio: str | None,
+            ref_text: str,
+            remove_silence: bool,
+            randomize_seed: bool,
+            seed_input: int,
+        ) -> tuple[tuple[int, np.ndarray | None] | dict[str, object] | None, str, int]:
             """Generate TTS audio for AI response"""
             if not conv_state or not ref_audio:
                 return None, ref_text, seed_input
@@ -903,7 +933,7 @@ Have a conversation with an AI using your reference voice!
             )
             return audio_result, ref_text_out, used_seed
 
-        def clear_conversation():
+        def clear_conversation() -> tuple[list[object], None]:
             """Reset the conversation"""
             return [], None
 
@@ -977,7 +1007,7 @@ If you're having issues, try converting your reference audio to WAV or MP3, clip
 
     last_used_custom = files("f5_tts").joinpath("infer/.cache/last_used_custom_model_info_v1.txt")
 
-    def load_last_used_custom():
+    def load_last_used_custom() -> list[str]:
         try:
             custom = []
             with open(last_used_custom, "r", encoding="utf-8") as f:
@@ -988,7 +1018,7 @@ If you're having issues, try converting your reference audio to WAV or MP3, clip
             last_used_custom.parent.mkdir(parents=True, exist_ok=True)
             return DEFAULT_TTS_MODEL_CFG
 
-    def switch_tts_model(new_choice):
+    def switch_tts_model(new_choice: str) -> tuple[dict[str, object], dict[str, object], dict[str, object]]:
         global tts_model_choice
         if new_choice == "Custom":  # override in case webpage is refreshed
             custom_ckpt_path, custom_vocab_path, custom_model_cfg = load_last_used_custom()
@@ -1002,7 +1032,7 @@ If you're having issues, try converting your reference audio to WAV or MP3, clip
             tts_model_choice = new_choice
             return gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
 
-    def set_custom_model(custom_ckpt_path, custom_vocab_path, custom_model_cfg):
+    def set_custom_model(custom_ckpt_path: str, custom_vocab_path: str, custom_model_cfg: str) -> None:
         global tts_model_choice
         tts_model_choice = ("Custom", custom_ckpt_path, custom_vocab_path, custom_model_cfg)
         with open(last_used_custom, "w", encoding="utf-8") as f:
@@ -1118,7 +1148,7 @@ If you're having issues, try converting your reference audio to WAV or MP3, clip
     default=False,
     help="Automatically launch the interface in the default web browser",
 )
-def main(port, host, share, api, root_path, inbrowser):
+def main(port: int | None, host: str | None, share: bool, api: bool, root_path: str | None, inbrowser: bool) -> None:
     global app
     print("Starting app...")
     app.queue(api_open=api).launch(
