@@ -18,7 +18,9 @@ import shutil
 import signal
 import subprocess
 import sys
+from collections.abc import Iterator
 from contextlib import contextmanager
+from types import FrameType
 
 
 sys.path.append(os.getcwd())
@@ -47,16 +49,16 @@ CHUNK_SIZE = 100  # Number of files to process per worker batch
 executor = None  # Global executor for cleanup
 
 
-def is_csv_wavs_format(input_path):
+def is_csv_wavs_format(input_path: str | os.PathLike[str]) -> bool:
     fpath = Path(input_path).expanduser()
     return fpath.is_file() and fpath.suffix.lower() == ".csv"
 
 
 @contextmanager
-def graceful_exit():
+def graceful_exit() -> Iterator[None]:
     """Context manager for graceful shutdown on signals"""
 
-    def signal_handler(signum, frame):
+    def signal_handler(signum: int, frame: FrameType | None) -> None:
         print("\nReceived signal to terminate. Cleaning up...")
         if executor is not None:
             print("Shutting down executor...")
@@ -74,7 +76,7 @@ def graceful_exit():
             executor.shutdown(wait=False)
 
 
-def process_audio_file(audio_path, text, polyphone):
+def process_audio_file(audio_path: str, text: str, polyphone: bool) -> tuple[str, str, float] | None:
     """Process a single audio file by checking its existence and extracting duration."""
     if not Path(audio_path).exists():
         print(f"audio {audio_path} not found, skipping")
@@ -89,7 +91,7 @@ def process_audio_file(audio_path, text, polyphone):
         return None
 
 
-def batch_convert_texts(texts, polyphone, batch_size=BATCH_SIZE):
+def batch_convert_texts(texts: list[str], polyphone: bool, batch_size: int = BATCH_SIZE) -> list[list[str]]:
     """Convert a list of texts to pinyin in batches."""
     converted_texts = []
     for i in tqdm(
@@ -103,7 +105,9 @@ def batch_convert_texts(texts, polyphone, batch_size=BATCH_SIZE):
     return converted_texts
 
 
-def prepare_csv_wavs_dir(input_path, num_workers=None):
+def prepare_csv_wavs_dir(
+    input_path: str | os.PathLike[str], num_workers: int | None = None
+) -> tuple[list[dict[str, str | float | list[str]]], list[float], set[str]]:
     global executor
     if not is_csv_wavs_format(input_path):
         raise ValueError(f"input must be a .csv file: {input_path}")
@@ -169,7 +173,7 @@ def prepare_csv_wavs_dir(input_path, num_workers=None):
     return sub_result, durations, vocab_set
 
 
-def get_audio_duration(audio_path, timeout=5):
+def get_audio_duration(audio_path: str, timeout: float = 5) -> float:
     """Get the duration of an audio file in seconds with fallbacks."""
     try:
         return sf.info(audio_path).duration
@@ -206,7 +210,7 @@ def get_audio_duration(audio_path, timeout=5):
         raise RuntimeError(f"failed to get duration for {audio_path}: {e}")
 
 
-def read_audio_text_pairs(csv_file_path):
+def read_audio_text_pairs(csv_file_path: str | os.PathLike[str]) -> list[tuple[str, str]]:
     audio_text_pairs = []
 
     csv_path = Path(csv_file_path).expanduser().absolute()
@@ -232,7 +236,13 @@ def read_audio_text_pairs(csv_file_path):
     return audio_text_pairs
 
 
-def save_prepped_dataset(out_dir, result, duration_list, text_vocab_set, is_finetune):
+def save_prepped_dataset(
+    out_dir: str | os.PathLike[str],
+    result: list[dict[str, str | float | list[str]]],
+    duration_list: list[float],
+    text_vocab_set: set[str],
+    is_finetune: bool,
+) -> None:
     out_dir = Path(out_dir)
     out_dir.mkdir(exist_ok=True, parents=True)
     print(f"\nSaving to {out_dir} ...")
@@ -264,14 +274,19 @@ def save_prepped_dataset(out_dir, result, duration_list, text_vocab_set, is_fine
     print(f"For {dataset_name}, total {sum(duration_list) / 3600:.2f} hours")
 
 
-def prepare_and_save_set(inp_dir, out_dir, is_finetune: bool = True, num_workers: int = None):
+def prepare_and_save_set(
+    inp_dir: str | os.PathLike[str],
+    out_dir: str | os.PathLike[str],
+    is_finetune: bool = True,
+    num_workers: int | None = None,
+) -> None:
     if is_finetune:
         assert PRETRAINED_VOCAB_PATH.exists(), f"pretrained vocab.txt not found: {PRETRAINED_VOCAB_PATH}"
     sub_result, durations, vocab_set = prepare_csv_wavs_dir(inp_dir, num_workers=num_workers)
     save_prepped_dataset(out_dir, sub_result, durations, vocab_set, is_finetune)
 
 
-def get_args():
+def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Prepare and save dataset.")
     parser.add_argument(
         "inp_dir",
@@ -284,7 +299,7 @@ def get_args():
     return parser.parse_args()
 
 
-def cli():
+def cli() -> None:
     try:
         args = get_args()
         prepare_and_save_set(args.inp_dir, args.out_dir, is_finetune=not args.pretrain, num_workers=args.workers)

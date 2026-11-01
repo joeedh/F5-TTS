@@ -12,13 +12,16 @@ import sys
 import tempfile
 import threading
 import time
+from collections.abc import Generator, Iterator
 from glob import glob
 from importlib.resources import files
+from typing import IO
 
 import click
 import gradio as gr
 import librosa
 import numpy as np
+import numpy.typing as npt
 import psutil
 import torch
 import torchaudio
@@ -27,6 +30,7 @@ from datasets import Dataset as Dataset_
 from datasets.arrow_writer import ArrowWriter
 from safetensors.torch import load_file, save_file
 from scipy.io import wavfile
+from torch import Tensor
 
 from f5_tts.api import F5TTS
 from f5_tts.device_utils import get_default_device
@@ -68,27 +72,27 @@ device = get_default_device()
 
 # Save settings from a JSON file
 def save_settings(
-    project_name,
-    exp_name,
-    learning_rate,
-    batch_size_per_gpu,
-    batch_size_type,
-    max_samples,
-    grad_accumulation_steps,
-    max_grad_norm,
-    epochs,
-    num_warmup_updates,
-    save_per_updates,
-    keep_last_n_checkpoints,
-    last_per_updates,
-    finetune,
-    file_checkpoint_train,
-    tokenizer_type,
-    tokenizer_file,
-    mixed_precision,
-    logger,
-    ch_8bit_adam,
-):
+    project_name: str,
+    exp_name: str,
+    learning_rate: float,
+    batch_size_per_gpu: int,
+    batch_size_type: str,
+    max_samples: int,
+    grad_accumulation_steps: int,
+    max_grad_norm: float,
+    epochs: int,
+    num_warmup_updates: int,
+    save_per_updates: int,
+    keep_last_n_checkpoints: int,
+    last_per_updates: int,
+    finetune: bool,
+    file_checkpoint_train: str,
+    tokenizer_type: str,
+    tokenizer_file: str,
+    mixed_precision: str,
+    logger: str,
+    ch_8bit_adam: bool,
+) -> str:
     path_project = _safe_project_path(path_project_ckpts, project_name)
     os.makedirs(path_project, exist_ok=True)
     file_setting = os.path.join(path_project, "setting.json")
@@ -120,7 +124,9 @@ def save_settings(
 
 
 # Load settings from a JSON file
-def load_settings(project_name):
+def load_settings(
+    project_name: str,
+) -> tuple[str, float, int, str, int, int, float, int, int, int, int, int, bool, str, str, str, str, str, bool]:
     project_name = project_name.replace("_pinyin", "").replace("_char", "")
     path_project = _safe_project_path(path_project_ckpts, project_name)
     file_setting = os.path.join(path_project, "setting.json")
@@ -181,7 +187,7 @@ def load_settings(project_name):
 
 
 # Load metadata
-def get_audio_duration(audio_path):
+def get_audio_duration(audio_path: str) -> float:
     """Calculate the duration mono of an audio file."""
     audio, sample_rate = torchaudio.load(audio_path)
     return audio.shape[1] / sample_rate
@@ -196,7 +202,7 @@ class Slicer:  # https://github.com/RVC-Boss/GPT-SoVITS/blob/main/tools/slicer2.
         min_interval: int = 300,
         hop_size: int = 20,
         max_sil_kept: int = 2000,
-    ):
+    ) -> None:
         if not min_length >= min_interval >= hop_size:
             raise ValueError("The following condition must be satisfied: min_length >= min_interval >= hop_size")
         if not max_sil_kept >= hop_size:
@@ -209,14 +215,18 @@ class Slicer:  # https://github.com/RVC-Boss/GPT-SoVITS/blob/main/tools/slicer2.
         self.min_interval = round(min_interval / self.hop_size)
         self.max_sil_kept = round(sr * max_sil_kept / 1000 / self.hop_size)
 
-    def _apply_slice(self, waveform, begin, end):
+    def _apply_slice(
+        self, waveform: npt.NDArray[np.float32], begin: int | np.integer, end: int | np.integer
+    ) -> npt.NDArray[np.float32]:
         if len(waveform.shape) > 1:
             return waveform[:, begin * self.hop_size : min(waveform.shape[1], end * self.hop_size)]
         else:
             return waveform[begin * self.hop_size : min(waveform.shape[0], end * self.hop_size)]
 
     # @timeit
-    def slice(self, waveform):
+    def slice(
+        self, waveform: npt.NDArray[np.float32]
+    ) -> list[npt.NDArray[np.float32]] | list[list[npt.NDArray[np.float32] | int]]:
         if len(waveform.shape) > 1:
             samples = waveform.mean(axis=0)
         else:
@@ -304,7 +314,7 @@ class Slicer:  # https://github.com/RVC-Boss/GPT-SoVITS/blob/main/tools/slicer2.
 
 
 # terminal
-def terminate_process_tree(pid, including_parent=True):
+def terminate_process_tree(pid: int, including_parent: bool = True) -> None:
     try:
         parent = psutil.Process(pid)
     except psutil.NoSuchProcess:
@@ -324,7 +334,7 @@ def terminate_process_tree(pid, including_parent=True):
             pass
 
 
-def terminate_process(pid):
+def terminate_process(pid: int) -> None:
     if system == "Windows":
         cmd = f"taskkill /t /f /pid {pid}"
         os.system(cmd)
@@ -333,28 +343,30 @@ def terminate_process(pid):
 
 
 def start_training(
-    dataset_name,
-    exp_name,
-    learning_rate,
-    batch_size_per_gpu,
-    batch_size_type,
-    max_samples,
-    grad_accumulation_steps,
-    max_grad_norm,
-    epochs,
-    num_warmup_updates,
-    save_per_updates,
-    keep_last_n_checkpoints,
-    last_per_updates,
-    finetune,
-    file_checkpoint_train,
-    tokenizer_type,
-    tokenizer_file,
-    mixed_precision,
-    stream,
-    logger,
-    ch_8bit_adam,
-):
+    dataset_name: str,
+    exp_name: str,
+    learning_rate: float,
+    batch_size_per_gpu: int,
+    batch_size_type: str,
+    max_samples: int,
+    grad_accumulation_steps: int,
+    max_grad_norm: float,
+    epochs: int,
+    num_warmup_updates: int,
+    save_per_updates: int,
+    keep_last_n_checkpoints: int,
+    last_per_updates: int,
+    finetune: bool,
+    file_checkpoint_train: str,
+    tokenizer_type: str,
+    tokenizer_file: str,
+    mixed_precision: str,
+    stream: bool,
+    logger: str,
+    ch_8bit_adam: bool,
+) -> Generator[
+    tuple[str, dict[str, object], dict[str, object]], None, tuple[str, dict[str, object], dict[str, object]] | None
+]:
     global training_process, tts_api, stop_signal
 
     if tts_api is not None:
@@ -475,7 +487,7 @@ def start_training(
             training_process.wait()
         else:
 
-            def stream_output(pipe, output_queue):
+            def stream_output(pipe: IO[str], output_queue: queue.Queue[str]) -> None:
                 try:
                     for line in iter(pipe.readline, ""):
                         output_queue.put(line)
@@ -590,7 +602,7 @@ def start_training(
     yield text_info, gr.update(interactive=True), gr.update(interactive=False)
 
 
-def stop_training():
+def stop_training() -> tuple[str, dict[str, object], dict[str, object]]:
     global training_process, stop_signal
 
     if training_process is None:
@@ -601,7 +613,7 @@ def stop_training():
     return "Train stopped !", gr.update(interactive=True), gr.update(interactive=False)
 
 
-def get_list_projects():
+def get_list_projects() -> tuple[list[str], str | None]:
     project_list = []
     for folder in os.listdir(path_data):
         path_folder = os.path.join(path_data, folder)
@@ -617,7 +629,7 @@ def get_list_projects():
     return project_list, projects_selelect
 
 
-def create_data_project(name, tokenizer_type):
+def create_data_project(name: str, tokenizer_type: str) -> dict[str, object]:
     name += "_" + tokenizer_type
     project_dir = _safe_project_path(path_data, name)
     os.makedirs(project_dir, exist_ok=True)
@@ -626,7 +638,13 @@ def create_data_project(name, tokenizer_type):
     return gr.update(choices=project_list, value=name)
 
 
-def transcribe_all(name_project, audio_files, language, user=False, progress=gr.Progress()):
+def transcribe_all(
+    name_project: str,
+    audio_files: list[str] | None,
+    language: str,
+    user: bool = False,
+    progress: gr.Progress = gr.Progress(),
+) -> str:
     path_project = _safe_project_path(path_data, name_project)
     path_dataset = os.path.join(path_project, "dataset")
     path_project_wavs = os.path.join(path_project, "wavs")
@@ -697,7 +715,7 @@ def transcribe_all(name_project, audio_files, language, user=False, progress=gr.
     return f"transcribe complete samples : {num}\npath : {path_project_wavs}{error_text}"
 
 
-def format_seconds_to_hms(seconds):
+def format_seconds_to_hms(seconds: float) -> str:
     hours = int(seconds / 3600)
     minutes = int((seconds % 3600) / 60)
     seconds = seconds % 60
@@ -705,14 +723,14 @@ def format_seconds_to_hms(seconds):
 
 
 def get_correct_audio_path(
-    audio_input,
-    base_path="wavs",
-    supported_formats=("wav", "mp3", "aac", "flac", "m4a", "alac", "ogg", "aiff", "wma", "amr"),
-):
+    audio_input: str,
+    base_path: str = "wavs",
+    supported_formats: tuple[str, ...] = ("wav", "mp3", "aac", "flac", "m4a", "alac", "ogg", "aiff", "wma", "amr"),
+) -> str | None:
     file_audio = None
 
     # Helper function to check if file has a supported extension
-    def has_supported_extension(file_name):
+    def has_supported_extension(file_name: str) -> bool:
         return any(file_name.endswith(f".{ext}") for ext in supported_formats)
 
     # Case 1: If it's a full path with a valid extension, use it directly
@@ -735,7 +753,7 @@ def get_correct_audio_path(
     return file_audio
 
 
-def create_metadata(name_project, ch_tokenizer, progress=gr.Progress()):
+def create_metadata(name_project: str, ch_tokenizer: bool, progress: gr.Progress = gr.Progress()) -> tuple[str, str]:
     path_project = _safe_project_path(path_data, name_project)
     path_project_wavs = os.path.join(path_project, "wavs")
     file_metadata = os.path.join(path_project, "metadata.csv")
@@ -846,20 +864,20 @@ def create_metadata(name_project, ch_tokenizer, progress=gr.Progress()):
     )
 
 
-def check_user(value):
+def check_user(value: bool) -> tuple[dict[str, object], dict[str, object]]:
     return gr.update(visible=not value), gr.update(visible=value)
 
 
 def calculate_train(
-    name_project,
-    epochs,
-    learning_rate,
-    batch_size_per_gpu,
-    batch_size_type,
-    max_samples,
-    num_warmup_updates,
-    finetune,
-):
+    name_project: str,
+    epochs: int,
+    learning_rate: float,
+    batch_size_per_gpu: int,
+    batch_size_type: str,
+    max_samples: int,
+    num_warmup_updates: int,
+    finetune: bool,
+) -> tuple[int, float, int, int, int, str | int]:
     path_project = _safe_project_path(path_data, name_project)
     file_duration = os.path.join(path_project, "duration.json")
 
@@ -964,7 +982,7 @@ def prune_checkpoint(checkpoint_path: str, new_checkpoint_path: str, save_ema: b
         return f"An error occurred: {e}"
 
 
-def expand_model_embeddings(ckpt_path, new_ckpt_path, num_new_tokens=42):
+def expand_model_embeddings(ckpt_path: str, new_ckpt_path: str, num_new_tokens: int = 42) -> int:
     seed = 666
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
@@ -988,7 +1006,7 @@ def expand_model_embeddings(ckpt_path, new_ckpt_path, num_new_tokens=42):
     embed_dim = old_embed_ema.size(1)
     vocab_new = vocab_old + num_new_tokens
 
-    def expand_embeddings(old_embeddings):
+    def expand_embeddings(old_embeddings: Tensor) -> Tensor:
         new_embeddings = torch.zeros((vocab_new, embed_dim))
         new_embeddings[:vocab_old] = old_embeddings
         new_embeddings[vocab_old:] = torch.randn((num_new_tokens, embed_dim))
@@ -1004,11 +1022,11 @@ def expand_model_embeddings(ckpt_path, new_ckpt_path, num_new_tokens=42):
     return vocab_new
 
 
-def vocab_count(text):
+def vocab_count(text: str) -> str:
     return str(len(text.split(",")))
 
 
-def vocab_extend(project_name, symbols, model_type):
+def vocab_extend(project_name: str, symbols: str, model_type: str) -> str:
     if symbols == "":
         return "Symbols empty!"
 
@@ -1071,7 +1089,7 @@ def vocab_extend(project_name, symbols, model_type):
     return f"vocab old size : {size_vocab}\nvocab new size : {size}\nvocab add : {vocab_size_new}\nnew symbols :\n{vocab_new}"
 
 
-def vocab_check(project_name, tokenizer_type):
+def vocab_check(project_name: str, tokenizer_type: str) -> tuple[str, str]:
     name_project = project_name
     path_project = _safe_project_path(path_data, name_project)
 
@@ -1118,7 +1136,7 @@ def vocab_check(project_name, tokenizer_type):
     return info, vocab_miss
 
 
-def get_random_sample_prepare(project_name):
+def get_random_sample_prepare(project_name: str) -> tuple[str, str | None]:
     name_project = project_name
     path_project = _safe_project_path(path_data, name_project)
     file_arrow = os.path.join(path_project, "raw.arrow")
@@ -1131,7 +1149,7 @@ def get_random_sample_prepare(project_name):
     return text, audio_path
 
 
-def get_random_sample_transcribe(project_name):
+def get_random_sample_transcribe(project_name: str) -> tuple[str, str | None]:
     name_project = project_name
     path_project = _safe_project_path(path_data, name_project)
     file_metadata = os.path.join(path_project, "metadata.csv")
@@ -1160,7 +1178,7 @@ def get_random_sample_transcribe(project_name):
     return random_item[1], random_item[0]
 
 
-def get_random_sample_infer(project_name):
+def get_random_sample_infer(project_name: str) -> tuple[str, str, str | None]:
     text, audio = get_random_sample_transcribe(project_name)
     return (
         text,
@@ -1170,8 +1188,18 @@ def get_random_sample_infer(project_name):
 
 
 def infer(
-    project, file_checkpoint, exp_name, ref_text, ref_audio, gen_text, nfe_step, use_ema, speed, seed, remove_silence
-):
+    project: str,
+    file_checkpoint: str,
+    exp_name: str,
+    ref_text: str,
+    ref_audio: str,
+    gen_text: str,
+    nfe_step: int,
+    use_ema: bool,
+    speed: float,
+    seed: int,
+    remove_silence: bool,
+) -> tuple[None, str] | tuple[str, str, str]:
     global last_checkpoint, last_device, tts_api, last_ema
 
     if not os.path.isfile(file_checkpoint):
@@ -1217,11 +1245,13 @@ def infer(
         return f.name, tts_api.device, str(tts_api.seed)
 
 
-def check_finetune(finetune):
+def check_finetune(finetune: bool) -> tuple[dict[str, object], dict[str, object], dict[str, object]]:
     return gr.update(interactive=finetune), gr.update(interactive=finetune), gr.update(interactive=finetune)
 
 
-def get_checkpoints_project(project_name, is_gradio=True):
+def get_checkpoints_project(
+    project_name: str | None, is_gradio: bool = True
+) -> dict[str, object] | tuple[list[str], str | None]:
     if project_name is None:
         return [], ""
     project_name = project_name.replace("_pinyin", "").replace("_char", "")
@@ -1255,7 +1285,9 @@ def get_checkpoints_project(project_name, is_gradio=True):
     return files_checkpoints, selelect_checkpoint
 
 
-def get_audio_project(project_name, is_gradio=True):
+def get_audio_project(
+    project_name: str | None, is_gradio: bool = True
+) -> dict[str, object] | tuple[list[str], str | None]:
     if project_name is None:
         return [], ""
     project_name = project_name.replace("_pinyin", "").replace("_char", "")
@@ -1276,7 +1308,7 @@ def get_audio_project(project_name, is_gradio=True):
     return files_audios, selelect_checkpoint
 
 
-def get_gpu_stats():
+def get_gpu_stats() -> str:
     gpu_stats = ""
 
     if torch.cuda.is_available():
@@ -1330,7 +1362,7 @@ def get_gpu_stats():
     return gpu_stats
 
 
-def get_cpu_stats():
+def get_cpu_stats() -> str:
     cpu_usage = psutil.cpu_percent(interval=1)
     memory_info = psutil.virtual_memory()
     memory_used = memory_info.used / (1024**2)
@@ -1350,14 +1382,14 @@ def get_cpu_stats():
     return cpu_stats
 
 
-def get_combined_stats():
+def get_combined_stats() -> str:
     gpu_stats = get_gpu_stats()
     cpu_stats = get_cpu_stats()
     combined_stats = f"### GPU Stats\n{gpu_stats}\n\n### CPU Stats\n{cpu_stats}"
     return combined_stats
 
 
-def get_audio_select(file_sample):
+def get_audio_select(file_sample: str | None) -> tuple[str | None, str | None]:
     select_audio_ref = file_sample
     select_audio_gen = file_sample
 
@@ -1723,7 +1755,7 @@ If you encounter a memory error, try reducing the batch size per GPU to a smalle
                 check_finetune, inputs=[ch_finetune], outputs=[file_checkpoint_train, tokenizer_file, tokenizer_type]
             )
 
-            def setup_load_settings():
+            def setup_load_settings() -> list[gr.Component]:
                 output_components = [
                     exp_name,
                     learning_rate,
@@ -1843,13 +1875,13 @@ Reduce the Base model size from 5GB to 1.3GB. The new checkpoint file prunes out
         with gr.TabItem("System Info"):
             output_box = gr.Textbox(label="GPU and CPU Information", lines=20)
 
-            def update_stats():
+            def update_stats() -> str:
                 return get_combined_stats()
 
             update_button = gr.Button("Update Stats")
             update_button.click(fn=update_stats, outputs=output_box)
 
-            def auto_update():
+            def auto_update() -> Iterator[dict[str, object]]:
                 yield gr.update(value=update_stats())
 
             gr.update(fn=auto_update, inputs=[], outputs=output_box)
@@ -1866,7 +1898,7 @@ Reduce the Base model size from 5GB to 1.3GB. The new checkpoint file prunes out
     help="Share the app via Gradio share link",
 )
 @click.option("--api", "-a", default=True, is_flag=True, help="Allow API access")
-def main(port, host, share, api):
+def main(port: int | None, host: str | None, share: bool, api: bool) -> None:
     global app
     print("Starting app...")
     app.queue(api_open=api).launch(server_name=host, server_port=port, share=share, show_api=api)

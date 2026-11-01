@@ -4,7 +4,7 @@ import os
 from importlib.resources import files
 
 import hydra
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, OmegaConf
 
 from f5_tts.model import CFM, Trainer
 from f5_tts.model.dataset import load_dataset
@@ -15,7 +15,7 @@ os.chdir(str(files("f5_tts").joinpath("../..")))  # change working directory to 
 
 
 @hydra.main(version_base="1.3", config_path=str(files("f5_tts").joinpath("configs")), config_name=None)
-def main(model_cfg):
+def main(model_cfg: DictConfig) -> None:
     model_cls = hydra.utils.get_class(f"f5_tts.model.{model_cfg.model.backbone}")
     model_arc = model_cfg.model.arch
     tokenizer = model_cfg.model.tokenizer

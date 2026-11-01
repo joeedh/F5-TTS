@@ -14,7 +14,7 @@ from datasets.arrow_writer import ArrowWriter
 from tqdm import tqdm
 
 
-def deal_with_audio_dir(audio_dir):
+def deal_with_audio_dir(audio_dir: Path) -> tuple[list[dict[str, str | float]], list[float], set[str]]:
     sub_result, durations = [], []
     vocab_set = set()
     audio_lists = list(audio_dir.rglob("*.wav"))
@@ -31,7 +31,7 @@ def deal_with_audio_dir(audio_dir):
     return sub_result, durations, vocab_set
 
 
-def main():
+def main() -> None:
     result = []
     duration_list = []
     text_vocab_set = set()

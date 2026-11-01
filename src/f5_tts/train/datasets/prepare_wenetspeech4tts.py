@@ -18,7 +18,7 @@ from tqdm import tqdm
 from f5_tts.model.utils import convert_char_to_pinyin
 
 
-def deal_with_sub_path_files(dataset_path, sub_path):
+def deal_with_sub_path_files(dataset_path: str, sub_path: str) -> tuple[list[str], list[list[str] | str], list[float]]:
     print(f"Dealing with: {sub_path}")
 
     text_dir = os.path.join(dataset_path, sub_path, "txts")
@@ -46,7 +46,7 @@ def deal_with_sub_path_files(dataset_path, sub_path):
     return audio_paths, texts, durations
 
 
-def main():
+def main() -> None:
     assert tokenizer in ["pinyin", "char"]
 
     audio_path_list, text_list, duration_list = [], [], []

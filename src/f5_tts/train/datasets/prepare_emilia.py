@@ -108,7 +108,9 @@ out_en = {
 en_filters = ["ا", "い", "て"]
 
 
-def deal_with_audio_dir(audio_dir):
+def deal_with_audio_dir(
+    audio_dir: Path,
+) -> tuple[list[dict[str, str | float | list[str]]], list[float], set[str], int, int]:
     audio_jsonl = audio_dir.with_suffix(".jsonl")
     sub_result, durations = [], []
     vocab_set = set()
@@ -144,7 +146,7 @@ def deal_with_audio_dir(audio_dir):
     return sub_result, durations, vocab_set, bad_case_zh, bad_case_en
 
 
-def main():
+def main() -> None:
     assert tokenizer in ["pinyin", "char"]
     result = []
     duration_list = []

@@ -18,7 +18,7 @@ out_en = set()
 en_filters = ["ا", "い", "て"]
 
 
-def process_audio_directory(audio_dir):
+def process_audio_directory(audio_dir: Path) -> tuple[list[dict[str, str | float]], list[float], set[str], int]:
     sub_result, durations, vocab_set = [], [], set()
     bad_case_en = 0
 
@@ -41,7 +41,7 @@ def process_audio_directory(audio_dir):
     return sub_result, durations, vocab_set, bad_case_en
 
 
-def main():
+def main() -> None:
     assert tokenizer in ["pinyin", "char"]
     result, duration_list, text_vocab_set = [], [], set()
     total_bad_case_en = 0

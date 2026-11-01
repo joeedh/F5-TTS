@@ -20,7 +20,7 @@ mel_spec_type = "vocos"  # 'vocos' or 'bigvgan'
 
 
 # -------------------------- Argument Parsing --------------------------- #
-def parse_args():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Train CFM Model")
 
     parser.add_argument(
@@ -78,7 +78,7 @@ def parse_args():
 # -------------------------- Training Settings -------------------------- #
 
 
-def main():
+def main() -> None:
     args = parse_args()
 
     checkpoint_path = str(files("f5_tts").joinpath(f"../../ckpts/{args.dataset_name}"))

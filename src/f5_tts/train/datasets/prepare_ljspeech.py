@@ -13,7 +13,7 @@ from datasets.arrow_writer import ArrowWriter
 from tqdm import tqdm
 
 
-def main():
+def main() -> None:
     result = []
     duration_list = []
     text_vocab_set = set()
