@@ -37,10 +37,10 @@ Approach decided: pyright, and port many files at once, then drive the error cou
 - [ ] Commit per batch so a bad batch can be reverted alone.
 
 ### Drive errors to zero
-- [ ] Burn down by rule category, biggest first (possibly-unbound, attribute access, argument types, then the rest), fixing real bugs separately from annotation fixes.
-- [ ] Any real bug found goes into `docs/debugging.md` with its fix.
-- [ ] Review every suppression added; each needs a rule name and a reason.
-- [ ] Reach zero errors in the chosen mode and paths.
+- [x] Burn down by rule category, biggest first (possibly-unbound, attribute access, argument types, then the rest), fixing real bugs separately from annotation fixes. (Done 2026-11-01.)
+- [x] Any real bug found goes into `docs/debugging.md` with its fix. (Done for the 9 that pyright flagged; the unflagged ones are listed in the plan, step 5, and still open.)
+- [x] Review every suppression added; each needs a rule name and a reason. (12 reviewed 2026-11-01.)
+- [x] Reach zero errors in the chosen mode and paths. (0 errors, 0 warnings, basic mode, 2026-11-01.)
 
 ### Lock it in
 - [ ] Add pyright to pre-commit and to the GitHub workflow, failing on errors.
