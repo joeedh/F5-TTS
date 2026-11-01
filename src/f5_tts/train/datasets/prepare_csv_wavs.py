@@ -198,14 +198,14 @@ def get_audio_duration(audio_path: str, timeout: float = 5) -> float:
         if duration_str:
             return float(duration_str)
         raise ValueError("Empty duration string from ffprobe.")
-    except (subprocess.TimeoutExpired, subprocess.SubprocessError, ValueError) as e:
-        print(f"Warning: ffprobe failed for {audio_path} with error: {e}. Falling back to torchaudio.info.")
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError, ValueError, OSError) as e:
+        print(f"Warning: ffprobe failed for {audio_path} with error: {e}. Falling back to torchaudio.load.")
 
     try:
-        info = torchaudio.info(audio_path)
-        if info.sample_rate > 0:
-            return info.num_frames / info.sample_rate
-        raise ValueError("Invalid sample_rate from torchaudio.info.")
+        waveform, sample_rate = torchaudio.load(audio_path)
+        if sample_rate > 0:
+            return waveform.shape[-1] / sample_rate
+        raise ValueError("Invalid sample_rate from torchaudio.load.")
     except Exception as e:
         raise RuntimeError(f"failed to get duration for {audio_path}: {e}")
 

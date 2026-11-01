@@ -43,6 +43,12 @@ Each entry is one commit. All were found by reading pyright errors, then confirm
 - Cause: the `if cuda / elif xpu / elif mps` chain in `train/finetune_gradio.py` had no `else`.
 - Fix: an `else` returns the unchanged values with the message "no GPU found, cannot estimate the batch size", the same shape as the existing "project not found !" return.
 
+### Audio duration fallback in `prepare_csv_wavs.py` could never run
+- Symptom: if `soundfile` could not read a file, `get_audio_duration` raised `FileNotFoundError` (no `ffprobe` installed) or `RuntimeError: ... module 'torchaudio' has no attribute 'info'` instead of using its last fallback.
+- Cause: two separate faults. `ffprobe` missing raises `FileNotFoundError`, an `OSError`, which the `except (TimeoutExpired, SubprocessError, ValueError)` did not list. And `torchaudio.info` no longer exists in torchaudio 2.9+ (installed here: 2.11.1; `pyproject.toml` allows `>=2.0`).
+- Fix: `OSError` is caught, and the last fallback decodes with `torchaudio.load` and divides frames by sample rate. It decodes the whole file, which is acceptable because `soundfile` and `ffprobe` have already failed.
+- Tested: with `soundfile.info` forced to fail and no `ffprobe` on the machine, the old code raised `FileNotFoundError` and the new code reaches the `torchaudio.load` fallback. A stubbed `torchaudio.load` (24000 frames at 24 kHz) gives 1.0. Not tested end to end: `torchaudio.load` needs `torchcodec` with FFmpeg, which is unusable on this Windows/Python 3.15 machine.
+
 ## 2026-11-01: type-checking environment (Plan P, step 1)
 
 How the venv used for pyright and ruff was built, on Windows with Python 3.15.1. Commands run from the repo root; `.venv` is already in `.gitignore`.
