@@ -2,6 +2,16 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-01: bugs found by pyright and fixed (Plan P, step 5)
+
+Each entry is one commit. All were found by reading pyright errors, then confirmed by reading the code (not by running the Gradio apps, which need a GPU and models).
+
+### Gradio TTS tab crashes on blank text or missing reference audio
+- Symptom: clicking Synthesize with no reference audio or empty text raised `ValueError: not enough values to unpack` instead of showing the warning.
+- Cause: `infer()` in `infer/infer_gradio.py` returned 3 values on its two early-exit paths (after `gr.Warning`), but `basic_tts`, `generate_multistyle_speech` and `generate_audio_response` unpack 4 (audio, spectrogram, ref text, seed).
+- Fix: both early returns now give a fourth `gr.update()` (leaves the seed box unchanged), and the return annotation is a single 4-tuple.
+- Still open: `generate_multistyle_speech` unpacks `sr, audio_data = audio_out`, so a segment whose reference audio is blank still fails there (the early return carries a `gr.update()` dict, not audio). Needs a decision on whether to skip such a segment.
+
 ## 2026-11-01: type-checking environment (Plan P, step 1)
 
 How the venv used for pyright and ruff was built, on Windows with Python 3.15.1. Commands run from the repo root; `.venv` is already in `.gitignore`.

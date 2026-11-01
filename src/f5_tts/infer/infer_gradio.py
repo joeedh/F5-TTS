@@ -156,13 +156,15 @@ def infer(
     nfe_step: int = 32,
     speed: float = 1,
     show_info: Callable[[str], object] = gr.Info,
-) -> (
-    tuple[tuple[int, np.ndarray | None] | dict[str, object], str | dict[str, object], str]
-    | tuple[tuple[int, np.ndarray | None], str, str, int]
-):
+) -> tuple[
+    tuple[int, np.ndarray] | dict[str, object],
+    str | dict[str, object],
+    str,
+    int | dict[str, object],
+]:
     if not ref_audio_orig:
         gr.Warning("Please provide reference audio.")
-        return gr.update(), gr.update(), ref_text
+        return gr.update(), gr.update(), ref_text, gr.update()
 
     # Set inference seed
     if seed < 0 or seed > 2**31 - 1:
@@ -173,7 +175,7 @@ def infer(
 
     if not gen_text.strip():
         gr.Warning("Please enter text to generate or upload a text file.")
-        return gr.update(), gr.update(), ref_text
+        return gr.update(), gr.update(), ref_text, gr.update()
 
     ref_audio, ref_text = preprocess_ref_audio_text(ref_audio_orig, ref_text, show_info=show_info)
 
@@ -313,7 +315,12 @@ with gr.Blocks() as app_tts:
         cross_fade_duration_slider: float,
         nfe_slider: int,
         speed_slider: float,
-    ) -> tuple[tuple[int, np.ndarray | None] | dict[str, object], str | dict[str, object], str, int]:
+    ) -> tuple[
+        tuple[int, np.ndarray] | dict[str, object],
+        str | dict[str, object],
+        str,
+        int | dict[str, object],
+    ]:
         if randomize_seed:
             seed_input = np.random.randint(0, 2**31 - 1)
 
@@ -915,7 +922,7 @@ Have a conversation with an AI using your reference voice!
             remove_silence: bool,
             randomize_seed: bool,
             seed_input: int,
-        ) -> tuple[tuple[int, np.ndarray | None] | dict[str, object] | None, str, int]:
+        ) -> tuple[tuple[int, np.ndarray] | dict[str, object] | None, str, int | dict[str, object]]:
             """Generate TTS audio for AI response"""
             if not conv_state or not ref_audio:
                 return None, ref_text, seed_input
