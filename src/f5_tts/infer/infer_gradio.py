@@ -195,6 +195,10 @@ def infer(
             custom_ema_model = load_custom(model[1], vocab_path=model[2], model_cfg=model[3])
             pre_custom_path = model[1]
         ema_model = custom_ema_model
+    else:
+        raise ValueError(f"Unknown model choice: {model!r}")
+    if ema_model is None:
+        raise ValueError("No model loaded: the custom checkpoint path is empty.")
 
     final_wave, final_sample_rate, combined_spectrogram = infer_process(
         ref_audio,

@@ -12,6 +12,10 @@ Each entry is one commit. All were found by reading pyright errors, then confirm
 - Fix: both early returns now give a fourth `gr.update()` (leaves the seed box unchanged), and the return annotation is a single 4-tuple.
 - Still open: `generate_multistyle_speech` unpacks `sr, audio_data = audio_out`, so a segment whose reference audio is blank still fails there (the early return carries a `gr.update()` dict, not audio). Needs a decision on whether to skip such a segment.
 
+### `infer()` runs with no model for an unknown model name or an empty custom path
+- Symptom: `UnboundLocalError: ema_model` for a model choice that is neither the default, "E2-TTS" nor a `("Custom", ...)` tuple; or a crash inside `infer_process` for a custom model whose checkpoint path is empty (`pre_custom_path` starts as `""`, so the load is skipped and `custom_ema_model` stays `None`).
+- Fix: an `else` branch raises `ValueError` naming the choice, and a `None` model raises `ValueError` saying the custom path is empty.
+
 ## 2026-11-01: type-checking environment (Plan P, step 1)
 
 How the venv used for pyright and ruff was built, on Windows with Python 3.15.1. Commands run from the repo root; `.venv` is already in `.gitignore`.
