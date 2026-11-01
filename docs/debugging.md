@@ -38,6 +38,11 @@ Each entry is one commit. All were found by reading pyright errors, then confirm
 - Cause: `get_correct_audio_path` returns `None` for an absolute path whose extension is not in the supported list, and `create_metadata` passed that straight to `os.path.isfile`.
 - Fix: a `None` result is recorded as an "error path" entry (using the name from the transcript) like any other missing file, and the loop continues.
 
+### Auto-setting training parameters fails on a machine without a GPU
+- Symptom: `UnboundLocalError: gpu_count` (or `total_memory`) when pressing the auto-setting button on a machine with no CUDA, XPU or MPS device.
+- Cause: the `if cuda / elif xpu / elif mps` chain in `train/finetune_gradio.py` had no `else`.
+- Fix: an `else` returns the unchanged values with the message "no GPU found, cannot estimate the batch size", the same shape as the existing "project not found !" return.
+
 ## 2026-11-01: type-checking environment (Plan P, step 1)
 
 How the venv used for pyright and ruff was built, on Windows with Python 3.15.1. Commands run from the repo root; `.venv` is already in `.gitignore`.

@@ -927,6 +927,15 @@ def calculate_train(
     elif torch.backends.mps.is_available():
         gpu_count = 1
         total_memory = psutil.virtual_memory().available / (1024**3)
+    else:
+        return (
+            epochs,
+            learning_rate,
+            batch_size_per_gpu,
+            max_samples,
+            num_warmup_updates,
+            "no GPU found, cannot estimate the batch size",
+        )
 
     avg_gpu_memory = total_memory / gpu_count
 
