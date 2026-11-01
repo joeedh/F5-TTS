@@ -4,6 +4,7 @@
 # part of the code is borrowed from https://github.com/lawlict/ECAPA-TDNN
 
 import os
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -211,6 +212,7 @@ class ECAPA_TDNN(nn.Module):
         self.update_extract = update_extract
         self.sr = sr
 
+        self.feature_extract: Any  # Any: the s3prl WavLM wrapper from torch.hub, which is typed as object
         torch.hub._validate_not_a_forked_repo = lambda a, b, c: True
         try:
             local_s3prl_path = os.path.expanduser("~/.cache/torch/hub/s3prl_s3prl_main")
@@ -299,30 +301,30 @@ class ECAPA_TDNN(nn.Module):
             return 1
 
     def get_feat(self, x: Float[Tensor, "b nw"]) -> Float[Tensor, "b d t"]:
+        feat: Any  # Any: a tensor, or a list or dict of per-layer tensors, depending on the stage
         if self.update_extract:
-            x = self.feature_extract([sample for sample in x])
+            feat = self.feature_extract([sample for sample in x])
         else:
             with torch.no_grad():
                 if self.feat_type == "fbank" or self.feat_type == "mfcc":
-                    x = self.feature_extract(x) + 1e-6  # B x feat_dim x time_len
+                    feat = self.feature_extract(x) + 1e-6  # B x feat_dim x time_len
                 else:
-                    x = self.feature_extract([sample for sample in x])
+                    feat = self.feature_extract([sample for sample in x])
 
         if self.feat_type == "fbank":
-            x = x.log()
+            feat = feat.log()
 
         if self.feat_type != "fbank" and self.feat_type != "mfcc":
-            x = x[self.feature_selection]
-            if isinstance(x, (list, tuple)):
-                x = torch.stack(x, dim=0)
+            feat = feat[self.feature_selection]
+            if isinstance(feat, (list, tuple)):
+                feat = torch.stack(feat, dim=0)
             else:
-                x = x.unsqueeze(0)
+                feat = feat.unsqueeze(0)
             norm_weights = F.softmax(self.feature_weight, dim=-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
-            x = (norm_weights * x).sum(dim=0)
-            x = torch.transpose(x, 1, 2) + 1e-6
+            feat = (norm_weights * feat).sum(dim=0)
+            feat = torch.transpose(feat, 1, 2) + 1e-6
 
-        x = self.instance_norm(x)
-        return x
+        return self.instance_norm(feat)
 
     def forward(self, x: Float[Tensor, "b nw"]) -> Float[Tensor, "b e"]:
         x = self.get_feat(x)

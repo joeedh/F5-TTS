@@ -61,7 +61,7 @@ def get_librispeech_test_clean_metainfo(
 
 # padded to max length mel batch
 def padded_mel_batch(ref_mels: list[Float[Tensor, "d t"]]) -> Float[Tensor, "b t d"]:
-    max_mel_length = torch.LongTensor([mel.shape[-1] for mel in ref_mels]).amax()
+    max_mel_length = int(torch.LongTensor([mel.shape[-1] for mel in ref_mels]).amax())
     padded_ref_mels = []
     for mel in ref_mels:
         padded_ref_mel = F.pad(mel, (0, max_mel_length - mel.shape[-1]), value=0)
@@ -396,7 +396,7 @@ def run_sim(args: tuple[int, list[tuple[str, str, str]], str]) -> list[dict[str,
 
     use_gpu = True if torch.cuda.is_available() else False
     if use_gpu:
-        model = model.cuda(device)
+        model = model.cuda(torch.device(device))
     model.eval()
 
     sim_results = []
@@ -411,12 +411,12 @@ def run_sim(args: tuple[int, list[tuple[str, str, str]], str]) -> list[dict[str,
         if sr1 != 16000:
             resample1 = torchaudio.transforms.Resample(orig_freq=sr1, new_freq=16000)
             if use_gpu:
-                resample1 = resample1.cuda(device)
+                resample1 = resample1.cuda(torch.device(device))
             wav1 = resample1(wav1)
         if sr2 != 16000:
             resample2 = torchaudio.transforms.Resample(orig_freq=sr2, new_freq=16000)
             if use_gpu:
-                resample2 = resample2.cuda(device)
+                resample2 = resample2.cuda(torch.device(device))
             wav2 = resample2(wav2)
 
         with torch.no_grad():

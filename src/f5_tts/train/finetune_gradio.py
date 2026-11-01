@@ -12,10 +12,10 @@ import sys
 import tempfile
 import threading
 import time
-from collections.abc import Generator, Iterator
+from collections.abc import Generator, Iterable, Iterator
 from glob import glob
 from importlib.resources import files
-from typing import IO
+from typing import IO, Any, TypeVar, cast
 
 import click
 import gradio as gr
@@ -186,6 +186,14 @@ def load_settings(
     )
 
 
+_T = TypeVar("_T")
+
+
+def progress_iter(progress: gr.Progress, iterable: Iterable[_T], **kwargs: Any) -> Iterable[_T]:  # Any: tqdm options
+    """gradio types Progress.tqdm loosely; it returns the iterable it was given."""
+    return cast(Iterable[_T], progress.tqdm(iterable, **kwargs))
+
+
 # Load metadata
 def get_audio_duration(audio_path: str) -> float:
     """Calculate the duration mono of an audio file."""
@@ -199,7 +207,7 @@ class Slicer:  # https://github.com/RVC-Boss/GPT-SoVITS/blob/main/tools/slicer2.
         sr: int,
         threshold: float = -40.0,
         min_length: int = 20000,  # 20 seconds
-        min_interval: int = 300,
+        min_interval: float = 300,
         hop_size: int = 20,
         max_sil_kept: int = 2000,
     ) -> None:
@@ -221,7 +229,7 @@ class Slicer:  # https://github.com/RVC-Boss/GPT-SoVITS/blob/main/tools/slicer2.
         if len(waveform.shape) > 1:
             return waveform[:, begin * self.hop_size : min(waveform.shape[1], end * self.hop_size)]
         else:
-            return waveform[begin * self.hop_size : min(waveform.shape[0], end * self.hop_size)]
+            return waveform[begin * self.hop_size : min(waveform.shape[0], end * self.hop_size)]  # pyright: ignore[reportGeneralTypeIssues]  # pyright narrows shape to () in this branch
 
     # @timeit
     def slice(
@@ -582,6 +590,7 @@ def start_training(
                 time.sleep(0.1)
 
             # Clean up
+            assert training_process.stdout is not None and training_process.stderr is not None
             training_process.stdout.close()
             training_process.stderr.close()
             training_process.wait()
@@ -671,6 +680,7 @@ def transcribe_all(
         if file_audios == []:
             return "No audio file was found in the dataset."
     else:
+        assert audio_files is not None  # checked above when not user
         file_audios = audio_files
 
     alpha = 0.5
@@ -680,11 +690,11 @@ def transcribe_all(
     num = 0
     error_num = 0
     data = ""
-    for file_audio in progress.tqdm(file_audios, desc="transcribe files", total=len((file_audios))):
+    for file_audio in progress_iter(progress, file_audios, desc="transcribe files", total=len((file_audios))):
         audio, _ = librosa.load(file_audio, sr=24000, mono=True)
 
         list_slicer = slicer.slice(audio)
-        for chunk, start, end in progress.tqdm(list_slicer, total=len(list_slicer), desc="slicer files"):
+        for chunk, start, end in progress_iter(progress, list_slicer, total=len(list_slicer), desc="slicer files"):
             name_segment = os.path.join(f"segment_{num}")
             file_segment = os.path.join(path_project_wavs, f"{name_segment}.wav")
 
@@ -776,7 +786,7 @@ def create_metadata(name_project: str, ch_tokenizer: bool, progress: gr.Progress
     result = []
     error_files = []
     text_vocab_set = set()
-    for line in progress.tqdm(data.split("\n"), total=count):
+    for line in progress_iter(progress, data.split("\n"), total=count):
         sp_line = line.split("|")
         if len(sp_line) != 2:
             continue
@@ -825,7 +835,7 @@ def create_metadata(name_project: str, ch_tokenizer: bool, progress: gr.Progress
     max_second = round(max(duration_list), 2)
 
     with ArrowWriter(path=file_raw) as writer:
-        for line in progress.tqdm(result, total=len(result), desc="prepare data"):
+        for line in progress_iter(progress, result, total=len(result), desc="prepare data"):
             writer.write(line)
         writer.finalize()
 
@@ -1038,8 +1048,8 @@ def vocab_extend(project_name: str, symbols: str, model_type: str) -> str:
     if not os.path.isfile(file_vocab):
         return f"the file {file_vocab} not found !"
 
-    symbols = symbols.split(",")
-    if symbols == []:
+    symbol_list = symbols.split(",")
+    if symbol_list == []:
         return "Symbols to extend not found."
 
     with open(file_vocab, "r", encoding="utf-8-sig") as f:
@@ -1048,7 +1058,7 @@ def vocab_extend(project_name: str, symbols: str, model_type: str) -> str:
     vocab_check = set(vocab)
 
     miss_symbols = []
-    for item in symbols:
+    for item in symbol_list:
         item = item.replace(" ", "")
         if item in vocab_check:
             continue
@@ -1197,7 +1207,7 @@ def infer(
     nfe_step: int,
     use_ema: bool,
     speed: float,
-    seed: int,
+    seed: int | None,
     remove_silence: bool,
 ) -> tuple[None, str] | tuple[str, str, str]:
     global last_checkpoint, last_device, tts_api, last_ema
@@ -1394,8 +1404,8 @@ def get_audio_select(file_sample: str | None) -> tuple[str | None, str | None]:
     select_audio_gen = file_sample
 
     if file_sample is not None:
-        select_audio_ref += "_ref.wav"
-        select_audio_gen += "_gen.wav"
+        select_audio_ref = file_sample + "_ref.wav"
+        select_audio_gen = file_sample + "_gen.wav"
 
     return select_audio_ref, select_audio_gen
 
@@ -1674,8 +1684,8 @@ If you encounter a memory error, try reducing the batch size per GPU to a smalle
             select_audio_gen = select_audio
 
             if select_audio is not None:
-                select_audio_ref += "_ref.wav"
-                select_audio_gen += "_gen.wav"
+                select_audio_ref = select_audio + "_ref.wav"
+                select_audio_gen = select_audio + "_gen.wav"
 
             with gr.Row():
                 ch_list_audio = gr.Dropdown(

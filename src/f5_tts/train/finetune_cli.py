@@ -2,6 +2,7 @@ import argparse
 import os
 import shutil
 from importlib.resources import files
+from typing import Any
 
 from cached_path import cached_path
 
@@ -85,6 +86,7 @@ def main() -> None:
 
     # Model parameters based on experiment name
 
+    model_cfg: dict[str, Any]  # Any: mixed ints, bools and strings
     if args.exp_name == "F5TTS_v1_Base":
         wandb_resume_id = None
         model_cls = DiT

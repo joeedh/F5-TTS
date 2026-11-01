@@ -1,9 +1,11 @@
 import argparse
 import json
 from pathlib import Path
+from typing import cast
 
 import librosa
 import torch
+from torch import nn
 from tqdm import tqdm
 
 from f5_tts.device_utils import get_default_device
@@ -17,7 +19,10 @@ def main() -> None:
 
     device = get_default_device()
 
-    predictor = torch.hub.load("tarepan/SpeechMOS:v1.2.0", "utmos22_strong", trust_repo=True)
+    predictor = cast(
+        nn.Module,
+        torch.hub.load("tarepan/SpeechMOS:v1.2.0", "utmos22_strong", trust_repo=True),  # pyright: ignore[reportArgumentType]  # torch types trust_repo as str
+    )
     predictor = predictor.to(device)
 
     audio_paths = list(Path(args.audio_dir).rglob(f"*.{args.ext}"))

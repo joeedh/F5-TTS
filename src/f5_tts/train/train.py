@@ -2,6 +2,7 @@
 
 import os
 from importlib.resources import files
+from typing import Any, cast
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -66,7 +67,7 @@ def main(model_cfg: DictConfig) -> None:
         mel_spec_type=mel_spec_type,
         is_local_vocoder=model_cfg.model.vocoder.is_local,
         local_vocoder_path=model_cfg.model.vocoder.local_path,
-        model_cfg_dict=OmegaConf.to_container(model_cfg, resolve=True),
+        model_cfg_dict=cast(dict[str, Any], OmegaConf.to_container(model_cfg, resolve=True)),  # Any: yaml values
     )
 
     train_dataset = load_dataset(model_cfg.datasets.name, tokenizer, mel_spec_kwargs=model_cfg.model.mel_spec)
