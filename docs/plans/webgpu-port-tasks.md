@@ -33,7 +33,7 @@ Approach decided: pyright, and port many files at once, then drive the error cou
 ### Bulk conversion (many files at once)
 - [ ] Group files into a few batches by area: `model/` (cfm, backbones, modules, utils, dataset, trainer), `infer/` plus `api.py` and the socket files, `train/`, `eval/`, `scripts/`.
 - [x] Add `jaxtyping` as a dependency (done 2026-11-01, `jaxtyping>=0.3.0`) and convert the ein-notation annotations in `model/` to it in one pass. (Done 2026-11-01.)
-- [ ] Add parameter and return annotations across each batch (batch A, `model/` core, done 2026-11-01; B to E open) without stopping to fix every error on the way. Behaviour must not change; run the existing inference path before and after (golden output from plan 00's harness, or a fixed-seed run).
+- [x] Add parameter and return annotations across each batch (all batches A to E done 2026-11-01) without stopping to fix every error on the way. Behaviour must not change; run the existing inference path before and after (golden output from plan 00's harness, or a fixed-seed run).
 - [ ] Commit per batch so a bad batch can be reverted alone.
 
 ### Drive errors to zero

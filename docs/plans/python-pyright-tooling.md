@@ -124,7 +124,9 @@ Progress:
 - Batch A done 2026-11-01. Pyright errors 457 to 215 (all 69 ein-string errors gone, no undefined names). Guard passes. `tools/typing_guard/annotation_only.py` confirms all six files differ from HEAD only by annotations, imports and the two new aliases (`Rope`, `_T`). Details below the list.
 - Batch B done 2026-11-01 (`model/dataset.py`, `model/trainer.py`). Errors 215 to 211. Annotation-only check and guard pass. Found for step 5, not fixed here: `preprocessed_mel` is unbound in the `CustomDatasetPath` branch of `load_dataset` (`dataset.py`, passed to `CustomDataset`); that branch raises `UnboundLocalError` when used.
 - Batch C done 2026-11-01 (`infer/utils_infer.py`, `api.py`, `socket_server.py`, `socket_client.py`, `infer/infer_cli.py`; `device_utils.py` and `infer/speech_edit.py` were already annotated). Errors 211 to 212: real annotations expose mismatches at call sites (for example `socket_server.py` passes `local_path=None` to `load_vocoder`, and `infer_batch_process` yields 2-tuples when streaming and 3-tuples otherwise). Those belong to step 5. Guard and annotation-only check pass.
-- Batches D and E: not started.
+- Batches D and E done 2026-11-01 (`infer/infer_gradio.py`, `train/*`, `train/datasets/*`, `eval/*`; `scripts/*` and `tools/typing_guard/golden.py` were already annotated). Three agents annotated these in parallel under the rules above; I re-ran ruff, the guard and `annotation_only.py` on every file before committing. `ruff.toml` gained F722/F821 ignores for `eval/ecapa_tdnn.py` and `eval/utils_eval.py`.
+- Step 4 finished. No unannotated function remains outside `runtime/triton_trtllm`, no `type: ignore`, no ein notation. Pyright: **227 errors** (after batch A it was 215; real annotations expose call-site mismatches, so the number rose in later batches). By rule: reportArgumentType 106, reportAttributeAccessIssue 35, reportCallIssue 22, reportAssignmentType 14, reportReturnType 13, reportOperatorIssue 10, reportOptionalMemberAccess 8, reportMissingImports 5, reportOptionalCall 4, reportIndexIssue 4, reportGeneralTypeIssues 2, and 1 each of reportUnboundVariable, reportPrivateImportUsage, reportOptionalSubscript, reportOptionalIterable.
+- One shape left as plain `Tensor`: the nested `expand_embeddings` in `train/finetune_gradio.py` (`"v d"` in, `"vn d"` out). Add that file to the F722 ignores and restore the jaxtyping annotation if wanted.
 
 Batch A notes:
 - Both bare `# type: ignore` in `modules.py` were removed outright; pyright reports nothing on those lines, so no replacement was needed.
@@ -140,6 +142,30 @@ Within a batch:
 4. Run the guard (step 2), then `ruff check` and `ruff format --check` with the pinned version. Also run `python tools/typing_guard/annotation_only.py <files of the batch>` before committing; it must report every file as annotation-only. Commit.
 
 Out-of-band rule: a bug found while annotating is not fixed in the batch commit. Write it down for step 5.
+
+## Found while annotating (worklist for step 5)
+
+Real bugs, each to be fixed in its own behaviour commit with a `debugging.md` entry:
+- `infer/infer_gradio.py` `infer`: the two early returns give 3 values, but `basic_tts`, `generate_multistyle_speech` and `generate_audio_response` unpack 4. Empty text or missing reference audio raises `ValueError`.
+- `model/dataset.py` `load_dataset`: `preprocessed_mel` is unbound in the `CustomDatasetPath` branch.
+- `train/finetune_gradio.py` `start_training`: the early `return "Train run already!", ...` sits in a generator, so Gradio never gets it (needs `yield` then `return`). `stop_signal` is declared `global` but never defined at module level (`NameError` before the first run).
+- `train/finetune_gradio.py` `Slicer.slice` returns a bare `[waveform]` for short audio, which `transcribe_all` cannot unpack as `chunk, start, end`.
+- `train/finetune_gradio.py` `transcribe_all`: `error_num != []` compares an int to a list (always true); `chunk /= tmp_max` then `chunk / tmp_max * ...` divides twice and divides by zero for silent chunks.
+- `train/finetune_gradio.py` `create_metadata`: passes a list as `total=` to `progress.tqdm`.
+- `train/finetune_gradio.py` `infer`: 2-tuple on error but 3-tuple on success; temp file with `delete=False` never removed. `seed` is annotated `int` but rebound to `None`.
+- `train/finetune_gradio.py` end of System Info tab: `gr.update(fn=auto_update, ...)` takes no `fn`, so it does nothing.
+- Unbound variables: `ema_model` in `infer_gradio.infer` (unknown model name), `sr` in `generate_multistyle_speech`, `ckpt` in `expand_model_embeddings`, `ckpt_path` in `vocab_extend`, `utt` in `eval/utils_eval.py` metadata parsing, `metainfo` and `vocoder_local_path` in `eval/eval_infer_batch.py`.
+- `socket_server.py` passes `local_path=None` to `load_vocoder(local_path: str)`.
+
+Smells that are not bugs but block clean types:
+- `eval/ecapa_tdnn.py`: a bare `except:` around `torch.hub.load`; `torch.hub._validate_not_a_forked_repo` is monkeypatched globally in a constructor; `get_feat` reuses `x` as tensor, dict, list and tensor.
+- `eval/utils_eval.py`: `padded_mel_batch` passes a 0-d tensor as a `F.pad` width; `run_sim` passes `"cuda:{rank}"` to `.cuda()`. `eval_*` `main` functions rebind `args` from a Namespace to a list.
+- `infer_batch_process` yields 2-tuples when streaming and 3-tuples otherwise; callers need narrowing or two functions.
+- `model/utils.py` `exists` does not narrow, so `default(v, d)` fails. Options: `TypeIs` from `typing_extensions`, or a typed overload.
+- Optional globals: `chat_model_state`, `chat_tokenizer_state`, `asr_pipe`; `speech_type_delete_btns = [None]` later appended with buttons.
+- `tempfile_kwargs` in `utils_infer.py` is a dict of bools passed as keyword arguments; type it as a `TypedDict` or build the call differently.
+- `files(...).joinpath()` returns a `Traversable` that `open()` and `Path` methods do not accept as typed; wrap in `Path(str(...))` or type-narrow.
+- Unused parameter `polyphone` in `train/datasets/prepare_csv_wavs.py`; `prepare_emilia.py` `deal_with_audio_dir` reads module globals defined later in the file.
 
 ## Step 5: drive errors to zero
 
