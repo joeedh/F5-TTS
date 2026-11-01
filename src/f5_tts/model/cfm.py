@@ -10,11 +10,12 @@ d - dimension
 from __future__ import annotations
 
 from random import random
-from typing import Callable
+from typing import Any, Callable
 
 import torch
 import torch.nn.functional as F
-from torch import nn
+from jaxtyping import Bool, Float, Int
+from torch import Tensor, nn
 from torch.nn.utils.rnn import pad_sequence
 from torchdiffeq import odeint
 
@@ -34,20 +35,20 @@ class CFM(nn.Module):
     def __init__(
         self,
         transformer: nn.Module,
-        sigma=0.0,
-        odeint_kwargs: dict = dict(
+        sigma: float = 0.0,
+        odeint_kwargs: dict[str, Any] = dict(  # Any: forwarded to torchdiffeq.odeint
             # atol = 1e-5,
             # rtol = 1e-5,
             method="euler"  # 'midpoint'
         ),
-        audio_drop_prob=0.3,
-        cond_drop_prob=0.2,
-        num_channels=None,
+        audio_drop_prob: float = 0.3,
+        cond_drop_prob: float = 0.2,
+        num_channels: int | None = None,
         mel_spec_module: nn.Module | None = None,
-        mel_spec_kwargs: dict = dict(),
+        mel_spec_kwargs: dict[str, Any] = dict(),  # Any: forwarded to MelSpec
         frac_lengths_mask: tuple[float, float] = (0.7, 1.0),
-        vocab_char_map: dict[str:int] | None = None,
-    ):
+        vocab_char_map: dict[str, int] | None = None,
+    ) -> None:
         super().__init__()
 
         self.frac_lengths_mask = frac_lengths_mask
@@ -76,29 +77,29 @@ class CFM(nn.Module):
         self.vocab_char_map = vocab_char_map
 
     @property
-    def device(self):
+    def device(self) -> torch.device:
         return next(self.parameters()).device
 
     @torch.no_grad()
     def sample(
         self,
-        cond: float["b n d"] | float["b nw"],
-        text: int["b nt"] | list[str],
-        duration: int | int["b"],
+        cond: Float[Tensor, "b n d"] | Float[Tensor, "b nw"],
+        text: Int[Tensor, "b nt"] | list[str],
+        duration: int | Int[Tensor, "b"],
         *,
-        lens: int["b"] | None = None,
-        steps=32,
-        cfg_strength=1.0,
-        sway_sampling_coef=None,
+        lens: Int[Tensor, "b"] | None = None,
+        steps: int = 32,
+        cfg_strength: float = 1.0,
+        sway_sampling_coef: float | None = None,
         seed: int | None = None,
-        max_duration=65536,
-        vocoder: Callable[[float["b d n"]], float["b nw"]] | None = None,
-        use_epss=True,
-        no_ref_audio=False,
-        duplicate_test=False,
-        t_inter=0.1,
-        edit_mask=None,
-    ):
+        max_duration: int = 65536,
+        vocoder: Callable[[Float[Tensor, "b d n"]], Float[Tensor, "b nw"]] | None = None,
+        use_epss: bool = True,
+        no_ref_audio: bool = False,
+        duplicate_test: bool = False,
+        t_inter: float = 0.1,
+        edit_mask: Bool[Tensor, "b n"] | None = None,
+    ) -> tuple[Float[Tensor, "b n d"] | Float[Tensor, "b nw"], Float[Tensor, "t b n d"]]:
         self.eval()
         # raw wave
 
@@ -158,7 +159,7 @@ class CFM(nn.Module):
 
         # neural ode
 
-        def fn(t, x):
+        def fn(t: Tensor, x: Tensor) -> Tensor:
             # at each step, conditioning is fixed
             # step_cond = torch.where(cond_mask, cond, torch.zeros_like(cond))
 
@@ -229,12 +230,12 @@ class CFM(nn.Module):
 
     def forward(
         self,
-        inp: float["b n d"] | float["b nw"],  # mel or raw wave
-        text: int["b nt"] | list[str],
+        inp: Float[Tensor, "b n d"] | Float[Tensor, "b nw"],  # mel or raw wave
+        text: Int[Tensor, "b nt"] | list[str],
         *,
-        lens: int["b"] | None = None,
+        lens: Int[Tensor, "b"] | None = None,
         noise_scheduler: str | None = None,
-    ):
+    ) -> tuple[Float[Tensor, ""], Float[Tensor, "b n d"], Float[Tensor, "b n d"]]:
         # handle raw wave
         if inp.ndim == 2:
             inp = self.mel_spec(inp)

@@ -10,9 +10,11 @@ d - dimension
 from __future__ import annotations
 
 import threading
+from typing import Any, Callable
 
 import torch
-from torch import nn
+from jaxtyping import Bool, Float, Int
+from torch import Tensor, nn
 from x_transformers.x_transformers import RotaryEmbedding
 
 from f5_tts.model.modules import (
@@ -29,7 +31,7 @@ from f5_tts.model.modules import (
 
 
 class TextEmbedding(nn.Module):
-    def __init__(self, out_dim, text_num_embeds, mask_padding=True):
+    def __init__(self, out_dim: int, text_num_embeds: int, mask_padding: bool = True) -> None:
         super().__init__()
         self.text_embed = nn.Embedding(text_num_embeds + 1, out_dim)  # will use 0 as filler token
 
@@ -38,7 +40,7 @@ class TextEmbedding(nn.Module):
         self.precompute_max_pos = 1024
         self.register_buffer("freqs_cis", precompute_freqs_cis(out_dim, self.precompute_max_pos), persistent=False)
 
-    def forward(self, text: int["b nt"], drop_text=False) -> int["b nt d"]:
+    def forward(self, text: Int[Tensor, "b nt"], drop_text: bool = False) -> Float[Tensor, "b nt d"]:
         text = text + 1  # use 0 as filler token. preprocess of batch pad -1, see list_str_to_idx()
         if self.mask_padding:
             text_mask = text == 0
@@ -66,12 +68,14 @@ class TextEmbedding(nn.Module):
 
 
 class AudioEmbedding(nn.Module):
-    def __init__(self, in_dim, out_dim):
+    def __init__(self, in_dim: int, out_dim: int) -> None:
         super().__init__()
         self.linear = nn.Linear(2 * in_dim, out_dim)
         self.conv_pos_embed = ConvPositionEmbedding(out_dim)
 
-    def forward(self, x: float["b n d"], cond: float["b n d"], drop_audio_cond=False):
+    def forward(
+        self, x: Float[Tensor, "b n d"], cond: Float[Tensor, "b n d"], drop_audio_cond: bool = False
+    ) -> Float[Tensor, "b n d"]:
         if drop_audio_cond:
             cond = torch.zeros_like(cond)
         x = torch.cat((x, cond), dim=-1)
@@ -87,20 +91,20 @@ class MMDiT(nn.Module):
     def __init__(
         self,
         *,
-        dim,
-        depth=8,
-        heads=8,
-        dim_head=64,
-        dropout=0.1,
-        ff_mult=4,
-        mel_dim=100,
-        text_num_embeds=256,
-        text_mask_padding=True,
-        qk_norm=None,
-        checkpoint_activations=False,
-        attn_backend="torch",
-        attn_mask_enabled=False,
-    ):
+        dim: int,
+        depth: int = 8,
+        heads: int = 8,
+        dim_head: int = 64,
+        dropout: float = 0.1,
+        ff_mult: float = 4,
+        mel_dim: int = 100,
+        text_num_embeds: int = 256,
+        text_mask_padding: bool = True,
+        qk_norm: str | None = None,
+        checkpoint_activations: bool = False,
+        attn_backend: str = "torch",
+        attn_mask_enabled: bool = False,
+    ) -> None:
         super().__init__()
 
         self.time_embed = TimestepEmbedding(dim)
@@ -137,7 +141,7 @@ class MMDiT(nn.Module):
 
     # `_cache_local` is lazily initialized on first inference-time cache write so that
     # training models (which never touch the cache) stay deepcopy-friendly for EMA.
-    def _get_cache_local(self):
+    def _get_cache_local(self) -> threading.local:
         cache = self.__dict__.get("_cache_local")
         if cache is None:
             cache = threading.local()
@@ -145,24 +149,24 @@ class MMDiT(nn.Module):
         return cache
 
     @property
-    def text_cond(self):
+    def text_cond(self) -> Float[Tensor, "b n d"] | None:
         cache = self.__dict__.get("_cache_local")
         return getattr(cache, "text_cond", None) if cache is not None else None
 
     @text_cond.setter
-    def text_cond(self, value):
+    def text_cond(self, value: Float[Tensor, "b n d"] | None) -> None:
         self._get_cache_local().text_cond = value
 
     @property
-    def text_uncond(self):
+    def text_uncond(self) -> Float[Tensor, "b n d"] | None:
         cache = self.__dict__.get("_cache_local")
         return getattr(cache, "text_uncond", None) if cache is not None else None
 
     @text_uncond.setter
-    def text_uncond(self, value):
+    def text_uncond(self, value: Float[Tensor, "b n d"] | None) -> None:
         self._get_cache_local().text_uncond = value
 
-    def initialize_weights(self):
+    def initialize_weights(self) -> None:
         # Zero-out AdaLN layers in MMDiT blocks:
         for block in self.transformer_blocks:
             nn.init.constant_(block.attn_norm_x.linear.weight, 0)
@@ -176,8 +180,8 @@ class MMDiT(nn.Module):
         nn.init.constant_(self.proj_out.weight, 0)
         nn.init.constant_(self.proj_out.bias, 0)
 
-    def ckpt_wrapper(self, module):
-        def ckpt_forward(*inputs):
+    def ckpt_wrapper(self, module: nn.Module) -> Callable[..., Any]:  # Any: forwards a block's own inputs and outputs
+        def ckpt_forward(*inputs: Any) -> Any:
             outputs = module(*inputs)
             return outputs
 
@@ -185,13 +189,13 @@ class MMDiT(nn.Module):
 
     def get_input_embed(
         self,
-        x,  # b n d
-        cond,  # b n d
-        text,  # b nt
+        x: Float[Tensor, "b n d"],
+        cond: Float[Tensor, "b n d"],
+        text: Int[Tensor, "b nt"],
         drop_audio_cond: bool = False,
         drop_text: bool = False,
         cache: bool = True,
-    ):
+    ) -> tuple[Float[Tensor, "b n d"], Float[Tensor, "b nt d"]]:
         if cache:
             if drop_text:
                 if self.text_uncond is None:
@@ -207,21 +211,21 @@ class MMDiT(nn.Module):
 
         return x, c
 
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         self.text_cond, self.text_uncond = None, None
 
     def forward(
         self,
-        x: float["b n d"],  # nosied input audio
-        cond: float["b n d"],  # masked cond audio
-        text: int["b nt"],  # text
-        time: float["b"] | float[""],  # time step
-        mask: bool["b n"] | None = None,
+        x: Float[Tensor, "b n d"],  # nosied input audio
+        cond: Float[Tensor, "b n d"],  # masked cond audio
+        text: Int[Tensor, "b nt"],  # text
+        time: Float[Tensor, "b"] | Float[Tensor, ""],  # time step
+        mask: Bool[Tensor, "b n"] | None = None,
         drop_audio_cond: bool = False,  # cfg for cond audio
         drop_text: bool = False,  # cfg for text
         cfg_infer: bool = False,  # cfg inference, pack cond & uncond forward
         cache: bool = False,
-    ):
+    ) -> Float[Tensor, "b n d"]:
         batch = x.shape[0]
         if time.ndim == 0:
             time = time.repeat(batch)

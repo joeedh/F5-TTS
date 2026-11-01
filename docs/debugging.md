@@ -43,6 +43,16 @@ Versions that resulted: torch 2.15.0+cpu, torchaudio 2.11.1, numpy 2.5.4, accele
 - Verified it works as a tripwire: an annotation-only edit passes, a changed default (`steps=32` to `31`) fails in signatures, and a 0.1% change to the CFG formula fails in numeric.
 - Harmless warnings on stderr: pydub cannot find ffmpeg, and `torch.jit.script` on Python 3.14+. Set `PYTHONWARNINGS=ignore` to hide them.
 
+### Checking that an annotation batch changed nothing else
+- `python tools/typing_guard/annotation_only.py <files>` compares each file with `HEAD` after removing annotations, imports and the named type aliases from both syntax trees. It prints `annotation-only` or `DIFFERS` per file and exits 1 on any difference. Run it before committing, since it compares against `HEAD`.
+- Unlike `golden.py`, it covers every file, including the Gradio apps, trainer and eval code. If a batch adds a new module-level alias, add its name to `TYPE_ALIASES` in the script.
+- Verified: a change of `self.sigma = sigma` to `sigma + 0` is reported as `DIFFERS`.
+
+### Missing jaxtyping import is invisible to ruff
+- Symptom: none from ruff. The per-file ignores in `ruff.toml` turn off F821 (undefined name) in the six model files, so a missing `Bool`, `Float`, `Int` or `Tensor` import is not reported there.
+- Cause: the ignore is needed for the shape strings (`"b n d"`), and it covers genuine undefined names too.
+- Diagnose: run pyright and look for "is not defined". Caught once so far: `Bool` was used but not imported in `model/cfm.py` before the batch A commit.
+
 ### A freshly built DiT outputs all zeros
 - Symptom: any test of a new `DiT` returns zeros however the input changes.
 - Cause: `DiT.initialize_weights` zero-fills the AdaLN layers and `proj_out`, as in the paper, so only trained weights produce output.

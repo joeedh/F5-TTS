@@ -20,4 +20,10 @@ Review the ledger when it has about five entries, or before starting plan 01 (ON
 
 ## Entries
 
-None yet.
+### 2026-11-01 MMDiT text embedding annotated as integer
+- Where: `model/backbones/mmdit.py`, `TextEmbedding.forward`
+- What happened: the return was annotated `int["b nt d"]`, but the function returns the output of `nn.Embedding` plus positional embeddings, which is a float tensor. No runtime effect, because the annotation was never evaluated or checked.
+- How found: review while converting ein notation to jaxtyping in Plan P, batch A.
+- Time lost: none, but the wrong dtype sat in the code and would have misled anyone reading it.
+- Would a shape-aware static checker have caught it: unsure. A checker that infers dtypes through `nn.Embedding` and `+` would. Pyright with jaxtyping does not, since it reads both as `Tensor`.
+- Fix: annotation changed to `Float[Tensor, "b nt d"]`.

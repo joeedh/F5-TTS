@@ -120,11 +120,22 @@ Batches, in this order. Each batch is one commit and is followed by the guard fr
 | D | `infer/infer_gradio.py`, `train/*.py`, `train/datasets/*.py`, `scripts/*.py` | Gradio files are large; expect many `Optional` issues. |
 | E | `eval/*.py`, `tools/typing_guard/golden.py` | `ecapa_tdnn.py` is adapted third-party code; keep edits minimal. |
 
+Progress:
+- Batch A done 2026-11-01. Pyright errors 457 to 215 (all 69 ein-string errors gone, no undefined names). Guard passes. `tools/typing_guard/annotation_only.py` confirms all six files differ from HEAD only by annotations, imports and the two new aliases (`Rope`, `_T`). Details below the list.
+- Batches B to E: not started.
+
+Batch A notes:
+- Both bare `# type: ignore` in `modules.py` were removed outright; pyright reports nothing on those lines, so no replacement was needed.
+- Annotation fixes where the old annotation was wrong: `JointAttnProcessor.__call__` returned a tuple but was annotated `FloatTensor`; `Attention.forward` returns a tuple in the joint case; `mmdit.TextEmbedding.forward` was annotated `Int[...]` but returns embeddings.
+- `Rope = tuple[Tensor, Tensor | float | None]` in `model/modules.py` names the `(freqs, xpos_scale)` pair from x_transformers.
+- `exists` and `default` use `Any` and a `TypeVar`; `default` will report errors in step 5 because `exists` does not narrow types.
+- Because `F821` is ignored in these files, a missing jaxtyping import would not show in ruff. Pyright reports it, so check pyright for "is not defined" after each batch.
+
 Within a batch:
 1. Convert ein-notation annotations to jaxtyping using this map: `float[...]` to `Float[Tensor, ...]`, `int[...]` to `Int[Tensor, ...]`, `bool[...]` to `Bool[Tensor, ...]`. Unions such as `float["b n d"] | float["b nw"]` keep the `|`. A parameter annotated with a tensor type but defaulting to `None` (for example `mask: bool["b n"] = None`) gets `| None`. Names appearing only in the shape strings stay strings.
 2. Add parameter and return annotations to every function in the batch. Use `Any` only where a real type is unknowable without large effort, and give each such place a short trailing comment saying why. Do not use `CLAUDENOTE:` for this: `CLAUDE.md` reserves it for temporary code comments that get stripped. The final review (step 5.4) greps for `Any`.
 3. Edits are limited to annotations, `| None` on `None` defaults, and invalid annotation syntax such as `dict[str:int]` at `model/cfm.py:50` (becomes `dict[str, int]`; no runtime effect under `from __future__ import annotations`). Anything that touches an executable line belongs to step 5. Do not reformat or reorder code.
-4. Run the guard (step 2), then `ruff check` and `ruff format --check` with the pinned version. Commit.
+4. Run the guard (step 2), then `ruff check` and `ruff format --check` with the pinned version. Also run `python tools/typing_guard/annotation_only.py <files of the batch>` before committing; it must report every file as annotation-only. Commit.
 
 Out-of-band rule: a bug found while annotating is not fixed in the batch commit. Write it down for step 5.
 

@@ -10,10 +10,12 @@ d - dimension
 from __future__ import annotations
 
 import threading
+from typing import Any, Callable
 
 import torch
 import torch.nn.functional as F
-from torch import nn
+from jaxtyping import Bool, Float, Int
+from torch import Tensor, nn
 from x_transformers.x_transformers import RotaryEmbedding
 
 from f5_tts.model.modules import (
@@ -31,8 +33,14 @@ from f5_tts.model.modules import (
 
 class TextEmbedding(nn.Module):
     def __init__(
-        self, text_num_embeds, text_dim, mask_padding=True, average_upsampling=False, conv_layers=0, conv_mult=2
-    ):
+        self,
+        text_num_embeds: int,
+        text_dim: int,
+        mask_padding: bool = True,
+        average_upsampling: bool = False,
+        conv_layers: int = 0,
+        conv_mult: int = 2,
+    ) -> None:
         super().__init__()
         self.text_embed = nn.Embedding(text_num_embeds + 1, text_dim)  # use 0 as filler token
 
@@ -51,7 +59,9 @@ class TextEmbedding(nn.Module):
         else:
             self.extra_modeling = False
 
-    def average_upsample_text_by_mask(self, text, text_mask, target_lens):
+    def average_upsample_text_by_mask(
+        self, text: Float[Tensor, "b n d"], text_mask: Bool[Tensor, "b n"], target_lens: Int[Tensor, "b"]
+    ) -> Float[Tensor, "b n d"]:
         batch, max_seq_len, text_dim = text.shape
         text_lens = text_mask.sum(dim=1)  # [batch]
 
@@ -82,7 +92,9 @@ class TextEmbedding(nn.Module):
 
         return upsampled_text
 
-    def forward(self, text: int["b nt"], seq_len, drop_text=False):
+    def forward(
+        self, text: Int[Tensor, "b nt"], seq_len: int | Int[Tensor, "b"], drop_text: bool = False
+    ) -> Float[Tensor, "b n d"]:
         text = text + 1  # use 0 as filler token. preprocess of batch pad -1, see list_str_to_idx()
         valid_pos_mask = None
         if torch.is_tensor(seq_len):
@@ -142,19 +154,19 @@ class TextEmbedding(nn.Module):
 
 
 class InputEmbedding(nn.Module):
-    def __init__(self, mel_dim, text_dim, out_dim):
+    def __init__(self, mel_dim: int, text_dim: int, out_dim: int) -> None:
         super().__init__()
         self.proj = nn.Linear(mel_dim * 2 + text_dim, out_dim)
         self.conv_pos_embed = ConvPositionEmbedding(dim=out_dim)
 
     def forward(
         self,
-        x: float["b n d"],
-        cond: float["b n d"],
-        text_embed: float["b n d"],
-        drop_audio_cond=False,
-        audio_mask: bool["b n"] | None = None,
-    ):
+        x: Float[Tensor, "b n d"],
+        cond: Float[Tensor, "b n d"],
+        text_embed: Float[Tensor, "b n d"],
+        drop_audio_cond: bool = False,
+        audio_mask: Bool[Tensor, "b n"] | None = None,
+    ) -> Float[Tensor, "b n d"]:
         if drop_audio_cond:  # cfg for cond audio
             cond = torch.zeros_like(cond)
 
@@ -170,25 +182,25 @@ class DiT(nn.Module):
     def __init__(
         self,
         *,
-        dim,
-        depth=8,
-        heads=8,
-        dim_head=64,
-        dropout=0.1,
-        ff_mult=4,
-        mel_dim=100,
-        text_num_embeds=256,
-        text_dim=None,
-        text_mask_padding=True,
-        text_embedding_average_upsampling=False,
-        qk_norm=None,
-        conv_layers=0,
-        pe_attn_head=None,
-        attn_backend="torch",  # "torch" | "flash_attn"
-        attn_mask_enabled=False,
-        long_skip_connection=False,
-        checkpoint_activations=False,
-    ):
+        dim: int,
+        depth: int = 8,
+        heads: int = 8,
+        dim_head: int = 64,
+        dropout: float = 0.1,
+        ff_mult: float = 4,
+        mel_dim: int = 100,
+        text_num_embeds: int = 256,
+        text_dim: int | None = None,
+        text_mask_padding: bool = True,
+        text_embedding_average_upsampling: bool = False,
+        qk_norm: str | None = None,
+        conv_layers: int = 0,
+        pe_attn_head: int | None = None,
+        attn_backend: str = "torch",  # "torch" | "flash_attn"
+        attn_mask_enabled: bool = False,
+        long_skip_connection: bool = False,
+        checkpoint_activations: bool = False,
+    ) -> None:
         super().__init__()
 
         self.time_embed = TimestepEmbedding(dim)
@@ -235,7 +247,7 @@ class DiT(nn.Module):
 
     # `_cache_local` is lazily initialized on first inference-time cache write so that
     # training models (which never touch the cache) stay deepcopy-friendly for EMA.
-    def _get_cache_local(self):
+    def _get_cache_local(self) -> threading.local:
         cache = self.__dict__.get("_cache_local")
         if cache is None:
             cache = threading.local()
@@ -243,24 +255,24 @@ class DiT(nn.Module):
         return cache
 
     @property
-    def text_cond(self):
+    def text_cond(self) -> Float[Tensor, "b n d"] | None:
         cache = self.__dict__.get("_cache_local")
         return getattr(cache, "text_cond", None) if cache is not None else None
 
     @text_cond.setter
-    def text_cond(self, value):
+    def text_cond(self, value: Float[Tensor, "b n d"] | None) -> None:
         self._get_cache_local().text_cond = value
 
     @property
-    def text_uncond(self):
+    def text_uncond(self) -> Float[Tensor, "b n d"] | None:
         cache = self.__dict__.get("_cache_local")
         return getattr(cache, "text_uncond", None) if cache is not None else None
 
     @text_uncond.setter
-    def text_uncond(self, value):
+    def text_uncond(self, value: Float[Tensor, "b n d"] | None) -> None:
         self._get_cache_local().text_uncond = value
 
-    def initialize_weights(self):
+    def initialize_weights(self) -> None:
         # Zero-out AdaLN layers in DiT blocks:
         for block in self.transformer_blocks:
             nn.init.constant_(block.attn_norm.linear.weight, 0)
@@ -272,9 +284,9 @@ class DiT(nn.Module):
         nn.init.constant_(self.proj_out.weight, 0)
         nn.init.constant_(self.proj_out.bias, 0)
 
-    def ckpt_wrapper(self, module):
+    def ckpt_wrapper(self, module: nn.Module) -> Callable[..., Any]:  # Any: wraps a block's own inputs and outputs
         # https://github.com/chuanyangjin/fast-DiT/blob/main/models.py
-        def ckpt_forward(*inputs):
+        def ckpt_forward(*inputs: Any) -> Any:  # Any: forwards whatever the wrapped block takes and returns
             outputs = module(*inputs)
             return outputs
 
@@ -282,14 +294,14 @@ class DiT(nn.Module):
 
     def get_input_embed(
         self,
-        x,  # b n d
-        cond,  # b n d
-        text,  # b nt
+        x: Float[Tensor, "b n d"],
+        cond: Float[Tensor, "b n d"],
+        text: Int[Tensor, "b nt"],
         drop_audio_cond: bool = False,
         drop_text: bool = False,
         cache: bool = True,
-        audio_mask: bool["b n"] | None = None,
-    ):
+        audio_mask: Bool[Tensor, "b n"] | None = None,
+    ) -> Float[Tensor, "b n d"]:
         if self.text_uncond is None or self.text_cond is None or not cache:
             if audio_mask is None:
                 seq_len = x.shape[1]
@@ -312,21 +324,21 @@ class DiT(nn.Module):
 
         return x
 
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         self.text_cond, self.text_uncond = None, None
 
     def forward(
         self,
-        x: float["b n d"],  # nosied input audio
-        cond: float["b n d"],  # masked cond audio
-        text: int["b nt"],  # text
-        time: float["b"] | float[""],  # time step
-        mask: bool["b n"] | None = None,
+        x: Float[Tensor, "b n d"],  # nosied input audio
+        cond: Float[Tensor, "b n d"],  # masked cond audio
+        text: Int[Tensor, "b nt"],  # text
+        time: Float[Tensor, "b"] | Float[Tensor, ""],  # time step
+        mask: Bool[Tensor, "b n"] | None = None,
         drop_audio_cond: bool = False,  # cfg for cond audio
         drop_text: bool = False,  # cfg for text
         cfg_infer: bool = False,  # cfg inference, pack cond & uncond forward
         cache: bool = False,
-    ):
+    ) -> Float[Tensor, "b n d"]:
         batch, seq_len = x.shape[0], x.shape[1]
         if time.ndim == 0:
             time = time.repeat(batch)

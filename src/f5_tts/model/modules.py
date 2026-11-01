@@ -16,32 +16,37 @@ from typing import Optional
 import torch
 import torch.nn.functional as F
 import torchaudio
+from jaxtyping import Bool, Float, Int
 from librosa.filters import mel as librosa_mel_fn
-from torch import nn
+from torch import Tensor, nn
 from x_transformers.x_transformers import apply_rotary_pos_emb
 
 from f5_tts.model.utils import is_package_available
 
 
+# (freqs, xpos_scale) as returned by x_transformers' RotaryEmbedding.forward_from_seq_len
+Rope = tuple[Tensor, Tensor | float | None]
+
+
 # raw wav to mel spec
 
 
-mel_basis_cache = {}
-hann_window_cache = {}
-vocos_mel_stft_cache = {}
+mel_basis_cache: dict[str, Tensor] = {}
+hann_window_cache: dict[str, Tensor] = {}
+vocos_mel_stft_cache: dict[str, torchaudio.transforms.MelSpectrogram] = {}
 
 
 def get_bigvgan_mel_spectrogram(
-    waveform,
-    n_fft=1024,
-    n_mel_channels=100,
-    target_sample_rate=24000,
-    hop_length=256,
-    win_length=1024,
-    fmin=0,
-    fmax=None,
-    center=False,
-):  # Copy from https://github.com/NVIDIA/BigVGAN/tree/main
+    waveform: Float[Tensor, "b nw"],
+    n_fft: int = 1024,
+    n_mel_channels: int = 100,
+    target_sample_rate: int = 24000,
+    hop_length: int = 256,
+    win_length: int = 1024,
+    fmin: int = 0,
+    fmax: int | None = None,
+    center: bool = False,
+) -> Float[Tensor, "b d n"]:  # Copy from https://github.com/NVIDIA/BigVGAN/tree/main
     device = waveform.device
     key = f"{n_fft}_{n_mel_channels}_{target_sample_rate}_{hop_length}_{win_length}_{fmin}_{fmax}_{device}"
 
@@ -77,13 +82,13 @@ def get_bigvgan_mel_spectrogram(
 
 
 def get_vocos_mel_spectrogram(
-    waveform,
-    n_fft=1024,
-    n_mel_channels=100,
-    target_sample_rate=24000,
-    hop_length=256,
-    win_length=1024,
-):
+    waveform: Float[Tensor, "b nw"] | Float[Tensor, "b 1 nw"],
+    n_fft: int = 1024,
+    n_mel_channels: int = 100,
+    target_sample_rate: int = 24000,
+    hop_length: int = 256,
+    win_length: int = 1024,
+) -> Float[Tensor, "b d n"]:
     device = waveform.device
     key = f"{n_fft}_{n_mel_channels}_{target_sample_rate}_{hop_length}_{win_length}_{device}"
     if key not in vocos_mel_stft_cache:
@@ -111,13 +116,13 @@ def get_vocos_mel_spectrogram(
 class MelSpec(nn.Module):
     def __init__(
         self,
-        n_fft=1024,
-        hop_length=256,
-        win_length=1024,
-        n_mel_channels=100,
-        target_sample_rate=24_000,
-        mel_spec_type="vocos",
-    ):
+        n_fft: int = 1024,
+        hop_length: int = 256,
+        win_length: int = 1024,
+        n_mel_channels: int = 100,
+        target_sample_rate: int = 24_000,
+        mel_spec_type: str = "vocos",
+    ) -> None:
         super().__init__()
         assert mel_spec_type in ["vocos", "bigvgan"], print("We only support two extract mel backend: vocos or bigvgan")
 
@@ -134,7 +139,7 @@ class MelSpec(nn.Module):
 
         self.register_buffer("dummy", torch.tensor(0), persistent=False)
 
-    def forward(self, wav):
+    def forward(self, wav: Float[Tensor, "b nw"]) -> Float[Tensor, "b d n"]:
         if self.dummy.device != wav.device:
             self.to(wav.device)
 
@@ -154,11 +159,11 @@ class MelSpec(nn.Module):
 
 
 class SinusPositionEmbedding(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, dim: int) -> None:
         super().__init__()
         self.dim = dim
 
-    def forward(self, x, scale=1000):
+    def forward(self, x: Float[Tensor, "b"], scale: float = 1000) -> Float[Tensor, "b d"]:
         device = x.device
         half_dim = self.dim // 2
         emb = math.log(10000) / (half_dim - 1)
@@ -172,7 +177,7 @@ class SinusPositionEmbedding(nn.Module):
 
 
 class ConvPositionEmbedding(nn.Module):
-    def __init__(self, dim, kernel_size=31, groups=16):
+    def __init__(self, dim: int, kernel_size: int = 31, groups: int = 16) -> None:
         super().__init__()
         assert kernel_size % 2 != 0
         self.conv1d = nn.Sequential(
@@ -183,7 +188,7 @@ class ConvPositionEmbedding(nn.Module):
         )
         self.layer_need_mask_idx = [i for i, layer in enumerate(self.conv1d) if isinstance(layer, nn.Conv1d)]
 
-    def forward(self, x: float["b n d"], mask: bool["b n"] | None = None):
+    def forward(self, x: Float[Tensor, "b n d"], mask: Bool[Tensor, "b n"] | None = None) -> Float[Tensor, "b n d"]:
         if mask is not None:
             mask = mask.unsqueeze(1)  # [B 1 N]
         x = x.permute(0, 2, 1)  # [B D N]
@@ -203,21 +208,25 @@ class ConvPositionEmbedding(nn.Module):
 # rotary positional embedding related
 
 
-def precompute_freqs_cis(dim: int, end: int, theta: float = 10000.0, theta_rescale_factor=1.0):
+def precompute_freqs_cis(
+    dim: int, end: int, theta: float = 10000.0, theta_rescale_factor: float = 1.0
+) -> Float[Tensor, "n d"]:
     # proposed by reddit user bloc97, to rescale rotary embeddings to longer sequence length without fine-tuning
     # has some connection to NTK literature
     # https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/
     # https://github.com/lucidrains/rotary-embedding-torch/blob/main/rotary_embedding_torch/rotary_embedding_torch.py
     theta *= theta_rescale_factor ** (dim / (dim - 2))
     freqs = 1.0 / (theta ** (torch.arange(0, dim, 2)[: (dim // 2)].float() / dim))
-    t = torch.arange(end, device=freqs.device)  # type: ignore
-    freqs = torch.outer(t, freqs).float()  # type: ignore
+    t = torch.arange(end, device=freqs.device)
+    freqs = torch.outer(t, freqs).float()
     freqs_cos = torch.cos(freqs)  # real part
     freqs_sin = torch.sin(freqs)  # imaginary part
     return torch.cat([freqs_cos, freqs_sin], dim=-1)
 
 
-def get_pos_embed_indices(start, length, max_pos, scale=1.0):
+def get_pos_embed_indices(
+    start: Int[Tensor, "b"], length: int, max_pos: int, scale: float | Tensor = 1.0
+) -> Int[Tensor, "b n"]:
     # length = length if isinstance(length, int) else length.max()
     scale = scale * torch.ones_like(start, dtype=torch.float32)  # in case scale is a scalar
     pos = (
@@ -233,12 +242,12 @@ def get_pos_embed_indices(start, length, max_pos, scale=1.0):
 
 
 class GRN(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, dim: int) -> None:
         super().__init__()
         self.gamma = nn.Parameter(torch.zeros(1, 1, dim))
         self.beta = nn.Parameter(torch.zeros(1, 1, dim))
 
-    def forward(self, x):
+    def forward(self, x: Float[Tensor, "b n d"]) -> Float[Tensor, "b n d"]:
         Gx = torch.norm(x, p=2, dim=1, keepdim=True)
         Nx = Gx / (Gx.mean(dim=-1, keepdim=True) + 1e-6)
         return self.gamma * (x * Nx) + self.beta + x
@@ -254,7 +263,7 @@ class ConvNeXtV2Block(nn.Module):
         dim: int,
         intermediate_dim: int,
         dilation: int = 1,
-    ):
+    ) -> None:
         super().__init__()
         padding = (dilation * (7 - 1)) // 2
         self.dwconv = nn.Conv1d(
@@ -283,13 +292,13 @@ class ConvNeXtV2Block(nn.Module):
 
 
 class RMSNorm(nn.Module):
-    def __init__(self, dim: int, eps: float):
+    def __init__(self, dim: int, eps: float) -> None:
         super().__init__()
         self.eps = eps
         self.weight = nn.Parameter(torch.ones(dim))
         self.native_rms_norm = float(torch.__version__[:3]) >= 2.4
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         if self.native_rms_norm:
             if self.weight.dtype in [torch.float16, torch.bfloat16]:
                 x = x.to(self.weight.dtype)
@@ -309,7 +318,7 @@ class RMSNorm(nn.Module):
 
 
 class AdaLayerNorm(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, dim: int) -> None:
         super().__init__()
 
         self.silu = nn.SiLU()
@@ -317,7 +326,15 @@ class AdaLayerNorm(nn.Module):
 
         self.norm = nn.LayerNorm(dim, elementwise_affine=False, eps=1e-6)
 
-    def forward(self, x, emb=None):
+    def forward(
+        self, x: Float[Tensor, "b n d"], emb: Float[Tensor, "b d"] | None = None
+    ) -> tuple[
+        Float[Tensor, "b n d"],
+        Float[Tensor, "b d"],
+        Float[Tensor, "b d"],
+        Float[Tensor, "b d"],
+        Float[Tensor, "b d"],
+    ]:
         emb = self.linear(self.silu(emb))
         shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = torch.chunk(emb, 6, dim=1)
 
@@ -330,7 +347,7 @@ class AdaLayerNorm(nn.Module):
 
 
 class AdaLayerNorm_Final(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, dim: int) -> None:
         super().__init__()
 
         self.silu = nn.SiLU()
@@ -338,7 +355,7 @@ class AdaLayerNorm_Final(nn.Module):
 
         self.norm = nn.LayerNorm(dim, elementwise_affine=False, eps=1e-6)
 
-    def forward(self, x, emb):
+    def forward(self, x: Float[Tensor, "b n d"], emb: Float[Tensor, "b d"]) -> Float[Tensor, "b n d"]:
         emb = self.linear(self.silu(emb))
         scale, shift = torch.chunk(emb, 2, dim=1)
 
@@ -350,7 +367,9 @@ class AdaLayerNorm_Final(nn.Module):
 
 
 class FeedForward(nn.Module):
-    def __init__(self, dim, dim_out=None, mult=4, dropout=0.0, approximate: str = "none"):
+    def __init__(
+        self, dim: int, dim_out: int | None = None, mult: float = 4, dropout: float = 0.0, approximate: str = "none"
+    ) -> None:
         super().__init__()
         inner_dim = int(dim * mult)
         dim_out = dim_out if dim_out is not None else dim
@@ -359,7 +378,7 @@ class FeedForward(nn.Module):
         project_in = nn.Sequential(nn.Linear(dim, inner_dim), activation)
         self.ff = nn.Sequential(project_in, nn.Dropout(dropout), nn.Linear(inner_dim, dim_out))
 
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
         return self.ff(x)
 
 
@@ -378,7 +397,7 @@ class Attention(nn.Module):
         context_dim: Optional[int] = None,  # if not None -> joint attention
         context_pre_only: bool = False,
         qk_norm: Optional[str] = None,
-    ):
+    ) -> None:
         super().__init__()
 
         if not hasattr(F, "scaled_dot_product_attention"):
@@ -427,13 +446,13 @@ class Attention(nn.Module):
 
     def forward(
         self,
-        x: float["b n d"],  # noised input x
-        c: float["b n d"] = None,  # context c
-        mask: bool["b n"] | None = None,
-        rope=None,  # rotary position embedding for x
-        c_rope=None,  # rotary position embedding for c
-        c_mask: bool["b nt"] | None = None,  # text mask
-    ) -> torch.Tensor:
+        x: Float[Tensor, "b n d"],  # noised input x
+        c: Float[Tensor, "b n d"] | None = None,  # context c
+        mask: Bool[Tensor, "b n"] | None = None,
+        rope: Rope | None = None,  # rotary position embedding for x
+        c_rope: Rope | None = None,  # rotary position embedding for c
+        c_mask: Bool[Tensor, "b nt"] | None = None,  # text mask
+    ) -> Tensor | tuple[Tensor, Tensor]:  # a tuple when a context c is given (joint attention)
         if c is not None:
             return self.processor(self, x, c=c, mask=mask, rope=rope, c_rope=c_rope, c_mask=c_mask)
         else:
@@ -453,7 +472,7 @@ class AttnProcessor:
         pe_attn_head: int | None = None,  # number of attention head to apply rope, None for all
         attn_backend: str = "torch",  # "torch" or "flash_attn"
         attn_mask_enabled: bool = True,
-    ):
+    ) -> None:
         if attn_backend == "flash_attn":
             assert is_package_available("flash_attn"), "Please install flash-attn first."
         if attn_backend == "torch" and attn_mask_enabled:
@@ -470,9 +489,9 @@ class AttnProcessor:
     def __call__(
         self,
         attn: Attention,
-        x: float["b n d"],  # noised input x
-        mask: bool["b n"] | None = None,
-        rope=None,  # rotary position embedding
+        x: Float[Tensor, "b n d"],  # noised input x
+        mask: Bool[Tensor, "b n"] | None = None,
+        rope: Rope | None = None,  # rotary position embedding
     ) -> torch.FloatTensor:
         batch_size = x.shape[0]
 
@@ -564,7 +583,7 @@ class JointAttnProcessor:
         self,
         attn_backend: str = "torch",  # "torch" or "flash_attn"
         attn_mask_enabled: bool = True,
-    ):
+    ) -> None:
         if attn_backend == "flash_attn":
             assert is_package_available("flash_attn"), "Please install flash-attn first."
         if attn_backend == "torch" and attn_mask_enabled:
@@ -580,13 +599,13 @@ class JointAttnProcessor:
     def __call__(
         self,
         attn: Attention,
-        x: float["b n d"],  # noised input x
-        c: float["b nt d"] = None,  # context c, here text
-        mask: bool["b n"] | None = None,
-        rope=None,  # rotary position embedding for x
-        c_rope=None,  # rotary position embedding for c
-        c_mask: bool["b nt"] | None = None,  # text mask
-    ) -> torch.FloatTensor:
+        x: Float[Tensor, "b n d"],  # noised input x
+        c: Float[Tensor, "b nt d"] | None = None,  # context c, here text
+        mask: Bool[Tensor, "b n"] | None = None,
+        rope: Rope | None = None,  # rotary position embedding for x
+        c_rope: Rope | None = None,  # rotary position embedding for c
+        c_mask: Bool[Tensor, "b nt"] | None = None,  # text mask
+    ) -> tuple[Tensor, Tensor]:
         residual = x
         audio_mask = mask
 
@@ -710,16 +729,16 @@ class JointAttnProcessor:
 class DiTBlock(nn.Module):
     def __init__(
         self,
-        dim,
-        heads,
-        dim_head,
-        ff_mult=4,
-        dropout=0.1,
-        qk_norm=None,
-        pe_attn_head=None,
-        attn_backend="torch",  # "torch" or "flash_attn"
-        attn_mask_enabled=True,
-    ):
+        dim: int,
+        heads: int,
+        dim_head: int,
+        ff_mult: float = 4,
+        dropout: float = 0.1,
+        qk_norm: str | None = None,
+        pe_attn_head: int | None = None,
+        attn_backend: str = "torch",  # "torch" or "flash_attn"
+        attn_mask_enabled: bool = True,
+    ) -> None:
         super().__init__()
 
         self.attn_norm = AdaLayerNorm(dim)
@@ -739,7 +758,13 @@ class DiTBlock(nn.Module):
         self.ff_norm = nn.LayerNorm(dim, elementwise_affine=False, eps=1e-6)
         self.ff = FeedForward(dim=dim, mult=ff_mult, dropout=dropout, approximate="tanh")
 
-    def forward(self, x, t, mask=None, rope=None):  # x: noised input, t: time embedding
+    def forward(
+        self,
+        x: Float[Tensor, "b n d"],
+        t: Float[Tensor, "b d"],
+        mask: Bool[Tensor, "b n"] | None = None,
+        rope: Rope | None = None,
+    ) -> Float[Tensor, "b n d"]:  # x: noised input, t: time embedding
         # pre-norm & modulation for attention input
         norm, gate_msa, shift_mlp, scale_mlp, gate_mlp = self.attn_norm(x, emb=t)
 
@@ -771,17 +796,17 @@ class MMDiTBlock(nn.Module):
 
     def __init__(
         self,
-        dim,
-        heads,
-        dim_head,
-        ff_mult=4,
-        dropout=0.1,
-        context_dim=None,
-        context_pre_only=False,
-        qk_norm=None,
-        attn_backend="torch",
-        attn_mask_enabled=False,
-    ):
+        dim: int,
+        heads: int,
+        dim_head: int,
+        ff_mult: float = 4,
+        dropout: float = 0.1,
+        context_dim: int | None = None,
+        context_pre_only: bool = False,
+        qk_norm: str | None = None,
+        attn_backend: str = "torch",
+        attn_mask_enabled: bool = False,
+    ) -> None:
         super().__init__()
         if context_dim is None:
             context_dim = dim
@@ -813,8 +838,17 @@ class MMDiTBlock(nn.Module):
         self.ff_x = FeedForward(dim=dim, mult=ff_mult, dropout=dropout, approximate="tanh")
 
     def forward(
-        self, x, c, t, mask=None, rope=None, c_rope=None, c_mask=None
-    ):  # x: noised input, c: context, t: time embedding
+        self,
+        x: Float[Tensor, "b n d"],
+        c: Float[Tensor, "b nt d"],
+        t: Float[Tensor, "b d"],
+        mask: Bool[Tensor, "b n"] | None = None,
+        rope: Rope | None = None,
+        c_rope: Rope | None = None,
+        c_mask: Bool[Tensor, "b nt"] | None = None,
+    ) -> tuple[
+        Float[Tensor, "b nt d"] | None, Float[Tensor, "b n d"]
+    ]:  # x: noised input, c: context, t: time embedding
         # pre-norm & modulation for attention input
         if self.context_pre_only:
             norm_c = self.attn_norm_c(c, t)
@@ -849,12 +883,12 @@ class MMDiTBlock(nn.Module):
 
 
 class TimestepEmbedding(nn.Module):
-    def __init__(self, dim, freq_embed_dim=256):
+    def __init__(self, dim: int, freq_embed_dim: int = 256) -> None:
         super().__init__()
         self.time_embed = SinusPositionEmbedding(freq_embed_dim)
         self.time_mlp = nn.Sequential(nn.Linear(freq_embed_dim, dim), nn.SiLU(), nn.Linear(dim, dim))
 
-    def forward(self, timestep: float["b"]):
+    def forward(self, timestep: Float[Tensor, "b"]) -> Float[Tensor, "b d"]:
         time_hidden = self.time_embed(timestep)
         time_hidden = time_hidden.to(timestep.dtype)
         time = self.time_mlp(time_hidden)  # b d

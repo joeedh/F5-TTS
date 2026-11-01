@@ -4,17 +4,23 @@ import os
 import random
 from collections import defaultdict
 from importlib.resources import files
+from typing import Any, TypeVar
 
 import rjieba
 import torch
+from jaxtyping import Bool, Float, Int
 from pypinyin import Style, lazy_pinyin
+from torch import Tensor
 from torch.nn.utils.rnn import pad_sequence
+
+
+_T = TypeVar("_T")
 
 
 # seed everything
 
 
-def seed_everything(seed=0):
+def seed_everything(seed: int = 0) -> None:
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed % 2**32)  # force uint32 range
     torch.manual_seed(seed)
@@ -27,11 +33,11 @@ def seed_everything(seed=0):
 # helpers
 
 
-def exists(v):
+def exists(v: Any) -> bool:  # Any: accepts any value, only checks for None
     return v is not None
 
 
-def default(v, d):
+def default(v: _T | None, d: _T) -> _T:
     return v if exists(v) else d
 
 
@@ -48,7 +54,7 @@ def is_package_available(package_name: str) -> bool:
 # tensor helpers
 
 
-def lens_to_mask(t: int["b"], length: int | None = None) -> bool["b n"]:
+def lens_to_mask(t: Int[Tensor, "b"], length: int | None = None) -> Bool[Tensor, "b n"]:
     if not exists(length):
         length = t.amax()
 
@@ -56,7 +62,9 @@ def lens_to_mask(t: int["b"], length: int | None = None) -> bool["b n"]:
     return seq[None, :] < t[:, None]
 
 
-def mask_from_start_end_indices(seq_len: int["b"], start: int["b"], end: int["b"]):
+def mask_from_start_end_indices(
+    seq_len: Int[Tensor, "b"], start: Int[Tensor, "b"], end: Int[Tensor, "b"]
+) -> Bool[Tensor, "b n"]:
     max_seq_len = seq_len.max().item()
     seq = torch.arange(max_seq_len, device=start.device).long()
     start_mask = seq[None, :] >= start[:, None]
@@ -64,7 +72,7 @@ def mask_from_start_end_indices(seq_len: int["b"], start: int["b"], end: int["b"
     return start_mask & end_mask
 
 
-def mask_from_frac_lengths(seq_len: int["b"], frac_lengths: float["b"]):
+def mask_from_frac_lengths(seq_len: Int[Tensor, "b"], frac_lengths: Float[Tensor, "b"]) -> Bool[Tensor, "b n"]:
     lengths = (frac_lengths * seq_len).long()
     max_start = seq_len - lengths
 
@@ -75,7 +83,7 @@ def mask_from_frac_lengths(seq_len: int["b"], frac_lengths: float["b"]):
     return mask_from_start_end_indices(seq_len, start, end)
 
 
-def maybe_masked_mean(t: float["b n d"], mask: bool["b n"] = None) -> float["b d"]:
+def maybe_masked_mean(t: Float[Tensor, "b n d"], mask: Bool[Tensor, "b n"] | None = None) -> Float[Tensor, "b d"]:
     if not exists(mask):
         return t.mean(dim=1)
 
@@ -87,7 +95,7 @@ def maybe_masked_mean(t: float["b n d"], mask: bool["b n"] = None) -> float["b d
 
 
 # simple utf-8 tokenizer, since paper went character based
-def list_str_to_tensor(text: list[str], padding_value=-1) -> int["b nt"]:
+def list_str_to_tensor(text: list[str], padding_value: int = -1) -> Int[Tensor, "b nt"]:
     list_tensors = [torch.tensor([*bytes(t, "UTF-8")]) for t in text]  # ByT5 style
     text = pad_sequence(list_tensors, padding_value=padding_value, batch_first=True)
     return text
@@ -97,8 +105,8 @@ def list_str_to_tensor(text: list[str], padding_value=-1) -> int["b nt"]:
 def list_str_to_idx(
     text: list[str] | list[list[str]],
     vocab_char_map: dict[str, int],  # {char: idx}
-    padding_value=-1,
-) -> int["b nt"]:
+    padding_value: int = -1,
+) -> Int[Tensor, "b nt"]:
     list_idx_tensors = [torch.tensor([vocab_char_map.get(c, 0) for c in t]) for t in text]  # pinyin or char style
     text = pad_sequence(list_idx_tensors, padding_value=padding_value, batch_first=True)
     return text
@@ -107,7 +115,7 @@ def list_str_to_idx(
 # Get tokenizer
 
 
-def get_tokenizer(dataset_name, tokenizer: str = "pinyin"):
+def get_tokenizer(dataset_name: str, tokenizer: str = "pinyin") -> tuple[dict[str, int] | None, int]:
     """
     tokenizer   - "pinyin" do g2p for only chinese characters, need .txt vocab_file
                 - "char" for char-wise tokenizer, need .txt vocab_file
@@ -143,13 +151,13 @@ def get_tokenizer(dataset_name, tokenizer: str = "pinyin"):
 # convert char to pinyin
 
 
-def convert_char_to_pinyin(text_list, polyphone=True):
+def convert_char_to_pinyin(text_list: list[str], polyphone: bool = True) -> list[list[str]]:
     final_text_list = []
     custom_trans = str.maketrans(
         {";": ",", "“": '"', "”": '"', "‘": "'", "’": "'"}
     )  # add custom trans here, to address oov
 
-    def is_chinese(c):
+    def is_chinese(c: str) -> bool:
         return (
             "\u3100" <= c <= "\u9fff"  # common chinese characters
         )
@@ -186,7 +194,7 @@ def convert_char_to_pinyin(text_list, polyphone=True):
 # filter func for dirty data with many repetitions
 
 
-def repetition_found(text, length=2, tolerance=10):
+def repetition_found(text: str, length: int = 2, tolerance: int = 10) -> bool:
     pattern_count = defaultdict(int)
     for i in range(len(text) - length + 1):
         pattern = text[i : i + length]
@@ -200,7 +208,7 @@ def repetition_found(text, length=2, tolerance=10):
 # get the empirically pruned step for sampling
 
 
-def get_epss_timesteps(n, device, dtype):
+def get_epss_timesteps(n: int, device: torch.device | str, dtype: torch.dtype) -> Tensor:
     dt = 1 / 32
     predefined_timesteps = {
         5: [0, 2, 4, 8, 16, 32],
