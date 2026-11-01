@@ -22,6 +22,11 @@ Each entry is one commit. All were found by reading pyright errors, then confirm
 - Fix: the Hugging Face function is imported as `hf_load_dataset` and used in that branch; `CustomDatasetPath` sets `preprocessed_mel = False` (it only reads the raw format); unknown types raise `ValueError`.
 - Tested: a tiny on-disk dataset loads through `CustomDatasetPath` and the unknown-type errors fire. Not tested: the HFDataset branch needs a download and says in its own comment that its path must be edited by hand; only the call is corrected.
 
+### Eval metadata reader reuses the previous line on a malformed line
+- Symptom: `get_seedtts_testset_metainfo` and `get_seed_tts_test` (`eval/utils_eval.py`) either raised `UnboundLocalError: utt` (malformed first line) or silently copied the previous line's fields into a duplicate entry (malformed line later in the file, including a blank line in the middle of the file).
+- Cause: the `if len(fields) == 5 / elif len(fields) == 4` chain had no `else`, so other lengths fell through with stale variables.
+- Fix: blank lines are skipped and any other line without 4 or 5 fields raises `ValueError` naming the file and the line. Behaviour on well-formed files is unchanged.
+
 ## 2026-11-01: type-checking environment (Plan P, step 1)
 
 How the venv used for pyright and ruff was built, on Windows with Python 3.15.1. Commands run from the repo root; `.venv` is already in `.gitignore`.

@@ -24,11 +24,15 @@ def get_seedtts_testset_metainfo(metalst: str) -> list[tuple[str, str, str, str,
     f.close()
     metainfo = []
     for line in lines:
+        if not line.strip():
+            continue
         if len(line.strip().split("|")) == 5:
             utt, prompt_text, prompt_wav, gt_text, gt_wav = line.strip().split("|")
         elif len(line.strip().split("|")) == 4:
             utt, prompt_text, prompt_wav, gt_text = line.strip().split("|")
             gt_wav = os.path.join(os.path.dirname(metalst), "wavs", utt + ".wav")
+        else:
+            raise ValueError(f"Expected 4 or 5 '|' separated fields in {metalst}, got: {line.strip()!r}")
         if not os.path.isabs(prompt_wav):
             prompt_wav = os.path.join(os.path.dirname(metalst), prompt_wav)
         metainfo.append((utt, prompt_text, prompt_wav, gt_text, gt_wav))
@@ -221,10 +225,14 @@ def get_seed_tts_test(metalst: str, gen_wav_dir: str, gpus: list[int]) -> list[t
 
     test_set_ = []
     for line in tqdm(lines):
+        if not line.strip():
+            continue
         if len(line.strip().split("|")) == 5:
             utt, prompt_text, prompt_wav, gt_text, gt_wav = line.strip().split("|")
         elif len(line.strip().split("|")) == 4:
             utt, prompt_text, prompt_wav, gt_text = line.strip().split("|")
+        else:
+            raise ValueError(f"Expected 4 or 5 '|' separated fields in {metalst}, got: {line.strip()!r}")
 
         if not os.path.exists(os.path.join(gen_wav_dir, utt + ".wav")):
             continue
