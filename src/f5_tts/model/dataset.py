@@ -7,6 +7,7 @@ import torch
 import torch.nn.functional as F
 import torchaudio
 from datasets import Dataset as Dataset_
+from datasets import load_dataset as hf_load_dataset
 from datasets import load_from_disk
 from torch import Tensor, nn
 from torch.utils.data import Dataset, Sampler, SequentialSampler
@@ -282,6 +283,8 @@ def load_dataset(
         elif audio_type == "mel":
             train_dataset = Dataset_.from_file(f"{rel_data_path}/mel.arrow")
             preprocessed_mel = True
+        else:
+            raise ValueError(f"Unknown audio_type {audio_type!r}, expected 'raw' or 'mel'.")
         with open(f"{rel_data_path}/duration.json", "r", encoding="utf-8") as f:
             data_dict = json.load(f)
         durations = data_dict["duration"]
@@ -298,6 +301,7 @@ def load_dataset(
             train_dataset = load_from_disk(f"{dataset_name}/raw")
         except:  # noqa: E722
             train_dataset = Dataset_.from_file(f"{dataset_name}/raw.arrow")
+        preprocessed_mel = False  # this branch only reads the raw audio format
 
         with open(f"{dataset_name}/duration.json", "r", encoding="utf-8") as f:
             data_dict = json.load(f)
@@ -313,8 +317,16 @@ def load_dataset(
         )
         pre, post = dataset_name.split("_")
         train_dataset = HFDataset(
-            load_dataset(f"{pre}/{pre}", split=f"train.{post}", cache_dir=str(files("f5_tts").joinpath("../../data"))),
+            cast(
+                Dataset_,
+                hf_load_dataset(
+                    f"{pre}/{pre}", split=f"train.{post}", cache_dir=str(files("f5_tts").joinpath("../../data"))
+                ),
+            ),
         )
+
+    else:
+        raise ValueError(f"Unknown dataset_type {dataset_type!r}.")
 
     return train_dataset
 

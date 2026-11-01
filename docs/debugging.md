@@ -16,6 +16,12 @@ Each entry is one commit. All were found by reading pyright errors, then confirm
 - Symptom: `UnboundLocalError: ema_model` for a model choice that is neither the default, "E2-TTS" nor a `("Custom", ...)` tuple; or a crash inside `infer_process` for a custom model whose checkpoint path is empty (`pre_custom_path` starts as `""`, so the load is skipped and `custom_ema_model` stays `None`).
 - Fix: an `else` branch raises `ValueError` naming the choice, and a `None` model raises `ValueError` saying the custom path is empty.
 
+### `load_dataset` fails for two of its three dataset types
+- Symptom: `dataset_type="CustomDatasetPath"` raised `UnboundLocalError: preprocessed_mel`; `dataset_type="HFDataset"` raised `TypeError: load_dataset() got an unexpected keyword argument 'split'`; an unknown `dataset_type` or `audio_type` raised `UnboundLocalError` on `train_dataset` / `preprocessed_mel`.
+- Cause: `model/dataset.py` defines its own `load_dataset`, which shadows the Hugging Face function of the same name, so the HFDataset branch called itself with arguments it does not take. The CustomDatasetPath branch passed `preprocessed_mel` without ever setting it.
+- Fix: the Hugging Face function is imported as `hf_load_dataset` and used in that branch; `CustomDatasetPath` sets `preprocessed_mel = False` (it only reads the raw format); unknown types raise `ValueError`.
+- Tested: a tiny on-disk dataset loads through `CustomDatasetPath` and the unknown-type errors fire. Not tested: the HFDataset branch needs a download and says in its own comment that its path must be edited by hand; only the call is corrected.
+
 ## 2026-11-01: type-checking environment (Plan P, step 1)
 
 How the venv used for pyright and ruff was built, on Windows with Python 3.15.1. Commands run from the repo root; `.venv` is already in `.gitignore`.
