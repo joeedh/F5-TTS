@@ -1911,7 +1911,12 @@ Reduce the Base model size from 5GB to 1.3GB. The new checkpoint file prunes out
 def main(port: int | None, host: str | None, share: bool, api: bool) -> None:
     global app
     print("Starting app...")
-    app.queue(api_open=api).launch(server_name=host, server_port=port, share=share, show_api=api)
+    app.queue(api_open=api).launch(
+        server_name=host,
+        server_port=port,
+        share=share,
+        footer_links=None if api else ["gradio", "settings"],  # gradio 6 replaced show_api
+    )
 
 
 if __name__ == "__main__":

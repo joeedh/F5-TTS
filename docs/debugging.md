@@ -27,6 +27,12 @@ Each entry is one commit. All were found by reading pyright errors, then confirm
 - Cause: the `if len(fields) == 5 / elif len(fields) == 4` chain had no `else`, so other lengths fell through with stale variables.
 - Fix: blank lines are skipped and any other line without 4 or 5 fields raises `ValueError` naming the file and the line. Behaviour on well-formed files is unchanged.
 
+### `f5-tts_finetune-gradio` fails at startup with gradio 6
+- Symptom: `TypeError: Blocks.launch() got an unexpected keyword argument 'show_api'` when starting the fine-tuning app.
+- Cause: `pyproject.toml` requires `gradio>=6.15.0`, and gradio 6 removed `show_api` from `launch()` (checked with `inspect.signature` on 6.31.0: no `show_api`, no `**kwargs`). It was replaced by `footer_links`. `infer_gradio.py` never used it.
+- Fix: `launch(..., footer_links=None if api else ["gradio", "settings"])`. With `--api` (the default) the footer is gradio's default; without it the "api" link is left out. `queue(api_open=api)` still controls whether the API is open.
+- Not tested by launching the app (needs the full UI and a GPU environment); the signature was checked instead.
+
 ## 2026-11-01: type-checking environment (Plan P, step 1)
 
 How the venv used for pyright and ruff was built, on Windows with Python 3.15.1. Commands run from the repo root; `.venv` is already in `.gitignore`.
