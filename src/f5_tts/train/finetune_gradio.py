@@ -794,8 +794,8 @@ def create_metadata(name_project: str, ch_tokenizer: bool, progress: gr.Progress
 
         file_audio = get_correct_audio_path(name_audio, path_project_wavs)
 
-        if not os.path.isfile(file_audio):
-            error_files.append([file_audio, "error path"])
+        if file_audio is None or not os.path.isfile(file_audio):
+            error_files.append([file_audio or name_audio, "error path"])
             continue
 
         try:

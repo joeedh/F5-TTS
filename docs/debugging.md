@@ -33,6 +33,11 @@ Each entry is one commit. All were found by reading pyright errors, then confirm
 - Fix: `launch(..., footer_links=None if api else ["gradio", "settings"])`. With `--api` (the default) the footer is gradio's default; without it the "api" link is left out. `queue(api_open=api)` still controls whether the API is open.
 - Not tested by launching the app (needs the full UI and a GPU environment); the signature was checked instead.
 
+### Metadata creation crashes on an absolute audio path with an unsupported extension
+- Symptom: `TypeError: stat: path should be string, bytes, os.PathLike or integer, not NoneType` in `create_metadata` (`train/finetune_gradio.py`).
+- Cause: `get_correct_audio_path` returns `None` for an absolute path whose extension is not in the supported list, and `create_metadata` passed that straight to `os.path.isfile`.
+- Fix: a `None` result is recorded as an "error path" entry (using the name from the transcript) like any other missing file, and the loop continues.
+
 ## 2026-11-01: type-checking environment (Plan P, step 1)
 
 How the venv used for pyright and ruff was built, on Windows with Python 3.15.1. Commands run from the repo root; `.venv` is already in `.gitignore`.
