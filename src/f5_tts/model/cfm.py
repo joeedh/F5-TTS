@@ -132,7 +132,7 @@ class CFM(nn.Module):
             if exists(self.vocab_char_map):
                 text = list_str_to_idx(text, self.vocab_char_map).to(device)
             else:
-                text = list_str_to_tensor(text).to(device)
+                text = list_str_to_tensor(cast(list[str], text)).to(device)
             assert text.shape[0] == batch
 
         # duration
@@ -261,7 +261,7 @@ class CFM(nn.Module):
             if exists(self.vocab_char_map):
                 text = list_str_to_idx(text, self.vocab_char_map).to(device)
             else:
-                text = list_str_to_tensor(text).to(device)
+                text = list_str_to_tensor(cast(list[str], text)).to(device)
             assert text.shape[0] == batch
 
         # lens and mask

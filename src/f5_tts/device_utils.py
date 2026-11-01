@@ -11,7 +11,7 @@ def is_npu_available() -> bool:
     """
     if not hasattr(torch, "npu"):
         try:
-            import torch_npu  # noqa: F401
+            import torch_npu  # noqa: F401  # pyright: ignore[reportMissingImports]  # Ascend-only package
         except ImportError:
             return False
     npu = getattr(torch, "npu", None)

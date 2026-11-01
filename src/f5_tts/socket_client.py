@@ -4,7 +4,7 @@ import socket
 import time
 
 import numpy as np
-import pyaudio
+import pyaudio  # pyright: ignore[reportMissingModuleSource]  # needs PortAudio; only the client uses it
 
 
 logging.basicConfig(level=logging.INFO)

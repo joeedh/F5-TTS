@@ -4,7 +4,7 @@ import sys
 
 sys.path.append(os.getcwd())
 
-import thop
+import thop  # pyright: ignore[reportMissingImports]  # only needed by this script
 import torch
 
 from f5_tts.model import CFM, DiT
