@@ -43,6 +43,12 @@ Non-goals: changing runtime behaviour, adding unit tests for model quality, runt
 2. Install ruff 0.11.2 and a pinned `pyright` pip package into the same environment. Record versions and the exact commands in [../debugging.md](../debugging.md).
 3. Check that the torch version still supports the Python version CI will use (see step 6.1).
 
+Done 2026-11-01 (commands and versions in [../debugging.md](../debugging.md)). What differed from the plan:
+- The venv is Python 3.15.1 with torch 2.15.0+cpu, not the container's 3.13. It is a local Windows machine, not the cloud container.
+- `pip install -e ".[eval]"` fails on Python 3.15 (`av` has no wheel). The eval packages are installed one by one, with `faster_whisper` using `--no-deps`.
+- `src/third_party/BigVGAN` is checked out here, so `ruff check src` reports 75 errors from it. Run ruff on `src/f5_tts tools` only. That passes with 0.11.2, and `ruff format --check src/f5_tts` reports 47 files formatted.
+- Torch wheels: Python 3.10 has at most torch 2.14.1; Python 3.12 has 2.15.0. For step 6.1, Python 3.12 with torch 2.15.0 matches this venv. `pythonVersion` stays "3.10".
+
 ## Step 2: guard against behaviour change
 
 Do this on untouched `main` before any code change. Every later step is checked against it. It is a tripwire, not a proof: annotation-only edits cannot change numerical output, so a golden mismatch mostly means an accidental edit, a changed default or a changed signature. Batches that only add annotations are expected to leave it unchanged.
@@ -59,6 +65,13 @@ Files: `tools/typing_guard/golden.py` and the stored result `tools/typing_guard/
 5. Import check for an allow-list only: `f5_tts.model` and its submodules, `f5_tts.infer.utils_infer`, `f5_tts.api`, `f5_tts.device_utils`. Do not import `infer_cli`, `speech_edit`, the Gradio apps, `socket_*`, `train/*`, `eval/*` or the data prep scripts: they run module-level code, load checkpoints, download files or need extras.
 6. Record the torch version in the JSON. Compare only within the same environment.
 7. Run once, commit script and JSON.
+
+Done 2026-11-01; usage and results are in [../debugging.md](../debugging.md). What differed from the plan:
+- Added a parse of every file with the 3.10 grammar, since the venv runs 3.15.
+- `model/backbones/` has no `__init__.py`, so module names come from file paths, not `pkgutil`.
+- The tiny DiT has all parameters overwritten with seeded random values, because `DiT` zero-initialises its output layers and would otherwise return zeros.
+- Numeric cases: `CFM.forward` (batch of 2 with lens), and `CFM.sample` for a single item with EPSS and sway, a masked batch of 2, and no CFG.
+- `tools/` already holds `webgpu-probe/` (a directory), not just a `.cjs` file.
 
 What the guard does not cover: Gradio apps, trainer, dataset code, eval code, socket server, CLI scripts. Those get the syntax check and line-by-line diff review only.
 

@@ -25,7 +25,7 @@ Approach decided: pyright, and port many files at once, then drive the error cou
 - [ ] Policy on suppressions: only `# pyright: ignore[ruleName]` with the rule name, never bare `# type: ignore`. Comments that are temporary start with `CLAUDENOTE:` per `CLAUDE.md`.
 
 ### Setup
-- [ ] Make a reproducible environment with torch, torchaudio and the other runtime dependencies installed, so errors are real and not missing-import noise. Record how in `docs/debugging.md`.
+- [x] Make a reproducible environment with torch, torchaudio and the other runtime dependencies installed, so errors are real and not missing-import noise. Record how in `docs/debugging.md`. (Done 2026-11-01, `.venv` on Python 3.15.1 with torch 2.15.0+cpu.)
 - [ ] Pin the pyright version (pre-commit, dev dependency, or both). Pyright updates often add errors.
 - [ ] Add `[tool.pyright]` to `pyproject.toml`: python version 3.10, include/exclude, start in `basic` mode, report missing imports as errors only after the environment is fixed.
 - [ ] Record the real baseline count with torch installed, by rule. This replaces the 672 figure.

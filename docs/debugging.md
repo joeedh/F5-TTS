@@ -2,6 +2,51 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-01: type-checking environment (Plan P, step 1)
+
+How the venv used for pyright and ruff was built, on Windows with Python 3.15.1. Commands run from the repo root; `.venv` is already in `.gitignore`.
+
+```
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -e . ruff==0.11.2 pyright
+.venv\Scripts\python.exe -m pip install funasr jiwer modelscope zhconv zhon
+.venv\Scripts\python.exe -m pip install --no-deps faster_whisper==0.10.1
+```
+
+Versions that resulted: torch 2.15.0+cpu, torchaudio 2.11.1, numpy 2.5.4, accelerate 1.15.0, x-transformers 2.31.11, vocos 0.1.0, ema-pytorch 0.8.3, gradio 6.31.0, ruff 0.11.2, pyright 1.1.414.
+
+### `pip install -e ".[eval]"` fails building `av`
+- Symptom: `Failed to build 'av' when getting requirements to build wheel` (a Cython `CompileError` on `av\logging.pyx`).
+- Cause: the `eval` extra pins `faster_whisper==0.10.1`, which needs `av`. PyAV has no wheel for Python 3.15 and its source build fails.
+- Workaround: install the rest of the extra normally and install `faster_whisper` with `--no-deps`. Pyright only needs its source to read, so type checking is unaffected. Do not run the eval scripts from this venv.
+
+### Ruff must be scoped to `src/f5_tts tools`
+- Symptom: `ruff check src` reports 75 errors, all in `src/third_party/BigVGAN`.
+- Cause: the BigVGAN submodule is checked out on this machine (the plan assumed an empty directory). Pre-commit only sees tracked files, so it never lints it.
+- Check: `ruff check src/f5_tts tools` and `ruff format --check src/f5_tts` both pass with 0.11.2 (47 files formatted).
+
+### Torch wheels by Python version
+- Checked with `pip index versions torch --python-version <v> --only-binary=:all:`: Python 3.10 tops out at torch 2.14.1; Python 3.12 gets 2.15.0. Torch typing differs between versions, so the CI job in step 6 needs one Python and one torch pinned together. Python 3.12 with torch 2.15.0 matches the local venv's torch.
+
+## 2026-11-01: behaviour guard for the typing work (Plan P, step 2)
+
+`tools/typing_guard/golden.py` compares the code against `tools/typing_guard/golden.json`, which was written on untouched `main` with torch 2.15.0+cpu on Windows.
+
+```
+.venv\Scripts\python.exe tools/typing_guard/golden.py          # check; exit 0 ok, 1 mismatch, 2 numeric skipped
+.venv\Scripts\python.exe tools/typing_guard/golden.py --write  # only on a known-good baseline
+```
+
+- Checks: syntax of every file under `src/f5_tts` (also with the 3.10 grammar), imports of `f5_tts.model.*`, `api`, `device_utils`, `infer.utils_infer`, a hash of `CFM.forward` and three `CFM.sample` runs on a tiny random DiT, `convert_char_to_pinyin` / `get_epss_timesteps` / `chunk_text` outputs, and parameter names, kinds and defaults of 117 public functions and methods.
+- The numeric part only runs when torch version, OS and CPU architecture match `golden.json`. Otherwise it prints SKIPPED and exits 2; regenerate the file on the baseline commit in the new environment.
+- Verified it works as a tripwire: an annotation-only edit passes, a changed default (`steps=32` to `31`) fails in signatures, and a 0.1% change to the CFG formula fails in numeric.
+- Harmless warnings on stderr: pydub cannot find ffmpeg, and `torch.jit.script` on Python 3.14+. Set `PYTHONWARNINGS=ignore` to hide them.
+
+### A freshly built DiT outputs all zeros
+- Symptom: any test of a new `DiT` returns zeros however the input changes.
+- Cause: `DiT.initialize_weights` zero-fills the AdaLN layers and `proj_out`, as in the paper, so only trained weights produce output.
+- Fix for tests: overwrite every parameter with seeded random values after construction, as `build_cfm` in the guard does.
+
 ## 2026-10-31: findings from checking docs/architecture.md against the code
 
 Each entry is a behaviour that can look like a bug. Source is `src/f5_tts/` unless noted. Read from code, not reproduced by running.
