@@ -304,7 +304,7 @@ ema_model = load_model(
 # inference process
 
 
-def main():
+def main() -> None:
     main_voice = {"ref_audio": ref_audio, "ref_text": ref_text}
     if "voices" not in config:
         voices = {"main": main_voice}

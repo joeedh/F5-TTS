@@ -11,14 +11,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-async def listen_to_F5TTS(text, server_ip="localhost", server_port=9998):
+async def listen_to_F5TTS(text: str, server_ip: str = "localhost", server_port: int | str = 9998) -> None:
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     await asyncio.get_event_loop().run_in_executor(None, client_socket.connect, (server_ip, int(server_port)))
 
     start_time = time.time()
     first_chunk_time = None
 
-    async def play_audio_stream():
+    async def play_audio_stream() -> None:
         nonlocal first_chunk_time
         p = pyaudio.PyAudio()
         stream = p.open(format=pyaudio.paFloat32, channels=1, rate=24000, output=True, frames_per_buffer=2048)

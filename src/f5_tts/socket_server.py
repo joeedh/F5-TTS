@@ -8,6 +8,7 @@ import threading
 import traceback
 import wave
 from importlib.resources import files
+from typing import Any
 
 import numpy as np
 import torch
@@ -24,6 +25,7 @@ from f5_tts.infer.utils_infer import (
     load_vocoder,
     preprocess_ref_audio_text,
 )
+from f5_tts.model import CFM
 
 
 logging.basicConfig(level=logging.INFO)
@@ -33,7 +35,7 @@ logger = logging.getLogger(__name__)
 class AudioFileWriterThread(threading.Thread):
     """Threaded file writer to avoid blocking the TTS streaming process."""
 
-    def __init__(self, output_file, sampling_rate):
+    def __init__(self, output_file: str, sampling_rate: int) -> None:
         super().__init__()
         self.output_file = output_file
         self.sampling_rate = sampling_rate
@@ -41,7 +43,7 @@ class AudioFileWriterThread(threading.Thread):
         self.stop_event = threading.Event()
         self.audio_data = []
 
-    def run(self):
+    def run(self) -> None:
         """Process queued audio data and write it to a file."""
         logger.info("AudioFileWriterThread started.")
         with wave.open(self.output_file, "wb") as wf:
@@ -59,11 +61,11 @@ class AudioFileWriterThread(threading.Thread):
                 except queue.Empty:
                     continue
 
-    def add_chunk(self, chunk):
+    def add_chunk(self, chunk: np.ndarray) -> None:
         """Add a new chunk to the queue."""
         self.queue.put(chunk)
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop writing and ensure all queued data is written."""
         self.stop_event.set()
         self.join()
@@ -71,7 +73,16 @@ class AudioFileWriterThread(threading.Thread):
 
 
 class TTSStreamingProcessor:
-    def __init__(self, model, ckpt_file, vocab_file, ref_audio, ref_text, device=None, dtype=torch.float32):
+    def __init__(
+        self,
+        model: str,
+        ckpt_file: str,
+        vocab_file: str,
+        ref_audio: str,
+        ref_text: str,
+        device: str | None = None,
+        dtype: torch.dtype = torch.float32,
+    ) -> None:
         self.device = device or get_default_device()
         model_cfg = OmegaConf.load(str(files("f5_tts").joinpath(f"configs/{model}.yaml")))
         self.model_cls = get_class(f"f5_tts.model.{model_cfg.model.backbone}")
@@ -87,7 +98,7 @@ class TTSStreamingProcessor:
         self.file_writer_thread = None
         self.first_package = True
 
-    def load_ema_model(self, ckpt_file, vocab_file, dtype):
+    def load_ema_model(self, ckpt_file: str, vocab_file: str, dtype: torch.dtype) -> CFM:
         return load_model(
             self.model_cls,
             self.model_arc,
@@ -99,10 +110,10 @@ class TTSStreamingProcessor:
             device=self.device,
         ).to(self.device, dtype=dtype)
 
-    def load_vocoder_model(self):
+    def load_vocoder_model(self) -> Any:  # Any: a Vocos or a BigVGAN
         return load_vocoder(vocoder_name=self.mel_spec_type, is_local=False, local_path=None, device=self.device)
 
-    def update_reference(self, ref_audio, ref_text):
+    def update_reference(self, ref_audio: str, ref_text: str) -> None:
         self.ref_audio, self.ref_text = preprocess_ref_audio_text(ref_audio, ref_text)
         self.audio, self.sr = torchaudio.load(self.ref_audio)
 
@@ -112,7 +123,7 @@ class TTSStreamingProcessor:
         self.few_chars = int(ref_text_byte_len / (ref_audio_duration) * (25 - ref_audio_duration) / 2)
         self.min_chars = int(ref_text_byte_len / (ref_audio_duration) * (25 - ref_audio_duration) / 4)
 
-    def _warm_up(self):
+    def _warm_up(self) -> None:
         logger.info("Warming up the model...")
         gen_text = "Warm-up text for the model."
         for _ in infer_batch_process(
@@ -128,7 +139,7 @@ class TTSStreamingProcessor:
             pass
         logger.info("Warm-up completed.")
 
-    def generate_stream(self, text, conn):
+    def generate_stream(self, text: str, conn: socket.socket) -> None:
         text_batches = chunk_text(text, max_chars=self.max_chars)
         if self.first_package:
             text_batches = chunk_text(text_batches[0], max_chars=self.few_chars) + text_batches[1:]
@@ -170,7 +181,7 @@ class TTSStreamingProcessor:
         self.file_writer_thread.stop()
 
 
-def handle_client(conn, processor):
+def handle_client(conn: socket.socket, processor: TTSStreamingProcessor) -> None:
     try:
         with conn:
             conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
@@ -193,7 +204,7 @@ def handle_client(conn, processor):
         traceback.print_exc()
 
 
-def start_server(host, port, processor):
+def start_server(host: str, port: int, processor: TTSStreamingProcessor) -> None:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((host, port))
         s.listen()

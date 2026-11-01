@@ -2,7 +2,9 @@
 # Make adjustments inside functions, and consider both gradio and cli scripts if need to change func output format
 import os
 import sys
+from collections.abc import Callable, Iterator, Mapping
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any
 
 
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"  # for MPS device compatibility
@@ -25,6 +27,7 @@ import torchaudio
 import tqdm
 from huggingface_hub import hf_hub_download
 from pydub import AudioSegment, silence
+from torch import Tensor, nn
 from transformers import pipeline
 from vocos import Vocos
 
@@ -63,7 +66,7 @@ fix_duration = None
 # chunk text into smaller pieces
 
 
-def chunk_text(text, max_chars=135):
+def chunk_text(text: str, max_chars: int = 135) -> list[str]:
     """
     Splits the input text into chunks, each with a maximum number of characters.
 
@@ -96,7 +99,13 @@ def chunk_text(text, max_chars=135):
 
 
 # load vocoder
-def load_vocoder(vocoder_name="vocos", is_local=False, local_path="", device=device, hf_cache_dir=None):
+def load_vocoder(
+    vocoder_name: str = "vocos",
+    is_local: bool = False,
+    local_path: str = "",
+    device: str = device,
+    hf_cache_dir: str | None = None,
+) -> Any:  # Any: a Vocos or a BigVGAN, which share no base class
     if vocoder_name == "vocos":
         # vocoder = Vocos.from_pretrained("charactr/vocos-mel-24khz").to(device)
         if is_local:
@@ -143,7 +152,7 @@ def load_vocoder(vocoder_name="vocos", is_local=False, local_path="", device=dev
 asr_pipe = None
 
 
-def initialize_asr_pipeline(device: str = device, dtype=None):
+def initialize_asr_pipeline(device: str = device, dtype: torch.dtype | None = None) -> None:
     if dtype is None:
         dtype = (
             torch.float16
@@ -164,7 +173,7 @@ def initialize_asr_pipeline(device: str = device, dtype=None):
 # transcribe
 
 
-def transcribe(ref_audio, language=None):
+def transcribe(ref_audio: str, language: str | None = None) -> str:
     global asr_pipe
     if asr_pipe is None:
         initialize_asr_pipeline(device=device)
@@ -180,7 +189,9 @@ def transcribe(ref_audio, language=None):
 # load model checkpoint for inference
 
 
-def load_checkpoint(model, ckpt_path, device: str, dtype=None, use_ema=True):
+def load_checkpoint(
+    model: CFM, ckpt_path: str, device: str, dtype: torch.dtype | None = None, use_ema: bool = True
+) -> CFM:
     if dtype is None:
         dtype = (
             torch.float16
@@ -229,15 +240,15 @@ def load_checkpoint(model, ckpt_path, device: str, dtype=None, use_ema=True):
 
 
 def load_model(
-    model_cls,
-    model_cfg,
-    ckpt_path,
-    mel_spec_type=mel_spec_type,
-    vocab_file="",
-    ode_method=ode_method,
-    use_ema=True,
-    device=device,
-):
+    model_cls: type[nn.Module],
+    model_cfg: Mapping[str, Any],  # Any: backbone arguments of mixed types, from the model yaml
+    ckpt_path: str,
+    mel_spec_type: str = mel_spec_type,
+    vocab_file: str = "",
+    ode_method: str = ode_method,
+    use_ema: bool = True,
+    device: str = device,
+) -> CFM:
     if vocab_file == "":
         vocab_file = str(files("f5_tts").joinpath("infer/examples/vocab.txt"))
     tokenizer = "custom"
@@ -269,7 +280,7 @@ def load_model(
     return model
 
 
-def remove_silence_edges(audio, silence_threshold=-42):
+def remove_silence_edges(audio: AudioSegment, silence_threshold: float = -42) -> AudioSegment:
     # Remove silence from the start
     non_silent_start_idx = silence.detect_leading_silence(audio, silence_threshold=silence_threshold)
     audio = audio[non_silent_start_idx:]
@@ -288,7 +299,9 @@ def remove_silence_edges(audio, silence_threshold=-42):
 # preprocess reference audio and text
 
 
-def preprocess_ref_audio_text(ref_audio_orig, ref_text, show_info=print):
+def preprocess_ref_audio_text(
+    ref_audio_orig: str, ref_text: str, show_info: Callable[[str], object] = print
+) -> tuple[str, str]:
     show_info("Converting audio...")
 
     # Compute a hash of the reference audio file
@@ -375,23 +388,23 @@ def preprocess_ref_audio_text(ref_audio_orig, ref_text, show_info=print):
 
 
 def infer_process(
-    ref_audio,
-    ref_text,
-    gen_text,
-    model_obj,
-    vocoder,
-    mel_spec_type=mel_spec_type,
-    show_info=print,
-    progress=tqdm,
-    target_rms=target_rms,
-    cross_fade_duration=cross_fade_duration,
-    nfe_step=nfe_step,
-    cfg_strength=cfg_strength,
-    sway_sampling_coef=sway_sampling_coef,
-    speed=speed,
-    fix_duration=fix_duration,
-    device=device,
-):
+    ref_audio: str,
+    ref_text: str,
+    gen_text: str,
+    model_obj: CFM,
+    vocoder: Any,  # Any: a Vocos or a BigVGAN
+    mel_spec_type: str = mel_spec_type,
+    show_info: Callable[[str], object] = print,
+    progress: Any = tqdm,  # Any: the tqdm module or a gradio progress tracker; both offer .tqdm
+    target_rms: float = target_rms,
+    cross_fade_duration: float = cross_fade_duration,
+    nfe_step: int = nfe_step,
+    cfg_strength: float = cfg_strength,
+    sway_sampling_coef: float = sway_sampling_coef,
+    speed: float = speed,
+    fix_duration: float | None = fix_duration,
+    device: str | None = device,
+) -> tuple[np.ndarray | None, int, np.ndarray | None]:
     # Split the input text into batches
     audio, sr = torchaudio.load(ref_audio)
     max_chars = int(len(ref_text.encode("utf-8")) / (audio.shape[-1] / sr) * (22 - audio.shape[-1] / sr) * speed)
@@ -431,24 +444,26 @@ def infer_process(
 
 
 def infer_batch_process(
-    ref_audio,
-    ref_text,
-    gen_text_batches,
-    model_obj,
-    vocoder,
-    mel_spec_type="vocos",
-    progress=tqdm,
-    target_rms=0.1,
-    cross_fade_duration=0.15,
-    nfe_step=32,
-    cfg_strength=2.0,
-    sway_sampling_coef=-1,
-    speed=1,
-    fix_duration=None,
-    device=None,
-    streaming=False,
-    chunk_size=2048,
-):
+    ref_audio: tuple[Tensor, int],
+    ref_text: str,
+    gen_text_batches: list[str],
+    model_obj: CFM,
+    vocoder: Any,  # Any: a Vocos or a BigVGAN
+    mel_spec_type: str = "vocos",
+    progress: Any = tqdm,  # Any: the tqdm module or a gradio progress tracker; both offer .tqdm
+    target_rms: float = 0.1,
+    cross_fade_duration: float = 0.15,
+    nfe_step: int = 32,
+    cfg_strength: float = 2.0,
+    sway_sampling_coef: float = -1,
+    speed: float = 1,
+    fix_duration: float | None = None,
+    device: str | None = None,
+    streaming: bool = False,
+    chunk_size: int = 2048,
+) -> Iterator[
+    tuple[np.ndarray, int] | tuple[np.ndarray | None, int, np.ndarray | None]
+]:  # 2 items per chunk when streaming
     audio, sr = ref_audio
     if audio.shape[0] > 1:
         audio = torch.mean(audio, dim=0, keepdim=True)
@@ -479,7 +494,7 @@ def infer_batch_process(
     else:
         fix_durations = [fix_duration] * len(gen_text_batches)
 
-    def _infer_basic(gen_text, fix_dur):
+    def _infer_basic(gen_text: str, fix_dur: float | None) -> tuple[np.ndarray, Tensor]:
         local_speed = speed
         if len(gen_text.encode("utf-8")) < 10:
             local_speed = speed * 0.3
@@ -524,13 +539,13 @@ def infer_batch_process(
 
         return generated_wave, generated
 
-    def infer_single_process(gen_text, fix_dur):
+    def infer_single_process(gen_text: str, fix_dur: float | None) -> tuple[np.ndarray, np.ndarray]:
         generated_wave, generated = _infer_basic(gen_text, fix_dur)
         generated_cpu = generated[0].cpu().numpy()
         del generated
         return generated_wave, generated_cpu
 
-    def infer_single_process_streaming(gen_text, fix_dur):
+    def infer_single_process_streaming(gen_text: str, fix_dur: float | None) -> Iterator[tuple[np.ndarray, int]]:
         # for src/f5_tts/socket_server.py
         generated_wave, generated = _infer_basic(gen_text, fix_dur)
         del generated
@@ -602,7 +617,7 @@ def infer_batch_process(
 # remove silence from generated wav
 
 
-def remove_silence_for_generated_wav(filename):
+def remove_silence_for_generated_wav(filename: str) -> None:
     aseg = AudioSegment.from_file(filename)
     non_silent_segs = silence.split_on_silence(
         aseg, min_silence_len=1000, silence_thresh=-50, keep_silence=500, seek_step=10
@@ -617,7 +632,7 @@ def remove_silence_for_generated_wav(filename):
 # save spectrogram
 
 
-def save_spectrogram(spectrogram, path):
+def save_spectrogram(spectrogram: np.ndarray, path: str) -> None:
     plt.figure(figsize=(12, 4))
     plt.imshow(spectrogram, origin="lower", aspect="auto")
     plt.colorbar()

@@ -1,7 +1,10 @@
 import random
 import sys
+from collections.abc import Callable
 from importlib.resources import files
+from typing import Any
 
+import numpy as np
 import soundfile as sf
 import tqdm
 from cached_path import cached_path
@@ -24,15 +27,15 @@ from f5_tts.model.utils import seed_everything
 class F5TTS:
     def __init__(
         self,
-        model="F5TTS_v1_Base",
-        ckpt_file="",
-        vocab_file="",
-        ode_method="euler",
-        use_ema=True,
-        vocoder_local_path=None,
-        device=None,
-        hf_cache_dir=None,
-    ):
+        model: str = "F5TTS_v1_Base",
+        ckpt_file: str = "",
+        vocab_file: str = "",
+        ode_method: str = "euler",
+        use_ema: bool = True,
+        vocoder_local_path: str | None = None,
+        device: str | None = None,
+        hf_cache_dir: str | None = None,
+    ) -> None:
         model_cfg = OmegaConf.load(str(files("f5_tts").joinpath(f"configs/{model}.yaml")))
         model_cls = get_class(f"f5_tts.model.{model_cfg.model.backbone}")
         model_arc = model_cfg.model.arch
@@ -74,37 +77,37 @@ class F5TTS:
             model_cls, model_arc, ckpt_file, self.mel_spec_type, vocab_file, self.ode_method, self.use_ema, self.device
         )
 
-    def transcribe(self, ref_audio, language=None):
+    def transcribe(self, ref_audio: str, language: str | None = None) -> str:
         return transcribe(ref_audio, language)
 
-    def export_wav(self, wav, file_wave, remove_silence=False):
+    def export_wav(self, wav: np.ndarray, file_wave: str, remove_silence: bool = False) -> None:
         sf.write(file_wave, wav, self.target_sample_rate)
 
         if remove_silence:
             remove_silence_for_generated_wav(file_wave)
 
-    def export_spectrogram(self, spec, file_spec):
+    def export_spectrogram(self, spec: np.ndarray, file_spec: str) -> None:
         save_spectrogram(spec, file_spec)
 
     def infer(
         self,
-        ref_file,
-        ref_text,
-        gen_text,
-        show_info=print,
-        progress=tqdm,
-        target_rms=0.1,
-        cross_fade_duration=0.15,
-        sway_sampling_coef=-1,
-        cfg_strength=2,
-        nfe_step=32,
-        speed=1.0,
-        fix_duration=None,
-        remove_silence=False,
-        file_wave=None,
-        file_spec=None,
-        seed=None,
-    ):
+        ref_file: str,
+        ref_text: str,
+        gen_text: str,
+        show_info: Callable[[str], object] = print,
+        progress: Any = tqdm,  # Any: the tqdm module or a gradio progress tracker; both offer .tqdm
+        target_rms: float = 0.1,
+        cross_fade_duration: float = 0.15,
+        sway_sampling_coef: float = -1,
+        cfg_strength: float = 2,
+        nfe_step: int = 32,
+        speed: float = 1.0,
+        fix_duration: float | None = None,
+        remove_silence: bool = False,
+        file_wave: str | None = None,
+        file_spec: str | None = None,
+        seed: int | None = None,
+    ) -> tuple[np.ndarray | None, int, np.ndarray | None]:
         if seed is None:
             seed = random.randint(0, sys.maxsize)
         seed_everything(seed)
