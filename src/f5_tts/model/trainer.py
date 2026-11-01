@@ -13,11 +13,11 @@ from accelerate.utils import DistributedDataParallelKwargs
 from ema_pytorch import EMA
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import LinearLR, SequentialLR
-from torch.utils.data import DataLoader, Dataset, SequentialSampler
+from torch.utils.data import DataLoader, SequentialSampler
 from tqdm import tqdm
 
 from f5_tts.model import CFM
-from f5_tts.model.dataset import DynamicBatchSampler, collate_fn
+from f5_tts.model.dataset import CustomDataset, DynamicBatchSampler, HFDataset, collate_fn
 from f5_tts.model.utils import default, exists
 
 
@@ -139,7 +139,9 @@ class Trainer:
         if bnb_optimizer:
             import bitsandbytes as bnb
 
-            self.optimizer = bnb.optim.AdamW8bit(model.parameters(), lr=learning_rate)
+            self.optimizer = bnb.optim.AdamW8bit(  # pyright: ignore[reportPrivateImportUsage]  # documented bitsandbytes API
+                model.parameters(), lr=learning_rate
+            )
         else:
             self.optimizer = AdamW(model.parameters(), lr=learning_rate, fused=True)
         self.model, self.optimizer = self.accelerator.prepare(self.model, self.optimizer)
@@ -213,6 +215,7 @@ class Trainer:
                 # If no training checkpoints, use pretrained model
                 latest_checkpoint = next(f for f in all_checkpoints if f.startswith("pretrained_"))
 
+        checkpoint: dict[str, Any]
         if latest_checkpoint.endswith(".safetensors"):  # always a pretrained checkpoint
             from safetensors.torch import load_file
 
@@ -263,7 +266,9 @@ class Trainer:
         gc.collect()
         return update
 
-    def train(self, train_dataset: Dataset, num_workers: int = 16, resumable_with_seed: int | None = None) -> None:
+    def train(
+        self, train_dataset: CustomDataset | HFDataset, num_workers: int = 16, resumable_with_seed: int | None = None
+    ) -> None:
         if self.log_samples:
             from f5_tts.infer.utils_infer import cfg_strength, load_vocoder, nfe_step, sway_sampling_coef
 
@@ -397,6 +402,7 @@ class Trainer:
                         {"loss": loss.item(), "lr": self.scheduler.get_last_lr()[0]}, step=global_update
                     )
                 if self.logger == "tensorboard" and self.accelerator.is_main_process:
+                    assert self.writer is not None
                     self.writer.add_scalar("loss", loss.item(), global_update)
                     self.writer.add_scalar("lr", self.scheduler.get_last_lr()[0], global_update)
 

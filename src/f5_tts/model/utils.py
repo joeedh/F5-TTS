@@ -4,7 +4,7 @@ import os
 import random
 from collections import defaultdict
 from importlib.resources import files
-from typing import Any, TypeVar
+from typing import TypeGuard, TypeVar
 
 import rjieba
 import torch
@@ -33,7 +33,7 @@ def seed_everything(seed: int = 0) -> None:
 # helpers
 
 
-def exists(v: Any) -> bool:  # Any: accepts any value, only checks for None
+def exists(v: _T | None) -> TypeGuard[_T]:
     return v is not None
 
 
@@ -43,7 +43,7 @@ def default(v: _T | None, d: _T) -> _T:
 
 def is_package_available(package_name: str) -> bool:
     try:
-        import importlib
+        import importlib.util
 
         package_exists = importlib.util.find_spec(package_name) is not None
         return package_exists
@@ -55,8 +55,8 @@ def is_package_available(package_name: str) -> bool:
 
 
 def lens_to_mask(t: Int[Tensor, "b"], length: int | None = None) -> Bool[Tensor, "b n"]:
-    if not exists(length):
-        length = t.amax()
+    if length is None:
+        length = int(t.amax())
 
     seq = torch.arange(length, device=t.device)
     return seq[None, :] < t[:, None]
@@ -84,7 +84,7 @@ def mask_from_frac_lengths(seq_len: Int[Tensor, "b"], frac_lengths: Float[Tensor
 
 
 def maybe_masked_mean(t: Float[Tensor, "b n d"], mask: Bool[Tensor, "b n"] | None = None) -> Float[Tensor, "b d"]:
-    if not exists(mask):
+    if mask is None:
         return t.mean(dim=1)
 
     t = torch.where(mask[:, :, None], t, torch.tensor(0.0, device=t.device))
@@ -97,8 +97,8 @@ def maybe_masked_mean(t: Float[Tensor, "b n d"], mask: Bool[Tensor, "b n"] | Non
 # simple utf-8 tokenizer, since paper went character based
 def list_str_to_tensor(text: list[str], padding_value: int = -1) -> Int[Tensor, "b nt"]:
     list_tensors = [torch.tensor([*bytes(t, "UTF-8")]) for t in text]  # ByT5 style
-    text = pad_sequence(list_tensors, padding_value=padding_value, batch_first=True)
-    return text
+    padded = pad_sequence(list_tensors, padding_value=padding_value, batch_first=True)
+    return padded
 
 
 # char tokenizer, based on custom dataset's extracted .txt file
@@ -108,8 +108,8 @@ def list_str_to_idx(
     padding_value: int = -1,
 ) -> Int[Tensor, "b nt"]:
     list_idx_tensors = [torch.tensor([vocab_char_map.get(c, 0) for c in t]) for t in text]  # pinyin or char style
-    text = pad_sequence(list_idx_tensors, padding_value=padding_value, batch_first=True)
-    return text
+    padded = pad_sequence(list_idx_tensors, padding_value=padding_value, batch_first=True)
+    return padded
 
 
 # Get tokenizer
@@ -126,7 +126,9 @@ def get_tokenizer(dataset_name: str, tokenizer: str = "pinyin") -> tuple[dict[st
                 - if use "byte", set to 256 (unicode byte range)
     """
     if tokenizer in ["pinyin", "char"]:
-        tokenizer_path = os.path.join(files("f5_tts").joinpath("../../data"), f"{dataset_name}_{tokenizer}/vocab.txt")
+        tokenizer_path = os.path.join(
+            str(files("f5_tts").joinpath("../../data")), f"{dataset_name}_{tokenizer}/vocab.txt"
+        )
         with open(tokenizer_path, "r", encoding="utf-8") as f:
             vocab_char_map = {}
             for i, char in enumerate(f):

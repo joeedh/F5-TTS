@@ -2093,6 +2093,30 @@
         "<required>"
       ]
     ],
+    "f5_tts.model.cfm.Backbone.__init__": [
+      [
+        "self",
+        "POSITIONAL_OR_KEYWORD",
+        "<required>"
+      ],
+      [
+        "args",
+        "VAR_POSITIONAL",
+        "<required>"
+      ],
+      [
+        "kwargs",
+        "VAR_KEYWORD",
+        "<required>"
+      ]
+    ],
+    "f5_tts.model.cfm.Backbone.clear_cache": [
+      [
+        "self",
+        "POSITIONAL_OR_KEYWORD",
+        "<required>"
+      ]
+    ],
     "f5_tts.model.cfm.CFM.__init__": [
       [
         "self",

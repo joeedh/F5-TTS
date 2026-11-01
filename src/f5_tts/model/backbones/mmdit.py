@@ -10,9 +10,11 @@ d - dimension
 from __future__ import annotations
 
 import threading
-from typing import Any, Callable
+from collections.abc import Iterable
+from typing import Any, Callable, cast
 
 import torch
+import torch.utils.checkpoint
 from jaxtyping import Bool, Float, Int
 from torch import Tensor, nn
 from x_transformers.x_transformers import RotaryEmbedding
@@ -31,6 +33,8 @@ from f5_tts.model.modules import (
 
 
 class TextEmbedding(nn.Module):
+    freqs_cis: Tensor  # registered as a buffer in __init__
+
     def __init__(self, out_dim: int, text_num_embeds: int, mask_padding: bool = True) -> None:
         super().__init__()
         self.text_embed = nn.Embedding(text_num_embeds + 1, out_dim)  # will use 0 as filler token
@@ -168,7 +172,7 @@ class MMDiT(nn.Module):
 
     def initialize_weights(self) -> None:
         # Zero-out AdaLN layers in MMDiT blocks:
-        for block in self.transformer_blocks:
+        for block in cast("Iterable[MMDiTBlock]", self.transformer_blocks):
             nn.init.constant_(block.attn_norm_x.linear.weight, 0)
             nn.init.constant_(block.attn_norm_x.linear.bias, 0)
             nn.init.constant_(block.attn_norm_c.linear.weight, 0)

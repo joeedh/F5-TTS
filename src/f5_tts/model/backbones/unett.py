@@ -10,7 +10,8 @@ d - dimension
 from __future__ import annotations
 
 import threading
-from typing import Literal
+from collections.abc import Iterable
+from typing import Literal, cast
 
 import torch
 import torch.nn.functional as F
@@ -35,6 +36,8 @@ from f5_tts.model.modules import (
 
 
 class TextEmbedding(nn.Module):
+    freqs_cis: Tensor  # registered as a buffer when conv_layers > 0
+
     def __init__(
         self, text_num_embeds: int, text_dim: int, mask_padding: bool = True, conv_layers: int = 0, conv_mult: int = 2
     ) -> None:
@@ -181,7 +184,7 @@ class UNetT(nn.Module):
             self.layers.append(
                 nn.ModuleList(
                     [
-                        skip_proj,
+                        skip_proj,  # pyright: ignore[reportArgumentType]  # None in the first half; ModuleList accepts it
                         attn_norm,
                         attn,
                         ff_norm,
@@ -286,7 +289,9 @@ class UNetT(nn.Module):
         # flat unet transformer
         skip_connect_type = self.skip_connect_type
         skips = []
-        for idx, (maybe_skip_proj, attn_norm, attn, ff_norm, ff) in enumerate(self.layers):
+        for idx, (maybe_skip_proj, attn_norm, attn, ff_norm, ff) in enumerate(
+            cast("Iterable[nn.ModuleList]", self.layers)
+        ):
             layer = idx + 1
 
             # skip connection logic

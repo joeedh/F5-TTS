@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import math
 import warnings
-from typing import Optional
+from typing import Callable, Optional, cast
 
 import torch
 import torch.nn.functional as F
@@ -26,6 +26,9 @@ from f5_tts.model.utils import is_package_available
 
 # (freqs, xpos_scale) as returned by x_transformers' RotaryEmbedding.forward_from_seq_len
 Rope = tuple[Tensor, Tensor | float | None]
+
+# x_transformers types the xpos scale as int; a float or a tensor is accepted at runtime
+_apply_rope = cast(Callable[[Tensor, Tensor, float | Tensor], Tensor], apply_rotary_pos_emb)
 
 
 # raw wav to mel spec
@@ -335,8 +338,9 @@ class AdaLayerNorm(nn.Module):
         Float[Tensor, "b d"],
         Float[Tensor, "b d"],
     ]:
-        emb = self.linear(self.silu(emb))
-        shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = torch.chunk(emb, 6, dim=1)
+        assert emb is not None
+        emb_out = self.linear(self.silu(emb))
+        shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = torch.chunk(emb_out, 6, dim=1)
 
         x = self.norm(x) * (1 + scale_msa[:, None]) + shift_msa[:, None]
         return x, gate_msa, shift_mlp, scale_mlp, gate_mlp
@@ -426,7 +430,7 @@ class Attention(nn.Module):
         else:
             raise ValueError(f"Unimplemented qk_norm: {qk_norm}")
 
-        if self.context_dim is not None:
+        if context_dim is not None:
             self.to_q_c = nn.Linear(context_dim, self.inner_dim)
             self.to_k_c = nn.Linear(context_dim, self.inner_dim)
             self.to_v_c = nn.Linear(context_dim, self.inner_dim)
@@ -441,7 +445,7 @@ class Attention(nn.Module):
         self.to_out.append(nn.Linear(self.inner_dim, dim))
         self.to_out.append(nn.Dropout(dropout))
 
-        if self.context_dim is not None and not self.context_pre_only:
+        if context_dim is not None and not self.context_pre_only:
             self.to_out_c = nn.Linear(self.inner_dim, context_dim)
 
     def forward(
@@ -454,7 +458,9 @@ class Attention(nn.Module):
         c_mask: Bool[Tensor, "b nt"] | None = None,  # text mask
     ) -> Tensor | tuple[Tensor, Tensor]:  # a tuple when a context c is given (joint attention)
         if c is not None:
-            return self.processor(self, x, c=c, mask=mask, rope=rope, c_rope=c_rope, c_mask=c_mask)
+            return cast(JointAttnProcessor, self.processor)(
+                self, x, c=c, mask=mask, rope=rope, c_rope=c_rope, c_mask=c_mask
+            )
         else:
             return self.processor(self, x, mask=mask, rope=rope)
 
@@ -462,8 +468,14 @@ class Attention(nn.Module):
 # Attention processor
 
 if is_package_available("flash_attn"):
-    from flash_attn import flash_attn_func, flash_attn_varlen_func
-    from flash_attn.bert_padding import pad_input, unpad_input
+    from flash_attn import (  # pyright: ignore[reportMissingImports]  # optional dependency
+        flash_attn_func,
+        flash_attn_varlen_func,
+    )
+    from flash_attn.bert_padding import (  # pyright: ignore[reportMissingImports]  # optional dependency
+        pad_input,
+        unpad_input,
+    )
 
 
 class AttnProcessor:
@@ -492,7 +504,7 @@ class AttnProcessor:
         x: Float[Tensor, "b n d"],  # noised input x
         mask: Bool[Tensor, "b n"] | None = None,
         rope: Rope | None = None,  # rotary position embedding
-    ) -> torch.FloatTensor:
+    ) -> Tensor:
         batch_size = x.shape[0]
 
         # `sample` projections
@@ -520,11 +532,11 @@ class AttnProcessor:
 
             if self.pe_attn_head is not None:
                 pn = self.pe_attn_head
-                query[:, :pn, :, :] = apply_rotary_pos_emb(query[:, :pn, :, :], freqs, q_xpos_scale)
-                key[:, :pn, :, :] = apply_rotary_pos_emb(key[:, :pn, :, :], freqs, k_xpos_scale)
+                query[:, :pn, :, :] = _apply_rope(query[:, :pn, :, :], freqs, q_xpos_scale)
+                key[:, :pn, :, :] = _apply_rope(key[:, :pn, :, :], freqs, k_xpos_scale)
             else:
-                query = apply_rotary_pos_emb(query, freqs, q_xpos_scale)
-                key = apply_rotary_pos_emb(key, freqs, k_xpos_scale)
+                query = _apply_rope(query, freqs, q_xpos_scale)
+                key = _apply_rope(key, freqs, k_xpos_scale)
 
         if self.attn_backend == "torch":
             # mask. e.g. inference got a batch with different target durations, mask out the padding
@@ -609,6 +621,7 @@ class JointAttnProcessor:
         residual = x
         audio_mask = mask
 
+        assert c is not None
         batch_size = c.shape[0]
 
         # `sample` projections
@@ -645,13 +658,13 @@ class JointAttnProcessor:
         if rope is not None:
             freqs, xpos_scale = rope
             q_xpos_scale, k_xpos_scale = (xpos_scale, xpos_scale**-1.0) if xpos_scale is not None else (1.0, 1.0)
-            query = apply_rotary_pos_emb(query, freqs, q_xpos_scale)
-            key = apply_rotary_pos_emb(key, freqs, k_xpos_scale)
+            query = _apply_rope(query, freqs, q_xpos_scale)
+            key = _apply_rope(key, freqs, k_xpos_scale)
         if c_rope is not None:
             freqs, xpos_scale = c_rope
             q_xpos_scale, k_xpos_scale = (xpos_scale, xpos_scale**-1.0) if xpos_scale is not None else (1.0, 1.0)
-            c_query = apply_rotary_pos_emb(c_query, freqs, q_xpos_scale)
-            c_key = apply_rotary_pos_emb(c_key, freqs, k_xpos_scale)
+            c_query = _apply_rope(c_query, freqs, q_xpos_scale)
+            c_key = _apply_rope(c_key, freqs, k_xpos_scale)
 
         # joint attention
         query = torch.cat([query, c_query], dim=2)
@@ -703,7 +716,7 @@ class JointAttnProcessor:
         x = x.to(query.dtype)
 
         # Split the attention outputs.
-        x, c = (
+        x, c_out = (
             x[:, : residual.shape[1]],
             x[:, residual.shape[1] :],
         )
@@ -713,14 +726,14 @@ class JointAttnProcessor:
         # dropout
         x = attn.to_out[1](x)
         if not attn.context_pre_only:
-            c = attn.to_out_c(c)
+            c_out = attn.to_out_c(c_out)
 
         if audio_mask is not None:
             x = x.masked_fill(~audio_mask.unsqueeze(-1), 0.0)
         if c_mask is not None:
-            c = c.masked_fill(~c_mask.unsqueeze(-1), 0.0)
+            c_out = c_out.masked_fill(~c_mask.unsqueeze(-1), 0.0)
 
-        return x, c
+        return x, c_out
 
 
 # DiT Block
@@ -861,13 +874,14 @@ class MMDiTBlock(nn.Module):
 
         # process attention output for context c
         if self.context_pre_only:
-            c = None
+            c_out = None
         else:  # if not last layer
+            assert self.ff_norm_c is not None and self.ff_c is not None
             c = c + c_gate_msa.unsqueeze(1) * c_attn_output
 
             norm_c = self.ff_norm_c(c) * (1 + c_scale_mlp[:, None]) + c_shift_mlp[:, None]
             c_ff_output = self.ff_c(norm_c)
-            c = c + c_gate_mlp.unsqueeze(1) * c_ff_output
+            c_out = c + c_gate_mlp.unsqueeze(1) * c_ff_output
 
         # process attention output for input x
         x = x + x_gate_msa.unsqueeze(1) * x_attn_output
@@ -876,7 +890,7 @@ class MMDiTBlock(nn.Module):
         x_ff_output = self.ff_x(norm_x)
         x = x + x_gate_mlp.unsqueeze(1) * x_ff_output
 
-        return c, x
+        return c_out, x
 
 
 # time step conditioning embedding

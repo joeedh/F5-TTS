@@ -10,7 +10,7 @@ d - dimension
 from __future__ import annotations
 
 from random import random
-from typing import Any, Callable
+from typing import Any, Callable, Protocol, cast
 
 import torch
 import torch.nn.functional as F
@@ -29,6 +29,16 @@ from f5_tts.model.utils import (
     list_str_to_tensor,
     mask_from_frac_lengths,
 )
+
+
+class Backbone(Protocol):
+    """What CFM needs from its transformer: DiT, UNetT and MMDiT all provide it."""
+
+    dim: int
+
+    def clear_cache(self) -> None: ...
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Tensor: ...  # Any: each backbone takes its own keyword tensors
 
 
 class CFM(nn.Module):
@@ -54,7 +64,9 @@ class CFM(nn.Module):
         self.frac_lengths_mask = frac_lengths_mask
 
         # mel spec
-        self.mel_spec = default(mel_spec_module, MelSpec(**mel_spec_kwargs))
+        self.mel_spec = cast(
+            MelSpec, default(mel_spec_module, MelSpec(**mel_spec_kwargs))
+        )  # a custom module must match
         num_channels = default(num_channels, self.mel_spec.n_mel_channels)
         self.num_channels = num_channels
 
@@ -63,8 +75,8 @@ class CFM(nn.Module):
         self.cond_drop_prob = cond_drop_prob
 
         # transformer
-        self.transformer = transformer
-        dim = transformer.dim
+        self.transformer = cast(Backbone, transformer)
+        dim = self.transformer.dim
         self.dim = dim
 
         # conditional flow related
@@ -136,7 +148,7 @@ class CFM(nn.Module):
             torch.maximum((text != -1).sum(dim=-1), lens) + 1, duration
         )  # duration at least text/audio prompt length plus one token, so something is generated
         duration = duration.clamp(max=max_duration)
-        max_duration = duration.amax()
+        max_duration = int(duration.amax())
 
         # duplicate test corner for inner time step oberservation
         if duplicate_test:
@@ -197,7 +209,7 @@ class CFM(nn.Module):
         for dur in duration:
             if exists(seed):
                 torch.manual_seed(seed)
-            y0.append(torch.randn(dur, self.num_channels, device=self.device, dtype=step_cond.dtype))
+            y0.append(torch.randn(int(dur), self.num_channels, device=self.device, dtype=step_cond.dtype))
         y0 = pad_sequence(y0, padding_value=0, batch_first=True)
 
         t_start = 0
@@ -215,7 +227,7 @@ class CFM(nn.Module):
         if sway_sampling_coef is not None:
             t = t + sway_sampling_coef * (torch.cos(torch.pi / 2 * t) - 1 + t)
 
-        trajectory = odeint(fn, y0, t, **self.odeint_kwargs)
+        trajectory = cast(Tensor, odeint(fn, y0, t, **self.odeint_kwargs))
         self.transformer.clear_cache()
 
         sampled = trajectory[-1]

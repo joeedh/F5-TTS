@@ -10,10 +10,12 @@ d - dimension
 from __future__ import annotations
 
 import threading
-from typing import Any, Callable
+from collections.abc import Iterable
+from typing import Any, Callable, cast
 
 import torch
 import torch.nn.functional as F
+import torch.utils.checkpoint
 from jaxtyping import Bool, Float, Int
 from torch import Tensor, nn
 from x_transformers.x_transformers import RotaryEmbedding
@@ -32,6 +34,8 @@ from f5_tts.model.modules import (
 
 
 class TextEmbedding(nn.Module):
+    freqs_cis: Tensor  # registered as a buffer when conv_layers > 0
+
     def __init__(
         self,
         text_num_embeds: int,
@@ -145,7 +149,8 @@ class TextEmbedding(nn.Module):
             else:
                 target_lens = torch.full((text.shape[0],), int(seq_len), device=text.device, dtype=torch.long)
 
-            text = self.average_upsample_text_by_mask(text, ~text_mask, target_lens)
+            # text_mask is bound here: average_upsampling requires mask_padding (asserted in __init__)
+            text = self.average_upsample_text_by_mask(text, ~text_mask, target_lens)  # pyright: ignore[reportOperatorIssue]
 
         return text
 
@@ -274,7 +279,7 @@ class DiT(nn.Module):
 
     def initialize_weights(self) -> None:
         # Zero-out AdaLN layers in DiT blocks:
-        for block in self.transformer_blocks:
+        for block in cast("Iterable[DiTBlock]", self.transformer_blocks):
             nn.init.constant_(block.attn_norm.linear.weight, 0)
             nn.init.constant_(block.attn_norm.linear.bias, 0)
 

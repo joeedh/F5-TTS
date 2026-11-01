@@ -1,7 +1,7 @@
 import json
 from collections.abc import Iterator
 from importlib.resources import files
-from typing import Any
+from typing import Any, TypedDict, cast
 
 import torch
 import torch.nn.functional as F
@@ -9,17 +9,22 @@ import torchaudio
 from datasets import Dataset as Dataset_
 from datasets import load_from_disk
 from torch import Tensor, nn
-from torch.utils.data import Dataset, Sampler
+from torch.utils.data import Dataset, Sampler, SequentialSampler
 from tqdm import tqdm
 
 from f5_tts.model.modules import MelSpec
 from f5_tts.model.utils import default
 
 
+class Sample(TypedDict):
+    mel_spec: Tensor  # d t
+    text: str
+
+
 class HFDataset(Dataset):
     def __init__(
         self,
-        hf_dataset: Dataset,
+        hf_dataset: Dataset_,
         target_sample_rate: int = 24_000,
         n_mel_channels: int = 100,
         hop_length: int = 256,
@@ -50,7 +55,7 @@ class HFDataset(Dataset):
     def __len__(self) -> int:
         return len(self.data)
 
-    def __getitem__(self, index: int) -> dict[str, Tensor | str]:
+    def __getitem__(self, index: int) -> Sample:
         row = self.data[index]
         audio = row["audio"]["array"]
 
@@ -75,16 +80,16 @@ class HFDataset(Dataset):
 
         text = row["text"]
 
-        return dict(
-            mel_spec=mel_spec,
-            text=text,
-        )
+        return {
+            "mel_spec": mel_spec,
+            "text": text,
+        }
 
 
 class CustomDataset(Dataset):
     def __init__(
         self,
-        custom_dataset: Dataset,
+        custom_dataset: Dataset_,
         durations: list[float] | None = None,
         target_sample_rate: int = 24_000,
         hop_length: int = 256,
@@ -128,7 +133,7 @@ class CustomDataset(Dataset):
     def __len__(self) -> int:
         return len(self.data)
 
-    def __getitem__(self, index: int) -> dict[str, Tensor | str]:
+    def __getitem__(self, index: int) -> Sample:
         while True:
             row = self.data[index]
             audio_path = row["audio_path"]
@@ -180,7 +185,7 @@ class DynamicBatchSampler(Sampler[list[int]]):
 
     def __init__(
         self,
-        sampler: Sampler[int],
+        sampler: SequentialSampler,
         frames_threshold: int,
         max_samples: int = 0,
         random_seed: int | None = None,
@@ -193,7 +198,7 @@ class DynamicBatchSampler(Sampler[list[int]]):
         self.epoch = 0
 
         indices, batches = [], []
-        data_source = self.sampler.data_source
+        data_source = cast("HFDataset | CustomDataset", self.sampler.data_source)
 
         for idx in tqdm(
             self.sampler, desc="Sorting with sampler... if slow, check whether dataset is provided with duration"
@@ -281,7 +286,7 @@ def load_dataset(
             data_dict = json.load(f)
         durations = data_dict["duration"]
         train_dataset = CustomDataset(
-            train_dataset,
+            cast(Dataset_, train_dataset),
             durations=durations,
             preprocessed_mel=preprocessed_mel,
             mel_spec_module=mel_spec_module,
@@ -298,7 +303,7 @@ def load_dataset(
             data_dict = json.load(f)
         durations = data_dict["duration"]
         train_dataset = CustomDataset(
-            train_dataset, durations=durations, preprocessed_mel=preprocessed_mel, **mel_spec_kwargs
+            cast(Dataset_, train_dataset), durations=durations, preprocessed_mel=preprocessed_mel, **mel_spec_kwargs
         )
 
     elif dataset_type == "HFDataset":
@@ -317,10 +322,10 @@ def load_dataset(
 # collation
 
 
-def collate_fn(batch: list[dict[str, Tensor | str]]) -> dict[str, Tensor | list[str]]:
+def collate_fn(batch: list[Sample]) -> dict[str, Tensor | list[str]]:
     mel_specs = [item["mel_spec"].squeeze(0) for item in batch]
     mel_lengths = torch.LongTensor([spec.shape[-1] for spec in mel_specs])
-    max_mel_length = mel_lengths.amax()
+    max_mel_length = int(mel_lengths.amax())
 
     padded_mel_specs = []
     for spec in mel_specs:
