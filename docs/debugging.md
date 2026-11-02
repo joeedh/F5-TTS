@@ -2,6 +2,21 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-02: audio loading and FFmpeg on the Windows laptop
+
+- **`torchaudio.load` fails because torchcodec has no Python 3.15 wheel, not because FFmpeg is missing.** torchaudio 2.11.1 loads through torchcodec. `pip` found no torchcodec wheel for cp315 and installed `torchcodec 0.0.0.dev0`, a placeholder whose `__init__.py` only prints `Stay tuned...`, so `torchaudio.load` raises `ImportError: TorchCodec is required for load_with_torchcodec`. That is the same error with or without FFmpeg on PATH. A real wheel exists for Python 3.13 on Windows (`torchcodec-0.17.0-cp313-cp313-win_amd64.whl`). This corrects the earlier note above, which blamed "torchcodec with FFmpeg".
+  - Diagnose: `pip show -f torchcodec`. A real install has native libraries; the placeholder has only `__init__.py`.
+  - Workarounds: read audio with `soundfile`, or use the Python 3.13 venv below, where `torchaudio.load` works.
+- **pydub reads and writes `.wav` without FFmpeg.** `AudioSegment.from_file` on a wav uses its own reader and only warns `Couldn't find ffmpeg`. Checked on `basic_ref_en.wav` (5333 ms, 24 kHz). Other formats (mp3, flac, m4a) need FFmpeg.
+- **FFmpeg from a Blender checkout.** `C:\dev\blender\main\lib\windows_x64\ffmpeg\lib` has `ffmpeg.exe`, `ffprobe.exe` (FFmpeg 8.1) and the `av*-62` DLLs. On its own, `ffmpeg.exe` exits with `0xC0000135` (DLL not found). The one missing dependency is `aom.dll` (imported by `avcodec-62.dll`), which is in `C:\dev\blender\main\lib\windows_x64\aom\bin`. With both folders on PATH, `ffmpeg.exe` runs. The `blender\blender` and `blender\fork` checkouts have only `ffprobe.exe` and FFmpeg 6 (`av*-60`) DLLs.
+  - Diagnose a `0xC0000135` exit by listing the PE imports of the exe and its DLLs, and checking which are missing from the folder and System32. There is no `dumpbin` here; reading the import table with `struct` takes about 40 lines of Python.
+- **Python 3.13 venv `.venv313` (made 2026-11-02)** for what Python 3.15 lacks: CUDA torch, `onnxruntime`, a real torchcodec.
+  - Created with `py install 3.13` (Python install manager; gave 3.13.17, and 3.15 stays the default `py`), then `py -V:3.13 -m venv .venv313`. The venv writes its own `.gitignore`, so git does not see it.
+  - `pip install torch==2.15.0 torchaudio --index-url https://download.pytorch.org/whl/cu132`. torch 2.15.0 is only on the cu132 index (cu130 stops at 2.14.1, cu128 at 2.11.0). It runs on driver 591.49, which reports CUDA 13.1, and includes sm_120 code for the RTX 5050. A 4096x4096 matmul runs at 7.6 TFLOPS in fp32 with TF32 off (relative error 1e-6 against fp64) and 25.4 TFLOPS in fp16 (relative error 4e-4).
+  - Then `pip install -e . onnxruntime torchcodec onnx onnxscript onnxconverter-common soundfile`. pip keeps the CUDA torch. Versions: onnxruntime 1.31.1 (CPU provider only), torchcodec 0.17.0, onnx 1.23.2, onnxscript 0.7.2.
+  - `torchaudio.load` works there only after both Blender folders are registered with `os.add_dll_directory`. PATH alone is not enough: since Python 3.8, Windows DLL lookup for extension modules ignores PATH. Without them, torchcodec fails with `OSError: Could not load this library: ...libtorchcodec_core8.dll`.
+  - `.venv313` is not the type-check venv. Pyright, ruff and `tools/typing_guard` stay on `.venv` (torch 2.15.0+cpu), which `golden.json` and CI match.
+
 ## 2026-11-02: CI type check and how to bump its pins (Plan P, step 6)
 
 `.github/workflows/typecheck.yaml` runs `pyright --pythonpath "$(which python)"` on Ubuntu with Python 3.12, CPU torch 2.15.0 (`torchaudio` unpinned) from the PyTorch CPU index, and `pip install -e ".[typecheck]"` followed by the eval packages (`jiwer modelscope zhconv zhon`, then `faster_whisper==0.10.1 funasr` with `--no-deps`). `pythonVersion = "3.10"` in `[tool.pyright]` stays, so stdlib typing is checked at the project's minimum level. Python 3.12 rather than 3.10 because 3.10 only has torch up to 2.14.1 and the local check uses 2.15.0.
@@ -94,7 +109,7 @@ Each entry is one commit. All were found by reading pyright errors, then confirm
 - Symptom: if `soundfile` could not read a file, `get_audio_duration` raised `FileNotFoundError` (no `ffprobe` installed) or `RuntimeError: ... module 'torchaudio' has no attribute 'info'` instead of using its last fallback.
 - Cause: two separate faults. `ffprobe` missing raises `FileNotFoundError`, an `OSError`, which the `except (TimeoutExpired, SubprocessError, ValueError)` did not list. And `torchaudio.info` no longer exists in torchaudio 2.9+ (installed here: 2.11.1; `pyproject.toml` allows `>=2.0`).
 - Fix: `OSError` is caught, and the last fallback decodes with `torchaudio.load` and divides frames by sample rate. It decodes the whole file, which is acceptable because `soundfile` and `ffprobe` have already failed.
-- Tested: with `soundfile.info` forced to fail and no `ffprobe` on the machine, the old code raised `FileNotFoundError` and the new code reaches the `torchaudio.load` fallback. A stubbed `torchaudio.load` (24000 frames at 24 kHz) gives 1.0. Not tested end to end: `torchaudio.load` needs `torchcodec` with FFmpeg, which is unusable on this Windows/Python 3.15 machine.
+- Tested: with `soundfile.info` forced to fail and no `ffprobe` on the machine, the old code raised `FileNotFoundError` and the new code reaches the `torchaudio.load` fallback. A stubbed `torchaudio.load` (24000 frames at 24 kHz) gives 1.0. Not tested end to end: `torchaudio.load` needs `torchcodec` with FFmpeg, which is unusable on this Windows/Python 3.15 machine (corrected 2026-11-02: the cause is that torchcodec has no Python 3.15 wheel, not FFmpeg; see the entry of that date).
 
 ## 2026-11-01: type-checking environment (Plan P, step 1)
 

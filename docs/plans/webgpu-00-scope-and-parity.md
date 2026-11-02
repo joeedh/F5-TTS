@@ -22,9 +22,12 @@ Out of scope: exporting the full DiT (plan 01), mel and vocoder ports (02), text
 - **Cloud container.** No GPU; Chromium WebGPU runs on SwiftShader (CPU). Fine for correctness tests at small shapes, useless for timing. See [../research/webgpu-environment.md](../research/webgpu-environment.md).
 - Package and tool facts checked 2026-11-02:
   - `onnx` has an abi3 wheel that installs on Python 3.15. `onnxscript` and `onnxconverter-common` are pure Python.
-  - `onnxruntime` has **no** Python 3.15 wheel. Running ONNX models from Python needs a second venv on an older Python, or the check runs in Node with `onnxruntime-node`.
-  - CUDA torch for Python 3.15 exists only as 2.14.1+cu130 (no 2.15). Installing it into `.venv` would change the torch build that `tools/typing_guard/golden.json` and the CI pin expect, so any CUDA torch goes in a separate venv.
-  - `torchaudio.load` needs torchcodec with FFmpeg, which does not work on this machine (`docs/debugging.md`). The generator loads audio with `soundfile` instead.
+  - `onnxruntime` has **no** Python 3.15 wheel. CUDA torch for Python 3.15 exists only as 2.14.1+cu130 (no 2.15). `torchaudio.load` does not work on Python 3.15 either: torchcodec has no cp315 wheel, so pip installs a placeholder.
+  - So there are two venvs (details in `docs/debugging.md`, 2026-11-02):
+    - `.venv` (Python 3.15, torch 2.15.0+cpu): type checking, lint, behaviour guard, golden-data generation on CPU. Its torch build is what `tools/typing_guard/golden.json` and the CI pin expect, so it is not changed.
+    - `.venv313` (Python 3.13.17, made and checked 2026-11-02): torch 2.15.0+cu132, working on the RTX 5050; `onnxruntime` 1.31.1 (CPU); torchcodec 0.17.0; `onnx`, `onnxscript`, `onnxconverter-common`, `soundfile`; `f5-tts` installed editable. Used for the CUDA runs in step 5 and for ONNX checks in Python.
+  - The generator loads audio with `soundfile` anyway, so it runs in either venv.
+  - pydub reads and writes `.wav` without FFmpeg, so `preprocess_ref_audio_text` should work on the wav references. FFmpeg 8.1 is available from `C:\dev\blender\main\lib\windows_x64\ffmpeg\lib`, with `aom.dll` from `...\windows_x64\aom\bin`. Python code that loads it through torchcodec must register both folders with `os.add_dll_directory`.
 
 ## Decisions
 
@@ -77,7 +80,7 @@ testdata/webgpu/<case>/  golden data; only the tiny case is committed
 - Language and tools: TypeScript (strict), Vite for dev server and bundling, Vitest for Node tests, Playwright for browser tests. Formatting with Prettier. ESLint is not added now; `tsc --noEmit` is the type gate.
 - Not `tests/`: that name is in `.gitignore`.
 - Python under `tools/webgpu/` follows Plan P: add `tools/webgpu` to `[tool.pyright] include` in `pyproject.toml`; ruff already covers `tools/`. Add a `webgpu` extra (`onnx`, `onnxscript`, `onnxconverter-common`, `soundfile`) and install it in `.github/workflows/typecheck.yaml`.
-- Python ONNX Runtime: not needed by this plan. Plan 01 decides between a second venv and `onnxruntime-node`.
+- Python ONNX Runtime: available in `.venv313` (CPU provider). Plan 01 can use it for export checks.
 - Answers the task list's question "should the Python package gain a `webgpu/` export entry point": no, for now. Export tools stay in `tools/webgpu/` and are not shipped in the `f5_tts` package.
 
 ### D5. Golden data format
@@ -186,10 +189,11 @@ Starting table. Every float row is a placeholder until step 5 replaces it with m
 - Reaching both GPUs: Chrome on Windows may ignore `powerPreference`. Try, in order: `powerPreference` in `requestAdapter`; the Chrome switch `--use-webgpu-power-preference=force-high-performance` or `force-low-power`; the Windows per-app graphics setting. Always record which adapter actually came back (vendor and description), not which one was asked for.
 - Record adapters, limits, features (`shader-f16`, `subgroups`, `timestamp-query`) and the naive matmul time in a new `docs/research/webgpu-laptop.md`; add it to `docs/index.md`.
 - Download the real checkpoint and Vocos into the Hugging Face cache.
-- Check that `preprocess_ref_audio_text` runs on the laptop (pydub); install FFmpeg if it needs it.
+- Check that `preprocess_ref_audio_text` runs on the laptop. pydub's wav reading is already confirmed to work without FFmpeg. If anything else needs FFmpeg, use the Blender copy (see Machines).
+- Done 2026-11-02, before step 2 started: the `.venv313` venv with CUDA torch, onnxruntime and torchcodec. `torchaudio.load` works there with the Blender FFmpeg (see Machines).
 - `pyproject.toml`: the `webgpu` extra; install it in `.venv`.
 - Minimal `web/`: `package.json` with Vite, TypeScript, `onnxruntime-web` and Playwright; strict `tsconfig.json`; `.gitignore` entries for `web/node_modules/` and `web/dist/`. Enough for the spike; tests come in step 4.
-- Optional, needed by step 5: a `.venv-cuda` with CUDA torch. Check first that the build supports compute capability 12 (sm_120); record which torch and Python versions worked in `docs/debugging.md`.
+- Install the `webgpu` extra into `.venv313` as well, so both venvs match.
 - Done when: the research doc exists, both GPUs show up with WebGPU in Chrome, weights are cached, and `npm install` in `web/` works.
 
 ### Step 3. Runtime spike (decision D3)
@@ -217,9 +221,9 @@ Starting table. Every float row is a placeholder until step 5 replaces it with m
 - Done when: pyright and ruff pass on the new Python, all cases are generated, and the tiny case is committed.
 
 ### Step 5. Measure noise floors and fix tolerances
-- `tools/webgpu/measure_floor.py`: rerun each stage on CUDA fp32 (TF32 off) with golden inputs, compare with the CPU golden data, take the maximum over all cases, chunks and steps.
+- `tools/webgpu/measure_floor.py`, run in `.venv313`: rerun each stage on CUDA fp32 (TF32 off) with golden inputs, compare with the CPU golden data, take the maximum over all cases, chunks and steps.
 - Replace the placeholder rows in the tolerance table with the measured values. Store the table as `testdata/webgpu/tolerances.json`, which both runners read; this file is the single source.
-- If the CUDA venv could not be built in step 2, use two CPU runs with different thread counts as a weaker floor and say so.
+- If CUDA stops working in `.venv313`, use two CPU runs with different thread counts as a weaker floor and say so.
 - Done when: `tolerances.json` is committed and the table above matches it.
 
 ### Step 6. Parity runner
@@ -251,7 +255,7 @@ Starting table. Every float row is a placeholder until step 5 replaces it with m
 - **R5. The tiny model's numbers are not representative.** Random small weights do not show fp16 overflow or real attention patterns. It is for plumbing; numeric conclusions come from the real cases.
 - **R6. Spike numbers are from one laptop.** Plan 07 owns the device matrix. If the RTX 5050 result is borderline, the integrated GPU will not be usable for full-length chunks, and plan 07 needs to know early.
 - **R7. Dynamo ONNX export of `scaled_dot_product_attention`** may produce an op ORT Web does not support, depending on the opset. The spike finds out; plan 01 owns the fix.
-- **R8. Python ONNX Runtime is not available on Python 3.15.** Handled in D4 (deferred to plan 01).
+- **R8. Python ONNX Runtime is not available on Python 3.15.** It is installed in `.venv313` instead.
 - **R9. The generator repeats two lines of `infer_process`** (`max_chars`, `chunk_text`) to avoid `torchaudio.load`. If upstream changes them, the golden data drifts from upstream silently. The generator asserts that the two lines it copies still appear verbatim in `infer_process`'s source.
 
 ## What the next plans get
