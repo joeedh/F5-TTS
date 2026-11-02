@@ -1,6 +1,6 @@
 # Plan P: pyright typing, with ruff for format and lint
 
-Status: pressure-tested 2026-10-31 by a fresh agent; its findings are folded in below (section "Review log"). Task list entry: [webgpu-port-tasks.md](webgpu-port-tasks.md).
+Status: steps 1 to 6 done 2026-11-01/02; the only open item is the first run of the CI job. Pressure-tested 2026-10-31 by a fresh agent; its findings are folded in below (section "Review log"). Task list entry: [webgpu-port-tasks.md](webgpu-port-tasks.md).
 
 ## Goal
 
@@ -202,6 +202,14 @@ Bugs seen while annotating that pyright does not flag: **all fixed 2026-11-02**,
 3. Update `CLAUDE.md` with the commands: type check, lint, format.
 4. Update [architecture.md](../architecture.md) if any file was renamed or moved (none are planned).
 5. Decide whether to ratchet to `standard` mode, per directory, and write the outcome in this plan. Not part of this plan's completion.
+
+Done 2026-11-02:
+1. CI: `.github/workflows/typecheck.yaml` (new file, next to `pre-commit.yaml`, which stays ruff-only). Python 3.12 because 3.10 only has torch up to 2.14.1; CPU torch 2.15.0 from the PyTorch CPU index (verified to exist for Linux/3.12 with `pip index versions`); `pip install -e ".[eval,typecheck]"`; `pyright --pythonpath "$(which python)"`. **It has not run yet**: this machine has only Python 3.15 and no push was made, so the Linux install and the first CI result are unverified.
+2. Pins: pyright in the `typecheck` extra of `pyproject.toml` (1.1.414), ruff in `.pre-commit-config.yaml` (0.11.2), torch in the workflow. How to bump them, and what to do if CI breaks without a code change, is in [../debugging.md](../debugging.md) ("CI type check and how to bump its pins").
+3. `CLAUDE.md` has a "Type checking, linting, formatting" section with the commands and the suppression policy.
+4. `architecture.md`: no file was renamed or moved, so no change.
+5. Ratchet decision: **stay on `basic` for now.** Measured with a temporary `typeCheckingMode = "standard"` config: 92 errors, all `reportPossiblyUnboundVariable` (trainer.py 33, modules.py 16, utils_eval.py 5, utils_infer.py 5, dit.py 5, finetune_cli.py 5, the rest fewer). No other rule fires. Next step when wanted: clear those 92 (mostly variables set inside `if`/`try` and used after), then change `typeCheckingMode` to `"standard"`; or turn on just `reportPossiblyUnbound = "error"` first. `strict` is not planned. Not part of this plan's completion.
+6. No single formatting commit was needed: `ruff format --check` already passed on the whole tree, and the pinned ruff changed no rules.
 
 ## Acceptance criteria
 

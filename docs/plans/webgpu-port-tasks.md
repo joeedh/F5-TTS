@@ -10,7 +10,7 @@ Every plan, once written, is saved in this folder and pressure-tested by a fresh
 
 ## Plan P: Python typing, formatter and linter
 
-Plan file: [python-pyright-tooling.md](python-pyright-tooling.md). Status: `plan pressure-tested`. Depends on: nothing. Blocks: nothing, but the port's Python export scripts (plans 01, 02, 05) should be written under it.
+Plan file: [python-pyright-tooling.md](python-pyright-tooling.md). Status: `done`, apart from the first CI run of the new `typecheck` workflow. Depends on: nothing. Blocks: nothing, but the port's Python export scripts (plans 01, 02, 05) should be written under it.
 
 Where things stand (checked 2026-10-31): no type checker is configured. Ruff does lint, format and import sorting through pre-commit and the `pre-commit` GitHub workflow. Pyright 1.1.414 and mypy 2.3.1 are installed in the cloud container, but not torch. First pyright run without torch: 672 errors, 23 warnings over 47 files. Largest groups: missing imports 239, possibly-unbound variables 130, attribute access 109, invalid type arguments 69 (the ein-notation strings like `float["b n d"]`), argument types 60.
 
@@ -26,7 +26,7 @@ Approach decided: pyright, and port many files at once, then drive the error cou
 
 ### Setup
 - [x] Make a reproducible environment with torch, torchaudio and the other runtime dependencies installed, so errors are real and not missing-import noise. Record how in `docs/debugging.md`. (Done 2026-11-01, `.venv` on Python 3.15.1 with torch 2.15.0+cpu.)
-- [ ] Pin the pyright version (pre-commit, dev dependency, or both). Pyright updates often add errors.
+- [x] Pin the pyright version (pre-commit, dev dependency, or both). Pyright updates often add errors. (`typecheck` extra, 1.1.414, 2026-11-02.)
 - [x] Add `[tool.pyright]` to `pyproject.toml`: python version 3.10, include/exclude, start in `basic` mode, report missing imports as errors only after the environment is fixed. (Done 2026-11-01.)
 - [x] Record the real baseline count with torch installed, by rule. This replaces the 672 figure. (Done 2026-11-01: 457 errors, 1 warning; see the plan, step 3.)
 
@@ -43,10 +43,10 @@ Approach decided: pyright, and port many files at once, then drive the error cou
 - [x] Reach zero errors in the chosen mode and paths. (0 errors, 0 warnings, basic mode, 2026-11-01.)
 
 ### Lock it in
-- [ ] Add pyright to pre-commit and to the GitHub workflow, failing on errors.
-- [ ] Add the chosen formatter and linter settings to `pyproject.toml` or `ruff.toml` and run them across the repo once, as a single formatting commit.
-- [ ] Update `CLAUDE.md` with the commands to run (type check, lint, format) and the suppression policy.
-- [ ] Decide when to ratchet strictness (for example `standard` then `strict` per directory).
+- [x] Add pyright to pre-commit and to the GitHub workflow, failing on errors. (Done 2026-11-02 as a separate `typecheck.yaml` workflow, not pre-commit by design: pyright needs the full dependency set. Not yet run in CI.)
+- [x] Add the chosen formatter and linter settings to `pyproject.toml` or `ruff.toml` and run them across the repo once, as a single formatting commit. (Settings were already in `ruff.toml`; the tree already passes `ruff format --check`, so there was nothing to reformat.)
+- [x] Update `CLAUDE.md` with the commands to run (type check, lint, format) and the suppression policy. (Done 2026-11-02.)
+- [x] Decide when to ratchet strictness (for example `standard` then `strict` per directory). (Decided 2026-11-02: stay on `basic`; `standard` adds 92 possibly-unbound errors; see the plan, step 6.)
 
 # WebGPU port
 

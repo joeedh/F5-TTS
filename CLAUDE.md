@@ -53,6 +53,20 @@ Paths under `src/f5_tts/`. Overview in `docs/architecture.md`; doc list in `docs
 
 `docs/debugging.md` is a running log. When a bug is found and fixed, or a debugging technique proves useful, add an entry: symptom, cause, fix or how to diagnose. Append new entries; edit old ones only to correct them.
 
+## Type checking, linting, formatting
+
+Run from the repo root, inside a venv with the project installed (`pip install -e ".[eval,typecheck]"`; see `docs/debugging.md` for the venv this was built in). Versions are pinned: ruff 0.11.2 (`.pre-commit-config.yaml`) and pyright 1.1.414 (`typecheck` extra in `pyproject.toml`). Do not use a newer ruff; its default rules report errors that are not real debt.
+
+| Task | Command |
+|---|---|
+| Type check | `pyright --pythonpath "$(which python)"` (Windows: `.venv\Scripts\pyright.exe --pythonpath .venv\Scripts\python.exe`). Must report 0 errors; CI runs it (`.github/workflows/typecheck.yaml`). |
+| Lint | `ruff check src/f5_tts tools` (not `src`: the BigVGAN submodule under `src/third_party` is not linted) |
+| Format | `ruff format src/f5_tts tools` |
+| Behaviour guard | `python tools/typing_guard/golden.py` before and after a change that should not alter behaviour; `--write` only on a known-good baseline |
+| Annotation-only check | `python tools/typing_guard/annotation_only.py <files>` before committing a change that should only add annotations |
+
+Suppressions: only `# pyright: ignore[ruleName]  # reason`, never a bare `# type: ignore`. Every `Any` gets a trailing `# Any: reason` comment. Pyright runs in `basic` mode; `runtime/triton_trtllm` and `src/third_party` are excluded. Ruff's `F722`/`F821` are ignored per file in `ruff.toml` for files that carry jaxtyping shape strings, so a missing import there only shows up in pyright ("is not defined").
+
 ## Tensor shapes
 
 Shape annotations use `jaxtyping`, e.g. `Float[Tensor, "b n d"]`. Pyright does not check the shapes, only that the value is a `Tensor`. Whenever a bug, a long debugging session or a near miss comes from a wrong tensor shape or dtype that a shape-aware checker would have caught, add an entry to `docs/shape-ledger.md` in the same commit as the fix. Do this even if the cost was small; the ledger is how we decide whether to extend pyright.

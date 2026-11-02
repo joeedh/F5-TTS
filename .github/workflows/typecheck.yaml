@@ -1,0 +1,26 @@
+name: typecheck
+
+# Runs pyright on src/f5_tts. Versions that decide the result are pinned: Python 3.12 with CPU torch
+# 2.15.0 (same torch as the local check; 3.10 only has torch up to 2.14.1) and pyright from the
+# `typecheck` extra in pyproject.toml. pythonVersion in [tool.pyright] stays 3.10, so the checked
+# language level is the project's minimum. Bump the pins deliberately, see docs/debugging.md.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  pyright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install CPU torch
+        run: pip install "torch==2.15.0" torchaudio --index-url https://download.pytorch.org/whl/cpu
+      - name: Install the project and pyright
+        run: pip install -e ".[eval,typecheck]"
+      - name: pyright
+        run: pyright --pythonpath "$(which python)"

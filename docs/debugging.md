@@ -2,6 +2,15 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-02: CI type check and how to bump its pins (Plan P, step 6)
+
+`.github/workflows/typecheck.yaml` runs `pyright --pythonpath "$(which python)"` on Ubuntu with Python 3.12, CPU torch 2.15.0 (`torchaudio` unpinned) from the PyTorch CPU index, and `pip install -e ".[eval,typecheck]"`. `pythonVersion = "3.10"` in `[tool.pyright]` stays, so stdlib typing is checked at the project's minimum level. Python 3.12 rather than 3.10 because 3.10 only has torch up to 2.14.1 and the local check uses 2.15.0.
+
+- The workflow has not run yet. Its commands were checked locally except `pip install -e ".[eval,typecheck]"` on 3.12 and the Linux torch install (this machine has only Python 3.15). Both wheels exist on the CPU index for Linux/3.12 (`pip index versions ... --python-version 3.12 --platform manylinux_2_28_x86_64`).
+- Third-party packages other than torch and pyright are not pinned. If CI starts failing with no code change, a dependency (gradio, transformers, x_transformers, ...) changed its types: reproduce locally with `pip install -U` of that package, then fix the code or add a narrow ignore with a reason.
+- To bump pyright: change `pyright==` in the `typecheck` extra of `pyproject.toml`, run it locally, fix or suppress what it reports, and commit all of it together. To bump torch: change `torch==` in the workflow and rerun locally with the same version. Ruff is bumped in `.pre-commit-config.yaml` only, and needs a full `ruff check`/`ruff format --check` run first.
+- The guard (`golden.py`) is not in CI: its numeric hashes are per torch build and OS, and `golden.json` was made on Windows.
+
 ## 2026-11-02: open bugs fixed after Plan P step 5
 
 Found while annotating (pyright did not flag them). All in `train/finetune_gradio.py` unless stated; one commit per file or area.
