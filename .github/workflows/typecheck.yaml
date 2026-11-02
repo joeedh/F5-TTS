@@ -21,6 +21,12 @@ jobs:
       - name: Install CPU torch
         run: pip install "torch==2.15.0" torchaudio --index-url https://download.pytorch.org/whl/cpu
       - name: Install the project and pyright
-        run: pip install -e ".[eval,typecheck]"
+        run: pip install -e ".[typecheck]"
+      # The `eval` extra cannot be installed as is: faster_whisper==0.10.1 pins av==10.*, which has no
+      # wheel for Python 3.12 and needs FFmpeg headers to build. pyright only needs the sources.
+      - name: Install eval packages for type resolution
+        run: |
+          pip install jiwer modelscope zhconv zhon
+          pip install --no-deps faster_whisper==0.10.1 funasr
       - name: pyright
         run: pyright --pythonpath "$(which python)"

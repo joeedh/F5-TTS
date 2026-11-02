@@ -55,7 +55,7 @@ Paths under `src/f5_tts/`. Overview in `docs/architecture.md`; doc list in `docs
 
 ## Type checking, linting, formatting
 
-Run from the repo root, inside a venv with the project installed (`pip install -e ".[eval,typecheck]"`; see `docs/debugging.md` for the venv this was built in). Versions are pinned: ruff 0.11.2 (`.pre-commit-config.yaml`) and pyright 1.1.414 (`typecheck` extra in `pyproject.toml`). Do not use a newer ruff; its default rules report errors that are not real debt.
+Run from the repo root, inside a venv with the project installed (`pip install -e ".[typecheck]"`, plus `pip install jiwer modelscope zhconv zhon` and `pip install --no-deps faster_whisper==0.10.1 funasr` so `eval/` resolves; the `eval` extra itself fails where `av==10.*` has no wheel, i.e. Python 3.12 and newer. See `docs/debugging.md`). Versions are pinned: ruff 0.11.2 (`.pre-commit-config.yaml`) and pyright 1.1.414 (`typecheck` extra in `pyproject.toml`). Do not use a newer ruff; its default rules report errors that are not real debt.
 
 | Task | Command |
 |---|---|

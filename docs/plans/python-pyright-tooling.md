@@ -204,7 +204,7 @@ Bugs seen while annotating that pyright does not flag: **all fixed 2026-11-02**,
 5. Decide whether to ratchet to `standard` mode, per directory, and write the outcome in this plan. Not part of this plan's completion.
 
 Done 2026-11-02:
-1. CI: `.github/workflows/typecheck.yaml` (new file, next to `pre-commit.yaml`, which stays ruff-only). Python 3.12 because 3.10 only has torch up to 2.14.1; CPU torch 2.15.0 from the PyTorch CPU index (verified to exist for Linux/3.12 with `pip index versions`); `pip install -e ".[eval,typecheck]"`; `pyright --pythonpath "$(which python)"`. **It has not run yet**: this machine has only Python 3.15 and no push was made, so the Linux install and the first CI result are unverified.
+1. CI: `.github/workflows/typecheck.yaml` (new file, next to `pre-commit.yaml`, which stays ruff-only). Python 3.12 because 3.10 only has torch up to 2.14.1; CPU torch 2.15.0 from the PyTorch CPU index (verified to exist for Linux/3.12 with `pip index versions`); `pip install -e ".[typecheck]"` plus the eval packages installed by hand (`av==10.*` from `faster_whisper==0.10.1` has no wheel on 3.12, which the first CI run showed); `pyright --pythonpath "$(which python)"`. The first CI run (2026-11-02) failed on that install; see the result below once it is rerun.
 2. Pins: pyright in the `typecheck` extra of `pyproject.toml` (1.1.414), ruff in `.pre-commit-config.yaml` (0.11.2), torch in the workflow. How to bump them, and what to do if CI breaks without a code change, is in [../debugging.md](../debugging.md) ("CI type check and how to bump its pins").
 3. `CLAUDE.md` has a "Type checking, linting, formatting" section with the commands and the suppression policy.
 4. `architecture.md`: no file was renamed or moved, so no change.
