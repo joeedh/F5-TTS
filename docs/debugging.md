@@ -6,6 +6,13 @@ Running log. Add an entry for each bug or useful technique: symptom, cause, fix 
 
 Found while annotating (pyright did not flag them). All in `train/finetune_gradio.py` unless stated; one commit per file or area.
 
+### Data-prep workers failed with `NameError` under spawn or forkserver
+- Symptom: `prepare_emilia.py` and `prepare_wenetspeech4tts.py` raised `NameError: name 'tokenizer' is not defined` (and `polyphone`) inside every worker process on Windows and macOS, and on Linux from Python 3.14 where the default start method became `forkserver`.
+- Cause: the worker functions (`deal_with_audio_dir`, `deal_with_sub_path_files`) read module globals that are only assigned inside `if __name__ == "__main__":`. A forked child inherits them; a spawned or forkserver child re-imports the module and never runs that block. The other two `ProcessPoolExecutor` scripts (`prepare_emilia_v2.py`, `prepare_libritts.py`) do not read such globals.
+- Fix: `tokenizer` and `polyphone` are now parameters of the worker functions and are passed in `executor.submit(...)`.
+- Also removed the unused `polyphone` parameter of `process_audio_file` in `prepare_csv_wavs.py` (it only matters later, in `batch_convert_texts`, which still receives it).
+- Tested: `prepare_emilia.deal_with_audio_dir` imported as a module (so no `__main__` globals exist, as in a spawned worker) and called on a one-line jsonl returns the row, duration and vocab. The scripts themselves need the Emilia and WenetSpeech datasets and were not run; `prepare_wenetspeech4tts.py` got the same change but was not exercised.
+
 ### Eval scripts: unknown settings left variables unbound
 - `eval/eval_infer_batch.py`: an unknown `--testset` left `metainfo` unbound (`UnboundLocalError` later), and an unknown `mel_spec_type` from the model yaml left `vocoder_local_path` unbound. Both now raise `ValueError` naming the accepted values.
 - `eval/eval_seedtts_testset.py` and `eval/eval_librispeech_test_clean.py`: `main` reused the name `args` for both the parsed `Namespace` and the per-GPU argument lists. It worked (the `Namespace` values were copied out first) but was easy to break; the lists are now `asr_args` and `sim_args`. No behaviour change.

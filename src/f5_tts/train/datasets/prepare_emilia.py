@@ -110,6 +110,8 @@ en_filters = ["ا", "い", "て"]
 
 def deal_with_audio_dir(
     audio_dir: Path,
+    tokenizer: str,
+    polyphone: bool,
 ) -> tuple[list[dict[str, str | float | list[str]]], list[float], set[str], int, int]:
     audio_jsonl = audio_dir.with_suffix(".jsonl")
     sub_result, durations = [], []
@@ -160,7 +162,7 @@ def main() -> None:
     for lang in langs:
         dataset_path = Path(os.path.join(dataset_dir, lang))
         [
-            futures.append(executor.submit(deal_with_audio_dir, audio_dir))
+            futures.append(executor.submit(deal_with_audio_dir, audio_dir, tokenizer, polyphone))
             for audio_dir in dataset_path.iterdir()
             if audio_dir.is_dir()
         ]

@@ -76,7 +76,7 @@ def graceful_exit() -> Iterator[None]:
             executor.shutdown(wait=False)
 
 
-def process_audio_file(audio_path: str, text: str, polyphone: bool) -> tuple[str, str, float] | None:
+def process_audio_file(audio_path: str, text: str) -> tuple[str, str, float] | None:
     """Process a single audio file by checking its existence and extracting duration."""
     if not Path(audio_path).exists():
         print(f"audio {audio_path} not found, skipping")
@@ -134,7 +134,7 @@ def prepare_csv_wavs_dir(
             for i in range(0, len(audio_path_text_pairs), CHUNK_SIZE):
                 chunk = audio_path_text_pairs[i : i + CHUNK_SIZE]
                 # Submit futures in order
-                chunk_futures = [executor.submit(process_audio_file, pair[0], pair[1], polyphone) for pair in chunk]
+                chunk_futures = [executor.submit(process_audio_file, pair[0], pair[1]) for pair in chunk]
 
                 # Iterate over futures in the original submission order to preserve ordering
                 for future in tqdm(
