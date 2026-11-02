@@ -131,7 +131,7 @@ def load_vocoder(
         vocoder = vocoder.eval().to(device)
     elif vocoder_name == "bigvgan":
         try:
-            from third_party.BigVGAN import bigvgan
+            from third_party.BigVGAN import bigvgan  # pyright: ignore[reportAttributeAccessIssue]  # git submodule, empty unless initialised
         except ImportError:
             print("You need to follow the README to init submodule and change the BigVGAN source code.")
         if is_local:
