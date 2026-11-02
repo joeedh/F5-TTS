@@ -68,7 +68,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 
 | # | Plan (file to be written) | Depends on | Status |
 |---|---|---|---|
-| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | plan not written |
+| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | plan pressure-tested; D1 and D2 decided, step 2 next |
 | 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | plan not written |
 | 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | plan not written |
 | 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | plan not written |
@@ -90,7 +90,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 ## Tasks per plan
 
 ### 00 Scope, runtime decision and parity harness
-- [ ] Confirm the starting assumptions above, or change them.
+- [x] Confirm the starting assumptions above, or change them. (Confirmed 2026-11-02, plan 00 D1: as written, plus v1 targets Chrome and Edge on desktop, tested on one discrete and one integrated GPU.)
 - [ ] Choose ORT Web versus custom WGSL, with a small spike: run one DiT block and a depthwise conv on WebGPU.
 - [ ] Pick the repo layout for web code (where it lives, build tool, language).
 - [ ] Build the golden-data generator: fixed seed, fixed noise tensor, fixed inputs; dump text ids, reference mel, per-step DiT output, final mel, final wav from PyTorch.
@@ -155,8 +155,8 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 
 ## Open questions
 
-- Is exact numerical match with PyTorch required, or only equal audio quality?
+- ~~Is exact numerical match with PyTorch required, or only equal audio quality?~~ Answered 2026-11-02 (plan 00 D2): numerical per stage with teacher-forced inputs, equal quality end to end.
 - Exact attribution wording for the model card. Gate for plan 05: nothing is published until this is settled.
 - App licence at publish time. MIT code with separately licensed CC-BY-NC weights is how upstream does it, so the code may not need to change as long as the weights are downloaded separately and not bundled in the app repo. If the app is hosted as a product and non-commercial use is intended, decide whether the app should say so. Revisit when plan 05 publishes.
-- Which browsers are in scope.
+- ~~Which browsers are in scope.~~ Answered 2026-11-02 (plan 00 D1): Chrome and Edge on desktop for v1; Safari and Firefox tested in plan 07 but not blocking.
 - Whether the Python package should gain a `webgpu/` export script entry point or this stays a separate project.
