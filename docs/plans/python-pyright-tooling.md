@@ -186,13 +186,14 @@ Result, 2026-11-01: **pyright reports 0 errors and 0 warnings** (basic mode, 37 
 
 Suppressions (12, all `# pyright: ignore[rule]` with a reason): optional packages `torch_npu`, `spaces`, `flash_attn` (2), `thop`, `pyaudio`; `bitsandbytes` private-import use; `torch.hub.load(trust_repo=True)` typed as `str`; pyright narrowing a shape tuple to `()` in `finetune_gradio.Slicer`; `ModuleList` holding `None` in `UNetT`; `infer_process` returning the non-streaming triple from a generator typed for both modes; `text_mask` bound by an `__init__` assertion in `dit.TextEmbedding`. Every remaining `Any` has a reason comment.
 
-Bugs seen while annotating that pyright does not flag, and that are **not fixed**, so they stay open:
-- `train/finetune_gradio.py`: `start_training` has a `return <tuple>` inside a generator (Gradio never gets the "already running" message; needs `yield` then `return`); `stop_signal` is declared `global` but never defined at module level; `Slicer.slice` returns a bare `[waveform]` for short audio, which `transcribe_all` cannot unpack; `transcribe_all` compares `error_num != []` (always true) and divides by `tmp_max` twice (zero for silent chunks); `create_metadata` passes a list as `total=` to the progress bar; `infer` returns a 2-tuple on error but a 3-tuple on success and leaves its temp file; `gr.update(fn=auto_update, ...)` at the end of the System Info tab does nothing.
-- `infer/infer_gradio.py` `generate_multistyle_speech`: a segment with blank reference audio still fails at `sr, audio_data = audio_out`; `sr` is unbound if there are no segments (guarded only by the early return).
-- `eval/ecapa_tdnn.py`: bare `except:` around `torch.hub.load` swallows every error; the constructor monkeypatches `torch.hub._validate_not_a_forked_repo` globally.
-- `eval/utils_eval.py`: `eval_*` `main` functions rebind `args` from a Namespace to a list; `eval_infer_batch.py` leaves `metainfo` and `vocoder_local_path` unbound for unknown settings.
-- `train/datasets/prepare_csv_wavs.py`: the `polyphone` parameter of `process_audio_file` is unused. `prepare_emilia.py`: `deal_with_audio_dir` reads module globals defined later in the file.
-- Also from step 4: `socket_server.py` still passes `local_path=None` (now allowed by `load_vocoder`'s signature).
+Bugs seen while annotating that pyright does not flag: **all fixed 2026-11-02**, each with an entry in [../debugging.md](../debugging.md) ("open bugs fixed after Plan P step 5"):
+- `train/finetune_gradio.py`: "already running" message yielded instead of returned from a generator; `Slicer.slice` returns `(chunk, start, end)` tuples on every path (the short-audio path used to raise `ValueError`, reproduced and fixed); `transcribe_all` error-count test and silent-chunk division; `create_metadata` progress total; `infer` error path returns three outputs; the dead `gr.update(fn=...)` became `app.load(...)`.
+- `infer/infer_gradio.py` `generate_multistyle_speech`: segments without audio are skipped.
+- `eval/ecapa_tdnn.py`: the `torch.hub` patch is restored after construction and the bare `except` is `except Exception` with a message (checked with a stub); `eval/eval_infer_batch.py` rejects unknown settings; `eval_*` mains no longer rebind `args`.
+- `train/datasets/prepare_emilia.py` and `prepare_wenetspeech4tts.py`: workers got `NameError` under spawn/forkserver because they read `__main__`-only globals; they now take `tokenizer` and `polyphone` as arguments (checked by calling the Emilia worker on a module import). The unused `polyphone` parameter of `process_audio_file` is gone.
+- `socket_server.py` passing `local_path=None` is allowed by `load_vocoder`'s signature (the path is unused when `is_local=False`).
+- Not bugs, and so left alone: `stop_signal` (only read after `start_training` assigns it; now also defined at module level), the double division by `tmp_max` for clipped chunks (matches the upstream slicer), `infer`'s `delete=False` temp wav (gradio needs it after return), and `Slicer.slice` comparing samples with a frame count (inherited upstream).
+- Still a design smell, not fixed: `infer_batch_process` yields 2-tuples when streaming and 3-tuples otherwise; callers cast. Splitting it into two functions would change its public shape.
 
 ## Step 6: lock it in
 
