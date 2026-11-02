@@ -10,7 +10,7 @@ Every plan, once written, is saved in this folder and pressure-tested by a fresh
 
 ## Plan P: Python typing, formatter and linter
 
-Plan file: [python-pyright-tooling.md](python-pyright-tooling.md). Status: `done`, apart from the first CI run of the new `typecheck` workflow. Depends on: nothing. Blocks: nothing, but the port's Python export scripts (plans 01, 02, 05) should be written under it.
+Plan file: [python-pyright-tooling.md](python-pyright-tooling.md). Status: `done`; the `typecheck` workflow passed in CI on 2026-11-02. Depends on: nothing. Blocks: nothing, but the port's Python export scripts (plans 01, 02, 05) should be written under it.
 
 Where things stand (checked 2026-10-31): no type checker is configured. Ruff does lint, format and import sorting through pre-commit and the `pre-commit` GitHub workflow. Pyright 1.1.414 and mypy 2.3.1 are installed in the cloud container, but not torch. First pyright run without torch: 672 errors, 23 warnings over 47 files. Largest groups: missing imports 239, possibly-unbound variables 130, attribute access 109, invalid type arguments 69 (the ein-notation strings like `float["b n d"]`), argument types 60.
 
@@ -43,7 +43,7 @@ Approach decided: pyright, and port many files at once, then drive the error cou
 - [x] Reach zero errors in the chosen mode and paths. (0 errors, 0 warnings, basic mode, 2026-11-01.)
 
 ### Lock it in
-- [x] Add pyright to pre-commit and to the GitHub workflow, failing on errors. (Done 2026-11-02 as a separate `typecheck.yaml` workflow, not pre-commit by design: pyright needs the full dependency set. Not yet run in CI.)
+- [x] Add pyright to pre-commit and to the GitHub workflow, failing on errors. (Done 2026-11-02 as a separate `typecheck.yaml` workflow, not pre-commit by design: pyright needs the full dependency set. Passed in CI on 2026-11-02 after two fixes.)
 - [x] Add the chosen formatter and linter settings to `pyproject.toml` or `ruff.toml` and run them across the repo once, as a single formatting commit. (Settings were already in `ruff.toml`; the tree already passes `ruff format --check`, so there was nothing to reformat.)
 - [x] Update `CLAUDE.md` with the commands to run (type check, lint, format) and the suppression policy. (Done 2026-11-02.)
 - [x] Decide when to ratchet strictness (for example `standard` then `strict` per directory). (Decided 2026-11-02: stay on `basic`; `standard` adds 92 possibly-unbound errors; see the plan, step 6.)

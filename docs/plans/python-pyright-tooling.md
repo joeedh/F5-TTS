@@ -1,6 +1,6 @@
 # Plan P: pyright typing, with ruff for format and lint
 
-Status: steps 1 to 6 done 2026-11-01/02; the only open item is the first run of the CI job. Pressure-tested 2026-10-31 by a fresh agent; its findings are folded in below (section "Review log"). Task list entry: [webgpu-port-tasks.md](webgpu-port-tasks.md).
+Status: steps 1 to 6 done 2026-11-01/02, CI job verified green on 2026-11-02. Pressure-tested 2026-10-31 by a fresh agent; its findings are folded in below (section "Review log"). Task list entry: [webgpu-port-tasks.md](webgpu-port-tasks.md).
 
 ## Goal
 
@@ -204,7 +204,7 @@ Bugs seen while annotating that pyright does not flag: **all fixed 2026-11-02**,
 5. Decide whether to ratchet to `standard` mode, per directory, and write the outcome in this plan. Not part of this plan's completion.
 
 Done 2026-11-02:
-1. CI: `.github/workflows/typecheck.yaml` (new file, next to `pre-commit.yaml`, which stays ruff-only). Python 3.12 because 3.10 only has torch up to 2.14.1; CPU torch 2.15.0 from the PyTorch CPU index (verified to exist for Linux/3.12 with `pip index versions`); `pip install -e ".[typecheck]"` plus the eval packages installed by hand (`av==10.*` from `faster_whisper==0.10.1` has no wheel on 3.12, which the first CI run showed); `pyright --pythonpath "$(which python)"`. The first CI run (2026-11-02) failed on that install; see the result below once it is rerun.
+1. CI: `.github/workflows/typecheck.yaml` (new file, next to `pre-commit.yaml`, which stays ruff-only). Python 3.12 because 3.10 only has torch up to 2.14.1; CPU torch 2.15.0 from the PyTorch CPU index (verified to exist for Linux/3.12 with `pip index versions`); `pip install -e ".[typecheck]"` plus the eval packages installed by hand (`av==10.*` from `faster_whisper==0.10.1` has no wheel on 3.12, which the first CI run showed); `pyright --pythonpath "$(which python)"`. CI history: run 1 failed on that install, run 2 on the BigVGAN submodule import (fixed with a narrow ignore, checked with the submodule present and empty), run 3 passed with 0 errors in 3m27s. Details in [../debugging.md](../debugging.md).
 2. Pins: pyright in the `typecheck` extra of `pyproject.toml` (1.1.414), ruff in `.pre-commit-config.yaml` (0.11.2), torch in the workflow. How to bump them, and what to do if CI breaks without a code change, is in [../debugging.md](../debugging.md) ("CI type check and how to bump its pins").
 3. `CLAUDE.md` has a "Type checking, linting, formatting" section with the commands and the suppression policy.
 4. `architecture.md`: no file was renamed or moved, so no change.

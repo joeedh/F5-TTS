@@ -60,7 +60,7 @@ Run from the repo root, inside a venv with the project installed (`pip install -
 | Task | Command |
 |---|---|
 | Type check | `pyright --pythonpath "$(which python)"` (Windows: `.venv\Scripts\pyright.exe --pythonpath .venv\Scripts\python.exe`). Must report 0 errors; CI runs it (`.github/workflows/typecheck.yaml`). |
-| Lint | `ruff check src/f5_tts tools` (not `src`: the BigVGAN submodule under `src/third_party` is not linted) |
+| Lint | `ruff check src/f5_tts tools` (not `src`: the BigVGAN submodule under `src/third_party` is not linted). Also run `ruff check --select I --fix src/f5_tts tools`: pre-commit runs this import sorter as a separate hook and fails on it. |
 | Format | `ruff format src/f5_tts tools` |
 | Behaviour guard | `python tools/typing_guard/golden.py` before and after a change that should not alter behaviour; `--write` only on a known-good baseline |
 | Annotation-only check | `python tools/typing_guard/annotation_only.py <files>` before committing a change that should only add annotations |
