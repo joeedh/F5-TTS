@@ -12,7 +12,7 @@ import sys
 import tempfile
 import threading
 import time
-from collections.abc import Generator, Iterable, Iterator
+from collections.abc import Generator, Iterable
 from glob import glob
 from importlib.resources import files
 from typing import IO, Any, TypeVar, cast
@@ -55,6 +55,7 @@ def _safe_project_path(base: str, name: str) -> str:
 
 
 training_process = None
+stop_signal = False  # set by stop_training, polled by the streaming loop in start_training
 system = platform.system()
 python_executable = sys.executable or "python"
 tts_api = None
@@ -234,13 +235,13 @@ class Slicer:  # https://github.com/RVC-Boss/GPT-SoVITS/blob/main/tools/slicer2.
     # @timeit
     def slice(
         self, waveform: npt.NDArray[np.float32]
-    ) -> list[npt.NDArray[np.float32]] | list[list[npt.NDArray[np.float32] | int]]:
+    ) -> list[tuple[npt.NDArray[np.float32], int, int]]:  # (chunk, start, end)
         if len(waveform.shape) > 1:
             samples = waveform.mean(axis=0)
         else:
             samples = waveform
         if samples.shape[0] <= self.min_length:
-            return [waveform]
+            return [(waveform, 0, int(samples.shape[0]))]
         rms_list = librosa.feature.rms(y=samples, frame_length=self.win_size, hop_length=self.hop_size).squeeze(0)
         sil_tags = []
         silence_start = None
@@ -297,26 +298,26 @@ class Slicer:  # https://github.com/RVC-Boss/GPT-SoVITS/blob/main/tools/slicer2.
             sil_tags.append((pos, total_frames + 1))
         # Apply and return slices: [chunk, start, end]
         if len(sil_tags) == 0:
-            return [[waveform, 0, int(total_frames * self.hop_size)]]
+            return [(waveform, 0, int(total_frames * self.hop_size))]
         else:
             chunks = []
             if sil_tags[0][0] > 0:
-                chunks.append([self._apply_slice(waveform, 0, sil_tags[0][0]), 0, int(sil_tags[0][0] * self.hop_size)])
+                chunks.append((self._apply_slice(waveform, 0, sil_tags[0][0]), 0, int(sil_tags[0][0] * self.hop_size)))
             for i in range(len(sil_tags) - 1):
                 chunks.append(
-                    [
+                    (
                         self._apply_slice(waveform, sil_tags[i][1], sil_tags[i + 1][0]),
                         int(sil_tags[i][1] * self.hop_size),
                         int(sil_tags[i + 1][0] * self.hop_size),
-                    ]
+                    )
                 )
             if sil_tags[-1][1] < total_frames:
                 chunks.append(
-                    [
+                    (
                         self._apply_slice(waveform, sil_tags[-1][1], total_frames),
                         int(sil_tags[-1][1] * self.hop_size),
                         int(total_frames * self.hop_size),
-                    ]
+                    )
                 )
             return chunks
 
@@ -372,9 +373,7 @@ def start_training(
     stream: bool,
     logger: str,
     ch_8bit_adam: bool,
-) -> Generator[
-    tuple[str, dict[str, object], dict[str, object]], None, tuple[str, dict[str, object], dict[str, object]] | None
-]:
+) -> Generator[tuple[str, dict[str, object], dict[str, object]], None, None]:
     global training_process, tts_api, stop_signal
 
     if tts_api is not None:
@@ -402,7 +401,8 @@ def start_training(
 
     # Check if a training process is already running
     if training_process is not None:
-        return "Train run already!", gr.update(interactive=False), gr.update(interactive=True)
+        yield "Train run already!", gr.update(interactive=False), gr.update(interactive=True)
+        return
 
     yield "start train", gr.update(interactive=False), gr.update(interactive=False)
 
@@ -701,7 +701,8 @@ def transcribe_all(
             tmp_max = np.abs(chunk).max()
             if tmp_max > 1:
                 chunk /= tmp_max
-            chunk = (chunk / tmp_max * (_max * alpha)) + (1 - alpha) * chunk
+            if tmp_max > 0:  # a silent chunk would divide by zero
+                chunk = (chunk / tmp_max * (_max * alpha)) + (1 - alpha) * chunk
             wavfile.write(file_segment, 24000, (chunk * 32767).astype(np.int16))
 
             try:
@@ -717,7 +718,7 @@ def transcribe_all(
     with open(file_metadata, "w", encoding="utf-8-sig") as f:
         f.write(data)
 
-    if error_num != []:
+    if error_num > 0:
         error_text = f"\nerror files : {error_num}"
     else:
         error_text = ""
@@ -786,7 +787,7 @@ def create_metadata(name_project: str, ch_tokenizer: bool, progress: gr.Progress
     result = []
     error_files = []
     text_vocab_set = set()
-    for line in progress_iter(progress, data.split("\n"), total=count):
+    for line in progress_iter(progress, data.split("\n"), total=len(count)):
         sp_line = line.split("|")
         if len(sp_line) != 2:
             continue
@@ -1218,11 +1219,11 @@ def infer(
     speed: float,
     seed: int | None,
     remove_silence: bool,
-) -> tuple[None, str] | tuple[str, str, str]:
+) -> tuple[str | None, str, str]:
     global last_checkpoint, last_device, tts_api, last_ema
 
     if not os.path.isfile(file_checkpoint):
-        return None, "checkpoint not found!"
+        return None, "checkpoint not found!", ""
 
     if training_process is not None:
         device_test = "cpu"
@@ -1900,10 +1901,7 @@ Reduce the Base model size from 5GB to 1.3GB. The new checkpoint file prunes out
             update_button = gr.Button("Update Stats")
             update_button.click(fn=update_stats, outputs=output_box)
 
-            def auto_update() -> Iterator[dict[str, object]]:
-                yield gr.update(value=update_stats())
-
-            gr.update(fn=auto_update, inputs=[], outputs=output_box)
+            app.load(fn=update_stats, inputs=[], outputs=output_box)  # fill the box when the page opens
 
 
 @click.command()

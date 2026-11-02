@@ -2,6 +2,21 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-02: open bugs fixed after Plan P step 5
+
+Found while annotating (pyright did not flag them). All in `train/finetune_gradio.py` unless stated; one commit per file or area.
+
+### Fine-tuning app: several flow bugs
+- "Train run already!" never reached the UI: `start_training` is a generator, so `return value` is discarded by gradio. It now `yield`s the message and then returns (return annotation is now `Generator[..., None, None]`).
+- `Slicer.slice` returned a bare `[waveform]` for audio no longer than `min_length`, so `transcribe_all`'s `for chunk, start, end in ...` raised `ValueError: too many values to unpack`. It now returns `(waveform, 0, n_samples)` like the long-audio path; every path returns `(chunk, start, end)` tuples. Reproduced before the fix with a 500-sample signal. Side observation, not changed: `slice` compares `samples.shape[0]` (samples) with `self.min_length` (already converted to frames), so the short path only triggers for very short clips. It is inherited from the upstream slicer.
+- `transcribe_all`: `if error_num != []` compared an int with a list, so "error files" was appended to the result every time; it is now `error_num > 0`. A silent chunk divided by `tmp_max == 0` and produced NaNs, so the loudness blend is skipped when `tmp_max` is 0. The double division by `tmp_max` for clipped chunks is unchanged: it matches the upstream GPT-SoVITS slicer.
+- `create_metadata` passed a list as `total=` to the progress bar; it passes `len(...)`.
+- `infer` returned 2 values on the "checkpoint not found" path but its click handler has 3 outputs (audio, device, seed), so gradio raised instead of showing the message. It returns `None, message, ""`.
+- The "System Info" tab ended with `gr.update(fn=auto_update, ...)`, which only builds a dict and does nothing. It is replaced by `app.load(fn=update_stats, ...)` so the box is filled when the page opens (the evident intent of `auto_update`).
+- Correction to the earlier worklist: `stop_signal` was **not** a crash. It is only read inside `start_training` after being assigned there. It is now also defined at module level for clarity.
+- Left alone on purpose: `infer` creates its output wav with `delete=False`; gradio needs the file to exist after the function returns, so it cannot be removed there.
+- Not tested by running the app (needs a GPU environment): the slicer was run directly; the rest was checked by reading the code and the click-handler wiring.
+
 ## 2026-11-01: bugs found by pyright and fixed (Plan P, step 5)
 
 Each entry is one commit. All were found by reading pyright errors, then confirmed by reading the code (not by running the Gradio apps, which need a GPU and models).
