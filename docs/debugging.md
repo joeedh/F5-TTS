@@ -6,6 +6,11 @@ Running log. Add an entry for each bug or useful technique: symptom, cause, fix 
 
 Found while annotating (pyright did not flag them). All in `train/finetune_gradio.py` unless stated; one commit per file or area.
 
+### Speaker-similarity model swallowed every error and patched `torch.hub` for the whole process
+- Symptom: `ECAPA_TDNN(...)` in `eval/ecapa_tdnn.py` hid why loading s3prl from the local hub cache failed (a bare `except:` also caught `KeyboardInterrupt`), and after the first construction `torch.hub._validate_not_a_forked_repo` stayed replaced for every later `torch.hub.load` in the process (for example UTMOS in `eval_utmos.py`).
+- Fix: the patch is restored in a `finally`, and the fallback catches `Exception` and prints the reason before downloading `s3prl/s3prl`. The fallback itself is unchanged.
+- Tested with a stub in place of `torch.hub.load`: the original function is restored after construction, both when the local load succeeds and when it fails and falls back. Not tested against the real s3prl (needs a download).
+
 ### Multi-style TTS tab fails when a segment has no usable reference audio
 - Symptom: a segment whose type has no reference audio (or whose text is blank) raised `ValueError: not enough values to unpack` at `sr, audio_data = audio_out` in `generate_multistyle_speech` (`infer/infer_gradio.py`), after `infer()` had already shown a warning.
 - Cause: `infer()` returns `gr.update()` placeholders instead of audio on those early exits (see the entry for the 3-versus-4 value fix), and the caller treated the first value as `(sample_rate, audio)`.

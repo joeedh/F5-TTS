@@ -213,12 +213,20 @@ class ECAPA_TDNN(nn.Module):
         self.sr = sr
 
         self.feature_extract: Any  # Any: the s3prl WavLM wrapper from torch.hub, which is typed as object
+        # s3prl is not a fork check target; disable the check only while loading it
+        original_fork_check = torch.hub._validate_not_a_forked_repo
         torch.hub._validate_not_a_forked_repo = lambda a, b, c: True
         try:
-            local_s3prl_path = os.path.expanduser("~/.cache/torch/hub/s3prl_s3prl_main")
-            self.feature_extract = torch.hub.load(local_s3prl_path, feat_type, source="local", config_path=config_path)
-        except:  # noqa: E722
-            self.feature_extract = torch.hub.load("s3prl/s3prl", feat_type)
+            try:
+                local_s3prl_path = os.path.expanduser("~/.cache/torch/hub/s3prl_s3prl_main")
+                self.feature_extract = torch.hub.load(
+                    local_s3prl_path, feat_type, source="local", config_path=config_path
+                )
+            except Exception as e:
+                print(f"Loading s3prl from the local hub cache failed ({e}); loading s3prl/s3prl from GitHub.")
+                self.feature_extract = torch.hub.load("s3prl/s3prl", feat_type)
+        finally:
+            torch.hub._validate_not_a_forked_repo = original_fork_check
 
         if len(self.feature_extract.model.encoder.layers) == 24 and hasattr(
             self.feature_extract.model.encoder.layers[23].self_attn, "fp32_attention"
