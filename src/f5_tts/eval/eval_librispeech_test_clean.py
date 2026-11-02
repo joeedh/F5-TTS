@@ -75,14 +75,14 @@ def main() -> None:
 
     if eval_task == "wer":
         with mp.Pool(processes=len(gpus)) as pool:
-            args = [(rank, lang, sub_test_set, asr_ckpt_dir) for (rank, sub_test_set) in test_set]
-            results = pool.map(run_asr_wer, args)
+            asr_args = [(rank, lang, sub_test_set, asr_ckpt_dir) for (rank, sub_test_set) in test_set]
+            results = pool.map(run_asr_wer, asr_args)
             for r in results:
                 full_results.extend(r)
     elif eval_task == "sim":
         with mp.Pool(processes=len(gpus)) as pool:
-            args = [(rank, sub_test_set, wavlm_ckpt_dir) for (rank, sub_test_set) in test_set]
-            results = pool.map(run_sim, args)
+            sim_args = [(rank, sub_test_set, wavlm_ckpt_dir) for (rank, sub_test_set) in test_set]
+            results = pool.map(run_sim, sim_args)
             for r in results:
                 full_results.extend(r)
     else:

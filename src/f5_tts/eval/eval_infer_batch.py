@@ -99,6 +99,9 @@ def main() -> None:
         metalst = rel_path + "/data/seedtts_testset/en/meta.lst"
         metainfo = get_seedtts_testset_metainfo(metalst)
 
+    else:
+        raise ValueError(f"Unknown testset {testset!r}; use ls_pc_test_clean, seedtts_test_zh or seedtts_test_en.")
+
     # path to save genereted wavs
     output_dir = (
         f"{rel_path}/"
@@ -131,6 +134,8 @@ def main() -> None:
         vocoder_local_path = "../checkpoints/charactr/vocos-mel-24khz"
     elif mel_spec_type == "bigvgan":
         vocoder_local_path = "../checkpoints/bigvgan_v2_24khz_100band_256x"
+    else:
+        raise ValueError(f"Unknown mel_spec_type {mel_spec_type!r}; use vocos or bigvgan.")
     vocoder = load_vocoder(vocoder_name=mel_spec_type, is_local=local, local_path=vocoder_local_path)
 
     # Tokenizer

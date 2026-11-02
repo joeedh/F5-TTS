@@ -6,6 +6,11 @@ Running log. Add an entry for each bug or useful technique: symptom, cause, fix 
 
 Found while annotating (pyright did not flag them). All in `train/finetune_gradio.py` unless stated; one commit per file or area.
 
+### Eval scripts: unknown settings left variables unbound
+- `eval/eval_infer_batch.py`: an unknown `--testset` left `metainfo` unbound (`UnboundLocalError` later), and an unknown `mel_spec_type` from the model yaml left `vocoder_local_path` unbound. Both now raise `ValueError` naming the accepted values.
+- `eval/eval_seedtts_testset.py` and `eval/eval_librispeech_test_clean.py`: `main` reused the name `args` for both the parsed `Namespace` and the per-GPU argument lists. It worked (the `Namespace` values were copied out first) but was easy to break; the lists are now `asr_args` and `sim_args`. No behaviour change.
+- Not tested by running (the scripts need models and test sets).
+
 ### Speaker-similarity model swallowed every error and patched `torch.hub` for the whole process
 - Symptom: `ECAPA_TDNN(...)` in `eval/ecapa_tdnn.py` hid why loading s3prl from the local hub cache failed (a bare `except:` also caught `KeyboardInterrupt`), and after the first construction `torch.hub._validate_not_a_forked_repo` stayed replaced for every later `torch.hub.load` in the process (for example UTMOS in `eval_utmos.py`).
 - Fix: the patch is restored in a `finally`, and the fallback catches `Exception` and prints the reason before downloading `s3prl/s3prl`. The fallback itself is unchanged.
