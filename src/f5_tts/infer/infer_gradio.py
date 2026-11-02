@@ -705,6 +705,8 @@ with gr.Blocks() as app_multistyle:
                 speed=speed,
                 show_info=print,  # no pull to top when generating
             )
+            if isinstance(audio_out, dict):  # infer() already warned and returned without audio
+                continue
             sr, audio_data = audio_out
 
             generated_audio_segments.append(audio_data)

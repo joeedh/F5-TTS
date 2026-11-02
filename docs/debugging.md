@@ -6,6 +6,12 @@ Running log. Add an entry for each bug or useful technique: symptom, cause, fix 
 
 Found while annotating (pyright did not flag them). All in `train/finetune_gradio.py` unless stated; one commit per file or area.
 
+### Multi-style TTS tab fails when a segment has no usable reference audio
+- Symptom: a segment whose type has no reference audio (or whose text is blank) raised `ValueError: not enough values to unpack` at `sr, audio_data = audio_out` in `generate_multistyle_speech` (`infer/infer_gradio.py`), after `infer()` had already shown a warning.
+- Cause: `infer()` returns `gr.update()` placeholders instead of audio on those early exits (see the entry for the 3-versus-4 value fix), and the caller treated the first value as `(sample_rate, audio)`.
+- Fix: such a segment is skipped (the warning is already on screen). If every segment is skipped the existing "No audio generated." path runs. `sr` was never unbound in practice: it is only read when at least one segment produced audio.
+- Not tested by running the app.
+
 ### Fine-tuning app: several flow bugs
 - "Train run already!" never reached the UI: `start_training` is a generator, so `return value` is discarded by gradio. It now `yield`s the message and then returns (return annotation is now `Generator[..., None, None]`).
 - `Slicer.slice` returned a bare `[waveform]` for audio no longer than `min_length`, so `transcribe_all`'s `for chunk, start, end in ...` raised `ValueError: too many values to unpack`. It now returns `(waveform, 0, n_samples)` like the long-audio path; every path returns `(chunk, start, end)` tuples. Reproduced before the fix with a 500-sample signal. Side observation, not changed: `slice` compares `samples.shape[0]` (samples) with `self.min_length` (already converted to frames), so the short path only triggers for very short clips. It is inherited from the upstream slicer.
