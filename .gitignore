@@ -1,5 +1,7 @@
 # Customed
 .vscode/
+node_modules/
+web/dist/
 tests/
 runs/
 data/

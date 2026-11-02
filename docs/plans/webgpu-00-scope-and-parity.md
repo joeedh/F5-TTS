@@ -49,7 +49,7 @@ This is the task list's open question "exact numerical match, or only equal audi
 
 ### D3. Runtime: ORT Web or hand-written WGSL
 
-Settled by the spike in step 3. Default is ORT Web. Criteria, measured on the RTX 5050 in Chrome:
+Settled by the spike in step 3. Default is ORT Web. Criteria, measured on the RTX 5050 in Chrome (launched with `--force_high_performance_gpu`; see R10):
 1. **Placement.** No compute op of the block runs on the CPU, and no activation tensor is copied from GPU to CPU inside the block. Shape-only nodes (Shape, Gather or Reshape on shape tensors) placed on the CPU by ORT on purpose do not count.
 2. **Correctness.** fp32 output matches PyTorch fp32 within relative L2 1e-4 (replaced by the step 5 DiT tolerance once it exists).
 3. **Speed.** Projected real-time factor (generation time divided by seconds of new audio) of at most 5 in fp32 for a 1024-frame chunk (about 10.9 s in total, about 5.7 s of it new audio after a 5.2 s reference). Projection: run the block session 22 times in a row with inputs and outputs kept on the GPU (`preferredOutputLocation: "gpu-buffer"`), so per-run overhead is included, then multiply by 32 steps. RTF 5 is the "usable but slow" bar; the fp16 RTF is recorded as the number plan 05 tries to improve.
@@ -195,6 +195,14 @@ Starting table. Every float row is a placeholder until step 5 replaces it with m
 - Minimal `web/`: `package.json` with Vite, TypeScript, `onnxruntime-web` and Playwright; strict `tsconfig.json`; `.gitignore` entries for `web/node_modules/` and `web/dist/`. Enough for the spike; tests come in step 4.
 - Install the `webgpu` extra into `.venv313` as well, so both venvs match.
 - Done when: the research doc exists, both GPUs show up with WebGPU in Chrome, weights are cached, and `npm install` in `web/` works.
+- **Done 2026-11-02.** Results:
+  - Probe results in [../research/webgpu-laptop.md](../research/webgpu-laptop.md). Both GPUs work with WebGPU in Chrome and Edge 156, headless too, both with `shader-f16`, subgroups and 2 GiB buffers.
+  - GPU choice: `powerPreference` is ignored on Windows (Chrome says so in the console) and `--use-webgpu-power-preference=force-high-performance` finds no adapter. `--force_high_performance_gpu` gives the NVIDIA GPU; no flag gives Intel. Step 3 uses that switch. See R10.
+  - Weights in the Hugging Face cache: `SWivid/F5-TTS` `F5TTS_v1_Base/model_1250000.safetensors` (1,348,435,761 bytes) and `vocab.txt`; `charactr/vocos-mel-24khz` `config.yaml` and `pytorch_model.bin` (54,365,991 bytes).
+  - `preprocess_ref_audio_text` runs in both venvs without FFmpeg, on `basic_ref_en.wav` (gives 4.96 s) and on a 44.1 kHz stereo, 16 s, RMS 0.03 version (clipped to 6.89 s, still 44.1 kHz stereo, so the downmix and resample in `infer_batch_process` still run for the `en-prep` case).
+  - `webgpu` extra added (`onnx`, `onnxconverter-common`, `onnxscript`, and `onnxruntime` only below Python 3.15), installed in both venvs. `.venv` torch is unchanged (the behaviour guard passes).
+  - `web/`: `package.json` (onnxruntime-web 1.31.1; dev: TypeScript 7.0, Vite 8.3, Prettier 3.9, Playwright 1.64, `@webgpu/types`), strict `tsconfig.json`, an empty `src/index.ts`. `npm run typecheck` and `prettier --check` pass. npm 11 blocks dependency install scripts by default; the only one, protobufjs's `postinstall` (pulled in by onnxruntime-web; it maintains protobufjs's own CLI), is denied in `allowScripts`.
+  - `tools/webgpu-probe` got its own `package.json` with Playwright, and the probe gained `high`, `low`, `dgpu` variants and `PROBE_POWER` / `PROBE_HEADED`. `node_modules/` and `web/dist/` are in `.gitignore`.
 
 ### Step 3. Runtime spike (decision D3)
 - Before starting, read existing community ONNX exports of F5-TTS (for example `DakeQQ/F5-TTS-ONNX` on GitHub) for known export problems. Read only; do not depend on them.
@@ -256,6 +264,7 @@ Starting table. Every float row is a placeholder until step 5 replaces it with m
 - **R6. Spike numbers are from one laptop.** Plan 07 owns the device matrix. If the RTX 5050 result is borderline, the integrated GPU will not be usable for full-length chunks, and plan 07 needs to know early.
 - **R7. Dynamo ONNX export of `scaled_dot_product_attention`** may produce an op ORT Web does not support, depending on the opset. The spike finds out; plan 01 owns the fix.
 - **R8. Python ONNX Runtime is not available on Python 3.15.** It is installed in `.venv313` instead.
+- **R10. On Windows laptops a web page gets the integrated GPU.** Found in step 2: Chrome ignores `powerPreference` on Windows (crbug 369219127), so only a browser switch or the user's Windows graphics setting reaches the discrete GPU. Spike timings on the RTX 5050 therefore describe users who changed that setting. The Intel numbers describe the default. Passed on to plans 06 and 07 in the task list.
 - **R9. The generator repeats two lines of `infer_process`** (`max_chars`, `chunk_text`) to avoid `torchaudio.load`. If upstream changes them, the golden data drifts from upstream silently. The generator asserts that the two lines it copies still appear verbatim in `infer_process`'s source.
 
 ## What the next plans get

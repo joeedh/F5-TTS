@@ -1,6 +1,8 @@
-// Usage: node probe.cjs [variant]   variants: default | swiftshader | vulkan
+// Usage: node probe.cjs [variant]   variants: default | swiftshader | vulkan | high | low
 // Launches Chromium with WebGPU flags, reports adapter info, features, limits,
 // and runs two compute shaders (vector add, 64x64 matmul, f16 if available).
+// Env: PROBE_CHANNEL (chromium | chrome | msedge), PROBE_POWER (high-performance | low-power,
+// passed to requestAdapter), PROBE_HEADED=1 to show the window (headless may not use the GPU).
 const { chromium } = require("playwright");
 const http = require("http");
 
@@ -21,12 +23,23 @@ const VARIANTS = {
     "--use-angle=vulkan",
     "--ignore-gpu-blocklist",
   ],
+  // Windows laptops with two GPUs: Chrome may ignore requestAdapter's powerPreference,
+  // so these force the choice with a switch.
+  high: ["--enable-unsafe-webgpu", "--use-webgpu-power-preference=force-high-performance"],
+  low: ["--enable-unsafe-webgpu", "--use-webgpu-power-preference=force-low-power"],
+  // moves Chrome's whole GPU process to the discrete GPU
+  dgpu: ["--enable-unsafe-webgpu", "--force_high_performance_gpu"],
+  dgpuHigh: [
+    "--enable-unsafe-webgpu",
+    "--force_high_performance_gpu",
+    "--use-webgpu-power-preference=force-high-performance",
+  ],
 };
 
-async function probeInPage() {
-  const out = { hasNavigatorGpu: !!navigator.gpu };
+async function probeInPage(powerPreference) {
+  const out = { hasNavigatorGpu: !!navigator.gpu, requestedPowerPreference: powerPreference || null };
   if (!navigator.gpu) return out;
-  const adapter = await navigator.gpu.requestAdapter();
+  const adapter = await navigator.gpu.requestAdapter(powerPreference ? { powerPreference } : undefined);
   out.adapterFound = !!adapter;
   if (!adapter) return out;
   const info = adapter.info || (adapter.requestAdapterInfo && (await adapter.requestAdapterInfo())) || {};
@@ -160,14 +173,20 @@ async function probeInPage() {
   await new Promise((res) => server.listen(0, "127.0.0.1", res));
   const url = `http://localhost:${server.address().port}/`;
   // channel "chromium" selects the full new-headless build; the default headless shell has no WebGPU.
-  const browser = await chromium.launch({ args, headless: true, channel: process.env.PROBE_CHANNEL || "chromium" });
+  const browser = await chromium.launch({
+    args,
+    headless: process.env.PROBE_HEADED !== "1",
+    channel: process.env.PROBE_CHANNEL || "chromium",
+  });
   const page = await browser.newPage();
   const logs = [];
   page.on("console", (m) => logs.push(m.text()));
   await page.goto(url);
   let result;
-  try { result = await page.evaluate(probeInPage); } catch (e) { result = { error: String(e) }; }
+  try { result = await page.evaluate(probeInPage, process.env.PROBE_POWER || null); } catch (e) { result = { error: String(e) }; }
   result.variant = variant;
+  result.channel = process.env.PROBE_CHANNEL || "chromium";
+  result.headed = process.env.PROBE_HEADED === "1";
   result.browser = browser.version();
   result.chromeGpuLogs = logs.slice(0, 5);
   console.log(JSON.stringify(result, null, 2));

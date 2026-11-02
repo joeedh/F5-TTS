@@ -68,7 +68,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 
 | # | Plan (file to be written) | Depends on | Status |
 |---|---|---|---|
-| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | plan pressure-tested; D1 and D2 decided, step 2 next |
+| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | in progress; steps 1 and 2 done, step 3 (runtime spike) next |
 | 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | plan not written |
 | 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | plan not written |
 | 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | plan not written |
@@ -145,12 +145,13 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Run inference in a Worker so the UI stays responsive.
 - [ ] Decide on optional reference transcription (transformers.js Whisper) and its cost.
 - [ ] Error handling: no WebGPU, out of memory, download failure.
+- [ ] Detect an integrated GPU (`adapter.info`) and tell the user how to switch the browser to the discrete GPU. On Windows the page cannot ask for it: Chrome ignores `powerPreference` there (found in plan 00 step 2, see `../research/webgpu-laptop.md`).
 
 ### 07 Performance and browser validation
 - [ ] Benchmark script: real-time factor, time to first audio, peak GPU memory.
 - [ ] Profile per-step cost; find the slowest ops (attention, convs).
 - [ ] Optimisations: step count (EPSS 16 steps), batching the CFG pair, sequence bucketing.
-- [ ] Browser and device matrix: Chrome, Edge, Safari, Firefox; desktop GPU, integrated GPU, mobile.
+- [ ] Browser and device matrix: Chrome, Edge, Safari, Firefox; desktop GPU, integrated GPU, mobile. On Windows laptops the integrated GPU is what a page gets by default, so it is the main case, not the fallback.
 - [ ] Record limits and known failures in [../debugging.md](../debugging.md).
 
 ## Open questions
