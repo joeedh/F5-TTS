@@ -1,0 +1,776 @@
+{
+  "adapter": {
+    "vendor": "intel",
+    "architecture": "xe-3lpg",
+    "description": "",
+    "features": ["core-features-and-limits", "shader-f16", "subgroup-size-control", "subgroups", "timestamp-query"],
+    "maxBufferSize": 2147483648,
+    "maxStorageBufferBindingSize": 2147483644
+  },
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36 Edg/157.0.0.0",
+  "ortVersion": {
+    "common": "1.31.1",
+    "web": "1.31.1"
+  },
+  "results": [
+    {
+      "name": "block_n256",
+      "file": "block_n256.onnx",
+      "kind": "block",
+      "n": 256,
+      "createMs": 218.90000000223517,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 15:59:35.987399 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 15:59:35.987999 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 15:59:36.011999 [V:onnxruntime:, graph_transformer_mgr.cc:49 ApplyTransformers] Skipping graph transformer TransposeOptimizer_CPUExecutionProvider on step 2 because it should only apply once.",
+        "2026-11-18 15:59:36.049999 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 15:59:36.050299 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 88"
+      ],
+      "logLineCount": 300,
+      "correctness": {
+        "relL2": 4.560520612228106e-7,
+        "maxAbs": 0.0000762939453125,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 18.300000000745058,
+        "min": 15.399999998509884,
+        "max": 24.699999999254942
+      },
+      "gflops": 498.7325411818806,
+      "chainFinite": true,
+      "chain22Ms": {
+        "median": 294.69999999925494,
+        "min": 274.79999999701977,
+        "max": 322.19999999925494
+      },
+      "projected": {
+        "stepMs": 294.69999999925494,
+        "genS": 9.430399999976158,
+        "newAudioS": -2.4693333333333336,
+        "rtf": null
+      }
+    },
+    {
+      "name": "block_n256",
+      "file": "block_n256_fp16.onnx",
+      "kind": "block",
+      "n": 256,
+      "createMs": 165.39999999850988,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 15:59:38.930599 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 15:59:38.931399 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 15:59:38.975099 [V:onnxruntime:, graph_transformer_mgr.cc:49 ApplyTransformers] Skipping graph transformer TransposeOptimizer_CPUExecutionProvider on step 2 because it should only apply once.",
+        "2026-11-18 15:59:39.007399 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 15:59:39.007699 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 92"
+      ],
+      "logLineCount": 300,
+      "correctness": {
+        "relL2": 0.01066115888978316,
+        "maxAbs": 1.1381263732910156,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 34.400000002235174,
+        "min": 28.299999997019768,
+        "max": 40.30000000074506
+      },
+      "gflops": 265.314113471133,
+      "chainFinite": true,
+      "chain22Ms": {
+        "median": 622.8000000007451,
+        "min": 564.6999999992549,
+        "max": 673.3000000007451
+      },
+      "projected": {
+        "stepMs": 622.8000000007451,
+        "genS": 19.929600000023843,
+        "newAudioS": -2.4693333333333336,
+        "rtf": null
+      }
+    },
+    {
+      "name": "matmul_n256",
+      "file": "matmul_n256.onnx",
+      "kind": "matmul",
+      "n": 256,
+      "createMs": 47.30000000074506,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 15:59:45.609599 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 15:59:45.609699 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 15:59:45.623099 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 15:59:45.623299 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+      ],
+      "logLineCount": 162,
+      "correctness": {
+        "relL2": 5.446951271754142e-7,
+        "maxAbs": 0.0000209808349609375,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 6,
+        "min": 3.899999998509884,
+        "max": 15.699999999254942
+      },
+      "gflops": 357.9139413333333
+    },
+    {
+      "name": "matmul_n256",
+      "file": "matmul_n256_fp16.onnx",
+      "kind": "matmul",
+      "n": 256,
+      "createMs": 34.5,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 15:59:46.404299 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 15:59:46.404399 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 15:59:46.420399 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 15:59:46.420599 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+      ],
+      "logLineCount": 162,
+      "correctness": {
+        "relL2": 0.004283344622014089,
+        "maxAbs": 0.14712238311767578,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 7,
+        "min": 4.100000001490116,
+        "max": 10.400000002235174
+      },
+      "gflops": 306.7833782857143
+    },
+    {
+      "name": "matmul_n256",
+      "file": "wgsl-tiled-matmul",
+      "kind": "wgsl",
+      "n": 256,
+      "correctness": {
+        "relL2": 5.425926727947425e-7,
+        "maxAbs": 0.0000209808349609375,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 5.600000001490116,
+        "min": 2.7999999970197678,
+        "max": 11.300000000745058
+      },
+      "gflops": 383.47922275510206
+    },
+    {
+      "name": "convpos_n256",
+      "file": "convpos_n256.onnx",
+      "kind": "convpos",
+      "n": 256,
+      "createMs": 59,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 15:59:47.632899 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 15:59:47.632999 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 15:59:47.650999 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 15:59:47.651299 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 8"
+      ],
+      "logLineCount": 179,
+      "correctness": {
+        "relL2": 6.886314290309977e-7,
+        "maxAbs": 0.00005340576171875,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 35.899999998509884,
+        "min": 30.199999999254942,
+        "max": 42.30000000074506
+      },
+      "gflops": 115.89831666219226
+    },
+    {
+      "name": "convpos_n256",
+      "file": "convpos_n256_fp16.onnx",
+      "kind": "convpos",
+      "n": 256,
+      "createMs": 57,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 15:59:48.757999 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 15:59:48.758199 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 15:59:48.778899 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 15:59:48.779099 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 10"
+      ],
+      "logLineCount": 181,
+      "correctness": {
+        "relL2": 0.009833672404688798,
+        "maxAbs": 0.45122718811035156,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 25.099999997764826,
+        "min": 20,
+        "max": 30.699999999254942
+      },
+      "gflops": 165.76691507452261
+    },
+    {
+      "name": "convnext_n256",
+      "file": "convnext_n256.onnx",
+      "kind": "convnext",
+      "n": 256,
+      "createMs": 42.399999998509884,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 15:59:49.571599 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 15:59:49.571799 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 15:59:49.585199 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 15:59:49.585399 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 18"
+      ],
+      "logLineCount": 197,
+      "correctness": {
+        "relL2": 7.105279391820829e-7,
+        "maxAbs": 0.0000019073486328125,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 8,
+        "min": 5.699999999254942,
+        "max": 10.5
+      },
+      "gflops": 134.67648
+    },
+    {
+      "name": "convnext_n256",
+      "file": "convnext_n256_fp16.onnx",
+      "kind": "convnext",
+      "n": 256,
+      "createMs": 37.80000000074506,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 15:59:50.090299 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 15:59:50.090299 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 15:59:50.104199 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 15:59:50.104399 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 20"
+      ],
+      "logLineCount": 197,
+      "correctness": {
+        "relL2": 0.0035506380313379826,
+        "maxAbs": 0.01581597328186035,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 8.300000000745058,
+        "min": 6.800000000745058,
+        "max": 10.100000001490116
+      },
+      "gflops": 129.80865541003433
+    },
+    {
+      "name": "block_n1024",
+      "file": "block_n1024.onnx",
+      "kind": "block",
+      "n": 1024,
+      "createMs": 126.09999999776483,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 15:59:50.905999 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 15:59:50.906399 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 15:59:50.923099 [V:onnxruntime:, graph_transformer_mgr.cc:49 ApplyTransformers] Skipping graph transformer TransposeOptimizer_CPUExecutionProvider on step 2 because it should only apply once.",
+        "2026-11-18 15:59:50.952499 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 15:59:50.952999 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 88"
+      ],
+      "logLineCount": 300,
+      "correctness": {
+        "relL2": 4.34655646394125e-7,
+        "maxAbs": 0.00006866455078125,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 68.59999999776483,
+        "min": 65.40000000223517,
+        "max": 72.5
+      },
+      "gflops": 626.0885271341023,
+      "chainFinite": true,
+      "chain22Ms": {
+        "median": 1344.6000000014901,
+        "min": 1342.1000000014901,
+        "max": 1359.199999999255
+      },
+      "projected": {
+        "stepMs": 1344.6000000014901,
+        "genS": 43.027200000047685,
+        "newAudioS": 5.722666666666666,
+        "rtf": 7.518732525637411
+      }
+    },
+    {
+      "name": "block_n1024",
+      "file": "block_n1024_fp16.onnx",
+      "kind": "block",
+      "n": 1024,
+      "createMs": 147.70000000298023,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:00:00.248399 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:00:00.248699 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:00:00.273599 [V:onnxruntime:, graph_transformer_mgr.cc:49 ApplyTransformers] Skipping graph transformer TransposeOptimizer_CPUExecutionProvider on step 2 because it should only apply once.",
+        "2026-11-18 16:00:00.311199 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:00:00.311599 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 92"
+      ],
+      "logLineCount": 300,
+      "correctness": {
+        "relL2": 0.008381275480213956,
+        "maxAbs": 1.1193771362304688,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 45.5,
+        "min": 41.80000000074506,
+        "max": 66.80000000074506
+      },
+      "gflops": 943.9488562637363,
+      "chainFinite": true,
+      "chain22Ms": {
+        "median": 823.1000000014901,
+        "min": 797.1999999992549,
+        "max": 1101.5999999977648
+      },
+      "projected": {
+        "stepMs": 823.1000000014901,
+        "genS": 26.339200000047683,
+        "newAudioS": 5.722666666666666,
+        "rtf": 4.6026095060661145
+      }
+    },
+    {
+      "name": "matmul_n1024",
+      "file": "matmul_n1024.onnx",
+      "kind": "matmul",
+      "n": 1024,
+      "createMs": 38.19999999925494,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:00:07.172699 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:00:07.172999 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:00:07.190399 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:00:07.190699 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+      ],
+      "logLineCount": 162,
+      "correctness": {
+        "relL2": 5.45223141891912e-7,
+        "maxAbs": 0.000034332275390625,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 10.199999999254942,
+        "min": 9.399999998509884,
+        "max": 12.5
+      },
+      "gflops": 842.1504502575932
+    },
+    {
+      "name": "matmul_n1024",
+      "file": "matmul_n1024_fp16.onnx",
+      "kind": "matmul",
+      "n": 1024,
+      "createMs": 34.399999998509884,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:00:07.698699 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:00:07.698799 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:00:07.714299 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:00:07.714399 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+      ],
+      "logLineCount": 162,
+      "correctness": {
+        "relL2": 0.004252683794487538,
+        "maxAbs": 0.1563434600830078,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 9.099999997764826,
+        "min": 7.400000002235174,
+        "max": 11.899999998509884
+      },
+      "gflops": 943.9488564955923
+    },
+    {
+      "name": "matmul_n1024",
+      "file": "wgsl-tiled-matmul",
+      "kind": "wgsl",
+      "n": 1024,
+      "correctness": {
+        "relL2": 5.427737120481801e-7,
+        "maxAbs": 0.0000324249267578125,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 9.300000000745058,
+        "min": 8.5,
+        "max": 11
+      },
+      "gflops": 923.6488807862181
+    },
+    {
+      "name": "convpos_n1024",
+      "file": "convpos_n1024.onnx",
+      "kind": "convpos",
+      "n": 1024,
+      "createMs": 51.100000001490116,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:00:08.742299 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:00:08.742599 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:00:08.758099 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:00:08.758699 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 8"
+      ],
+      "logLineCount": 179,
+      "correctness": {
+        "relL2": 6.927882462684599e-7,
+        "maxAbs": 0.00005340576171875,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 117.89999999850988,
+        "min": 103.5,
+        "max": 152.40000000223517
+      },
+      "gflops": 141.16198704164842
+    },
+    {
+      "name": "convpos_n1024",
+      "file": "convpos_n1024_fp16.onnx",
+      "kind": "convpos",
+      "n": 1024,
+      "createMs": 38.099999997764826,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:00:11.922199 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:00:11.922299 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:00:11.935399 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:00:11.935499 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 10"
+      ],
+      "logLineCount": 181,
+      "correctness": {
+        "relL2": 0.010317555356732623,
+        "maxAbs": 0.4819984436035156,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 74.89999999850988,
+        "min": 69.30000000074506,
+        "max": 85.29999999701977
+      },
+      "gflops": 222.2029141833259
+    },
+    {
+      "name": "convnext_n1024",
+      "file": "convnext_n1024.onnx",
+      "kind": "convnext",
+      "n": 1024,
+      "createMs": 40.19999999925494,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:00:13.927699 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:00:13.927999 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:00:13.943199 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:00:13.943399 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 18"
+      ],
+      "logLineCount": 197,
+      "correctness": {
+        "relL2": 0.000002691836042453409,
+        "maxAbs": 0.000004827976226806641,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 14.800000000745058,
+        "min": 12,
+        "max": 16
+      },
+      "gflops": 291.1923891745301
+    },
+    {
+      "name": "convnext_n1024",
+      "file": "convnext_n1024_fp16.onnx",
+      "kind": "convnext",
+      "n": 1024,
+      "createMs": 38.599999997764826,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:00:14.400699 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:00:14.400899 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:00:14.416199 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:00:14.416399 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 20"
+      ],
+      "logLineCount": 197,
+      "correctness": {
+        "relL2": 0.0035722430641812616,
+        "maxAbs": 0.018213868141174316,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 13.800000000745058,
+        "min": 12.100000001490116,
+        "max": 15.099999997764826
+      },
+      "gflops": 312.29328693966113
+    },
+    {
+      "name": "block_n2048",
+      "file": "block_n2048.onnx",
+      "kind": "block",
+      "n": 2048,
+      "createMs": 95.80000000074506,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:00:15.298699 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:00:15.299099 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:00:15.314199 [V:onnxruntime:, graph_transformer_mgr.cc:49 ApplyTransformers] Skipping graph transformer TransposeOptimizer_CPUExecutionProvider on step 2 because it should only apply once.",
+        "2026-11-18 16:00:15.331899 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:00:15.332199 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 88"
+      ],
+      "logLineCount": 300,
+      "correctness": {
+        "relL2": 4.383979976825077e-7,
+        "maxAbs": 0.000064849853515625,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 613.3999999985099,
+        "min": 448.69999999925494,
+        "max": 1039.4000000022352
+      },
+      "gflops": 168.04567183607824,
+      "chainFinite": true,
+      "chain22Ms": {
+        "median": 11808.10000000149,
+        "min": 10120.400000002235,
+        "max": 12251.60000000149
+      },
+      "projected": {
+        "stepMs": 11808.10000000149,
+        "genS": 377.8592000000477,
+        "newAudioS": 16.645333333333333,
+        "rtf": 22.700608779240287
+      }
+    },
+    {
+      "name": "block_n2048",
+      "file": "block_n2048_fp16.onnx",
+      "kind": "block",
+      "n": 2048,
+      "createMs": 175.69999999925494,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:01:32.410499 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:01:32.411099 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:01:32.431899 [V:onnxruntime:, graph_transformer_mgr.cc:49 ApplyTransformers] Skipping graph transformer TransposeOptimizer_CPUExecutionProvider on step 2 because it should only apply once.",
+        "2026-11-18 16:01:32.457199 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:01:32.457498 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 92"
+      ],
+      "logLineCount": 300,
+      "correctness": {
+        "relL2": 0.008105977059085924,
+        "maxAbs": 0.962158203125,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 304.3999999985099,
+        "min": 273.19999999925494,
+        "max": 438.3999999985099
+      },
+      "gflops": 338.63079863503486,
+      "chainFinite": true,
+      "chain22Ms": {
+        "median": 5923.79999999702,
+        "min": 5721.5,
+        "max": 6512.400000002235
+      },
+      "projected": {
+        "stepMs": 5923.79999999702,
+        "genS": 189.56159999990464,
+        "newAudioS": 16.645333333333333,
+        "rtf": 11.388272989420738
+      }
+    },
+    {
+      "name": "matmul_n2048",
+      "file": "matmul_n2048.onnx",
+      "kind": "matmul",
+      "n": 2048,
+      "createMs": 69.5,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:02:40.898999 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:02:40.899899 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:02:40.921099 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:02:40.922499 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+      ],
+      "logLineCount": 162,
+      "correctness": {
+        "relL2": 5.513249034896005e-7,
+        "maxAbs": 0.00002288818359375,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 18.800000000745058,
+        "min": 17.800000000745058,
+        "max": 20.300000000745058
+      },
+      "gflops": 913.8228288999547
+    },
+    {
+      "name": "matmul_n2048",
+      "file": "matmul_n2048_fp16.onnx",
+      "kind": "matmul",
+      "n": 2048,
+      "createMs": 58.900000002235174,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:02:43.662099 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:02:43.662399 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:02:43.686299 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:02:43.686799 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+      ],
+      "logLineCount": 162,
+      "correctness": {
+        "relL2": 0.004321314001135307,
+        "maxAbs": 0.1624164581298828,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 15.399999998509884,
+        "min": 14.400000002235174,
+        "max": 16.699999999254942
+      },
+      "gflops": 1115.575921146905
+    },
+    {
+      "name": "matmul_n2048",
+      "file": "wgsl-tiled-matmul",
+      "kind": "wgsl",
+      "n": 2048,
+      "correctness": {
+        "relL2": 5.48766029763825e-7,
+        "maxAbs": 0.00002288818359375,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 21.5,
+        "min": 20.699999999254942,
+        "max": 23.800000000745058
+      },
+      "gflops": 799.0636829767443
+    },
+    {
+      "name": "convpos_n2048",
+      "file": "convpos_n2048.onnx",
+      "kind": "convpos",
+      "n": 2048,
+      "createMs": 77.19999999925494,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:02:48.440599 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:02:48.440799 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:02:48.460099 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:02:48.460399 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 8"
+      ],
+      "logLineCount": 179,
+      "correctness": {
+        "relL2": 7.071413940893811e-7,
+        "maxAbs": 0.00005340576171875,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 208.09999999776483,
+        "min": 200,
+        "max": 220.5
+      },
+      "gflops": 159.95192957403904
+    },
+    {
+      "name": "convpos_n2048",
+      "file": "convpos_n2048_fp16.onnx",
+      "kind": "convpos",
+      "n": 2048,
+      "createMs": 67.40000000223517,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:02:54.435499 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:02:54.435699 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:02:54.456399 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:02:54.456599 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 10"
+      ],
+      "logLineCount": 181,
+      "correctness": {
+        "relL2": 0.010636357045216755,
+        "maxAbs": 0.4507255554199219,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 142.5,
+        "min": 135.10000000149012,
+        "max": 153.79999999701977
+      },
+      "gflops": 233.58594065964914
+    },
+    {
+      "name": "convnext_n2048",
+      "file": "convnext_n2048.onnx",
+      "kind": "convnext",
+      "n": 2048,
+      "createMs": 75.10000000149012,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:02:58.582499 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:02:58.582699 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:02:58.610099 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:02:58.610399 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 18"
+      ],
+      "logLineCount": 197,
+      "correctness": {
+        "relL2": 0.0000063536562405591564,
+        "maxAbs": 0.000013202428817749023,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 29,
+        "min": 25.5,
+        "max": 30.899999998509884
+      },
+      "gflops": 297.2170593103448
+    },
+    {
+      "name": "convnext_n2048",
+      "file": "convnext_n2048_fp16.onnx",
+      "kind": "convnext",
+      "n": 2048,
+      "createMs": 87.89999999850988,
+      "sameDevice": true,
+      "placementLog": [
+        "2026-11-18 16:03:00.830499 [V:onnxruntime:, graph_transformer_mgr.cc:55 ApplyTransformers] Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+        "2026-11-18 16:03:00.830899 [I:onnxruntime:, graph_transformer.cc:15 Apply] GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+        "2026-11-18 16:03:00.862499 [V:onnxruntime:, session_state.cc:1578 VerifyEachNodeIsAssignedToAnEp] Node placements",
+        "2026-11-18 16:03:00.862899 [V:onnxruntime:, session_state.cc:1581 VerifyEachNodeIsAssignedToAnEp]  All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 20"
+      ],
+      "logLineCount": 197,
+      "correctness": {
+        "relL2": 0.0032335242835418144,
+        "maxAbs": 0.021280288696289062,
+        "nonFinite": 0
+      },
+      "runMs": {
+        "median": 26.699999999254942,
+        "min": 22.600000001490116,
+        "max": 31.800000000745058
+      },
+      "gflops": 322.8200269753004
+    }
+  ],
+  "gpuErrors": [],
+  "channel": "msedge",
+  "gpuFlag": "intel",
+  "browserVersion": "157.0.4341.60",
+  "wallS": 207.184,
+  "pageErrors": []
+}

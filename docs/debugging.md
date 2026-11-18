@@ -2,6 +2,21 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-18: onnxruntime-web on WebGPU (plan 00, step 3)
+
+- **ORT ignores a `GPUDevice` you give it.** In onnxruntime-web 1.31.1, setting `ort.env.webgpu.device = myDevice` before the first session has no effect. ORT creates its own device and writes it back to `env.webgpu.device`.
+  - Symptom: inputs made with `ort.Tensor.fromGpuBuffer` on your own device fail in `session.run` with `WebGPU error scope failed ... [Buffer (unlabeled)] is associated with [Device], and cannot be used with [Device]`, inside `CreateBindGroup` of the first kernel.
+  - Fix: create a session first, then `const device = await ort.env.webgpu.device`, and make every shared buffer on that device. `web/spikes/ort-block/main.ts` (`ortDevice`) does this.
+- **ORT destroys its device when the last session is released.**
+  - Symptom: after `session.release()` on the only open session, the next run fails with `[Invalid Buffer (unlabeled)] ...`, and your own WebGPU work fails with `The Device was lost before mapping was resolved`.
+  - Fix: keep one session open for as long as the device is needed.
+- **Checking node placement.** Create the session with `logSeverityLevel: 0` and set `ort.env.logLevel = "verbose"`. ORT then logs `Node placements` followed by `All nodes placed on [WebGpuExecutionProvider]. Number of nodes: N`, or a list per provider. `GraphTransformer MemcpyTransformer modified: 0` means no GPU/CPU copy nodes were inserted.
+  - The verbose log is about 7 MB for 24 sessions.
+  - Vite 8 forwards the page console to the terminal by default. Pass `server: { forwardConsole: false }` when driving the page from a script.
+- **fp16 models are much less accurate on the WebGPU EP than on the CPU EP.** The same `convert_float_to_float16` model of one (2048, 1024) x (1024, 2048) MatMul gives relative L2 4.3e-3 on WebGPU and 1.5e-4 on ORT CPU. This looks like fp16 accumulation (not checked in ORT's source).
+  - When comparing an fp16 port against PyTorch, check the plain MatMul first, before suspecting your own graph.
+  - Numbers are in `docs/research/webgpu-runtime-spike.md`.
+
 ## 2026-11-02: audio loading and FFmpeg on the Windows laptop
 
 - **`torchaudio.load` fails because torchcodec has no Python 3.15 wheel, not because FFmpeg is missing.** torchaudio 2.11.1 loads through torchcodec. `pip` found no torchcodec wheel for cp315 and installed `torchcodec 0.0.0.dev0`, a placeholder whose `__init__.py` only prints `Stay tuned...`, so `torchaudio.load` raises `ImportError: TorchCodec is required for load_with_torchcodec`. That is the same error with or without FFmpeg on PATH. A real wheel exists for Python 3.13 on Windows (`torchcodec-0.17.0-cp313-cp313-win_amd64.whl`). This corrects the earlier note above, which blamed "torchcodec with FFmpeg".

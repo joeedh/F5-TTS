@@ -7,6 +7,7 @@
 | [debugging.md](debugging.md) | Running log of bugs and diagnosis tips; first entries are gotchas found while checking the architecture doc |
 | [research/webgpu-environment.md](research/webgpu-environment.md) | WebGPU in this cloud container: software only (SwiftShader); probe results and what they mean for the port |
 | [research/webgpu-laptop.md](research/webgpu-laptop.md) | WebGPU on the Windows laptop (RTX 5050 + Intel iGPU): adapter limits, and how to get the discrete GPU (`--force_high_performance_gpu`) |
+| [research/webgpu-runtime-spike.md](research/webgpu-runtime-spike.md) | Plan 00 step 3: ORT Web vs hand-written WGSL on one DiT block; D3 decided for ORT Web; fp16 accuracy and attention-cost findings |
 | [plans/webgpu-port-tasks.md](plans/webgpu-port-tasks.md) | Task list: Python typing/tooling plan (pyright) and the WebGPU port plans |
 | [plans/webgpu-00-scope-and-parity.md](plans/webgpu-00-scope-and-parity.md) | WebGPU plan 00: scope, ORT Web vs WGSL spike, golden-data generator, tolerances, parity runner |
 

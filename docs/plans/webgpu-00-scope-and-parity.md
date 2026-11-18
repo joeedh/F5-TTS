@@ -1,6 +1,6 @@
 # Plan 00: scope, runtime decision and parity harness
 
-Status: `plan pressure-tested` (drafted and reviewed 2026-11-02; findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; step 1 is done. Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
+Status: `plan pressure-tested` (drafted and reviewed 2026-11-02; findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; steps 1 and 2 done 2026-11-02; step 3 done 2026-11-18 (D3: ORT Web). Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
 
 Task list: [webgpu-port-tasks.md](webgpu-port-tasks.md). Model details: [../architecture.md](../architecture.md).
 
@@ -47,9 +47,18 @@ This is the task list's open question "exact numerical match, or only equal audi
 - Bit-exact or sample-exact audio is not a goal.
 - The port does not have to reproduce PyTorch's random numbers. Noise is an input: tests inject the golden noise, real use draws its own.
 
-### D3. Runtime: ORT Web or hand-written WGSL
+### D3. Runtime: ORT Web or hand-written WGSL (decided 2026-11-18: ORT Web)
 
-Settled by the spike in step 3. Default is ORT Web. Criteria, measured on the RTX 5050 in Chrome (launched with `--force_high_performance_gpu`; see R10):
+**Decided: ORT Web** (onnxruntime-web 1.31.1, `webgpu` EP). Measured in step 3; full results are in [../research/webgpu-runtime-spike.md](../research/webgpu-runtime-spike.md).
+- Criterion 1: every node of every spike model was placed on WebGPU, and no copies were inserted.
+- Criterion 2: fp32 relative L2 at most 8e-7 on the block.
+- Criterion 3: projected RTF 2.31 at n = 1024 (Chrome, RTX 5050).
+- Criterion 4: fp16 runs, but with relative L2 about 8e-3 against PyTorch. That is 20 to 30 times worse than ORT CPU fp16; plan 05 must deal with it.
+- Criterion 5: the Intel GPU is correct, at RTF 7.3 in fp32 and 4.2 in fp16.
+- ORT's MatMul matches the hand-written WGSL tiled matmul (0.8x to 1.5x of its time), so the "more than 2 times slower" rule does not apply.
+- Also found: attention exports unfused and dominates at n = 2048, especially on Intel. This goes to plan 01.
+
+Default was ORT Web. Criteria, measured on the RTX 5050 in Chrome (launched with `--force_high_performance_gpu`; see R10):
 1. **Placement.** No compute op of the block runs on the CPU, and no activation tensor is copied from GPU to CPU inside the block. Shape-only nodes (Shape, Gather or Reshape on shape tensors) placed on the CPU by ORT on purpose do not count.
 2. **Correctness.** fp32 output matches PyTorch fp32 within relative L2 1e-4 (replaced by the step 5 DiT tolerance once it exists).
 3. **Speed.** Projected real-time factor (generation time divided by seconds of new audio) of at most 5 in fp32 for a 1024-frame chunk (about 10.9 s in total, about 5.7 s of it new audio after a 5.2 s reference). Projection: run the block session 22 times in a row with inputs and outputs kept on the GPU (`preferredOutputLocation: "gpu-buffer"`), so per-run overhead is included, then multiply by 32 steps. RTF 5 is the "usable but slow" bar; the fp16 RTF is recorded as the number plan 05 tries to improve.
@@ -219,6 +228,11 @@ Starting table. Every float row is a placeholder until step 5 replaces it with m
 - Driven by a Playwright script so results come back as JSON; run on both GPUs, in Chrome and Edge.
 - Write the results and the decision into `docs/research/webgpu-runtime-spike.md` (add to the index) and into D3 above.
 - Done when: D3 is decided with numbers against each criterion.
+- **Done 2026-11-18.** D3 is decided (ORT Web), with numbers in [../research/webgpu-runtime-spike.md](../research/webgpu-runtime-spike.md). Notes:
+  - The spike data lives in `web/spikes/ort-block/public/data/` (gitignored, about 600 MB) and is rebuilt with `spike_export.py`. Result JSON for the four browser/GPU runs is committed in `web/spikes/ort-block/results/`.
+  - Chrome and Edge updated to 157 between steps 2 and 3.
+  - ORT Web 1.31.1 ignores a `GPUDevice` set on `env.webgpu.device` and destroys its own device when the last session is released. The spike works around both (see `docs/debugging.md`, 2026-11-18).
+  - Exported attention is unfused (MatMul, Softmax, MatMul), and fp16 on the WebGPU EP is much less accurate than on CPU. Both are passed on to plans 01 and 05; see "What the next plans get".
 
 ### Step 4. Test scaffolding and golden generator
 - `web/`: scripts `typecheck`, `test`, `test:browser`; one passing Vitest test and one Playwright test that only checks `navigator.gpu`.
@@ -269,11 +283,12 @@ Starting table. Every float row is a placeholder until step 5 replaces it with m
 
 ## What the next plans get
 
-- Plan 01: block-level export experience from the spike, the `dit` and `dit_internal` golden data (per-block outputs to bisect with), the DiT tolerance, `parity.py`.
+- Plan 01: block-level export experience from the spike, including that dynamo exports attention unfused and that this dominates block time at n = 2048 (try a fused attention op the WebGPU EP supports), the `dit` and `dit_internal` golden data (per-block outputs to bisect with), the DiT tolerance, `parity.py`.
 - Plan 02: `prep`, `audio`, `mel`, `vocoder` golden data and tolerances, including the `en-prep` case for resampling and RMS handling, and the browser loader.
 - Plan 03: `text` golden data for the cases, including Chinese with polyphones. Plan 03 will need a much larger text corpus; this plan does not build it.
 - Plan 04: `plan`, `noise`, `dit`, `mel_out`, `final` golden data, the off-by-one crop (`ref_audio_len` versus n_ref), the free-running tolerance, and the open task of a metric-based quality check.
-- Plans 05 and 07: the measurement method for fp16 tolerances, the laptop GPU facts, and the spike timings.
+- Plans 05 and 07: the measurement method for fp16 tolerances, the laptop GPU facts, and the spike timings. Plan 05 also gets the fp16 accuracy problem on the WebGPU EP (relative L2 4e-3 for a lone K = 1024 MatMul, 30 times ORT CPU fp16), and plan 07 gets the slow grouped conv in `conv_pos_embed` (about 7 percent of a step).
+- Plan 06: ORT Web's device handling (keep one session alive; share buffers only through `await ort.env.webgpu.device`).
 
 ## Pressure test, 2026-11-02
 
