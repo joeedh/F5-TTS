@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:browser": "playwright test",
+    "test:browser-local": "playwright test -c playwright.local.config.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

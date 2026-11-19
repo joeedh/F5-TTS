@@ -34,19 +34,20 @@
       "text_cond",
       "text_uncond"
     ],
-    "export_s": 1.8
+    "export_s": 1.4
   },
   "step": {
     "opset": {
       "ai.onnx": 20
     },
-    "nodes": 212,
+    "nodes": 213,
     "ops": {
       "Add": 35,
       "Concat": 14,
       "Conv": 2,
-      "Cos": 2,
+      "Cos": 1,
       "Expand": 1,
+      "Gather": 2,
       "Gelu": 2,
       "Gemm": 5,
       "LayerNormalization": 5,
@@ -54,17 +55,17 @@
       "Mish": 2,
       "Mul": 27,
       "Neg": 4,
-      "Reshape": 21,
+      "Reshape": 20,
       "Shape": 4,
       "Sigmoid": 2,
-      "Sin": 2,
+      "Sin": 1,
       "Slice": 17,
       "Softmax": 2,
       "Split": 3,
       "Squeeze": 8,
       "Sub": 1,
       "Transpose": 12,
-      "Unsqueeze": 23
+      "Unsqueeze": 25
     },
     "inputs": [
       "x",
@@ -80,19 +81,20 @@
       "v",
       "x_next"
     ],
-    "export_s": 2.0
+    "export_s": 1.8
   },
   "step_debug": {
     "opset": {
       "ai.onnx": 20
     },
-    "nodes": 214,
+    "nodes": 215,
     "ops": {
       "Add": 35,
       "Concat": 14,
       "Conv": 2,
-      "Cos": 2,
+      "Cos": 1,
       "Expand": 1,
+      "Gather": 2,
       "Gelu": 2,
       "Gemm": 5,
       "LayerNormalization": 5,
@@ -100,17 +102,17 @@
       "Mish": 2,
       "Mul": 27,
       "Neg": 4,
-      "Reshape": 21,
+      "Reshape": 20,
       "Shape": 4,
       "Sigmoid": 2,
-      "Sin": 2,
+      "Sin": 1,
       "Slice": 19,
       "Softmax": 2,
       "Split": 3,
       "Squeeze": 8,
       "Sub": 1,
       "Transpose": 12,
-      "Unsqueeze": 23
+      "Unsqueeze": 25
     },
     "inputs": [
       "x",
@@ -132,7 +134,7 @@
       "block01",
       "norm_out"
     ],
-    "export_s": 2.2
+    "export_s": 2.0
   },
   "heads": 2,
   "text_dim": 64,

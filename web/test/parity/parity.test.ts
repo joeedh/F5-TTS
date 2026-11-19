@@ -3,7 +3,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
-import { fsReader, loadCase, loadTolerances, type GoldenCase, type Tolerances } from "./case";
+import { fsReader, loadCase, loadTolerances, xNextGolden, type GoldenCase, type Tolerances } from "./case";
 import { checksFor, compare, report, type Result } from "./compare";
 import { parseNpy, toArrayBuffer, type Tensor } from "./npy";
 
@@ -56,6 +56,27 @@ describe("checksFor", () => {
     for (const check of names.flatMap(checksFor)) {
       if (check !== "exact") expect(tolerances.checks).toHaveProperty([check]);
     }
+  });
+});
+
+describe("xNextGolden", () => {
+  it("is the next step's x before the last step", async () => {
+    const { start, ref } = await xNextGolden(golden, 0, 0);
+    expect(start).toBe(0);
+    expect(ref).toBe(await golden.tensor("c0.dit.s01.x"));
+  });
+
+  it("is mel_out on the generated frames after the last step", async () => {
+    const nfe = golden.manifest.settings.nfe_step as number;
+    const n = (golden.manifest.chunks[0] as { duration: number }).duration;
+    const nRef = (golden.manifest.mel as { n_ref: number }).n_ref;
+    const { start, ref } = await xNextGolden(golden, 0, nfe - 1);
+    expect(start).toBe(nRef);
+    expect(ref.shape).toEqual([1, n - nRef, 100]);
+    // frame 0 of ref is mel_out frame (n_ref - ref_audio_len); mel_out is (1, 100, frames)
+    const mel = await golden.tensor("c0.mel_out");
+    const off = nRef - (golden.manifest.chunks[0] as { ref_audio_len: number }).ref_audio_len;
+    expect(ref.data[1]).toBe(mel.data[1 * (mel.shape[2] ?? 0) + off]);
   });
 });
 
@@ -128,19 +149,23 @@ const REAL = ["en-short", "zh-short", "en-multi", "en-multi-fixdur", "en-prep", 
 const dumped = REAL.filter((c) => existsSync(join(ROOT, c, "cuda")));
 
 describe.skipIf(dumped.length === 0)("smoke: CUDA rerun as a port", () => {
-  it.each(dumped)("%s passes", async (caseName) => {
-    const read = await fsReader(ROOT);
-    const g = await loadCase(read, caseName);
-    const { readFile } = await import("node:fs/promises");
-    const results: Result[] = [];
-    for (const file of readdirSync(join(ROOT, caseName, "cuda"))) {
-      const name = file.replace(/\.npy$/, "");
-      if (checksFor(name).length === 0) continue;
-      const t = parseNpy(toArrayBuffer(await readFile(join(ROOT, caseName, "cuda", file))));
-      results.push(...(await compare(g, tolerances, name, t)));
-    }
-    const r = report(results);
-    expect(r.failed, r.text).toBe(0);
-    expect(results.length).toBeGreaterThan(50);
-  });
+  it.each(dumped)(
+    "%s passes",
+    async (caseName) => {
+      const read = await fsReader(ROOT);
+      const g = await loadCase(read, caseName);
+      const { readFile } = await import("node:fs/promises");
+      const results: Result[] = [];
+      for (const file of readdirSync(join(ROOT, caseName, "cuda"))) {
+        const name = file.replace(/\.npy$/, "");
+        if (checksFor(name).length === 0) continue;
+        const t = parseNpy(toArrayBuffer(await readFile(join(ROOT, caseName, "cuda", file))));
+        results.push(...(await compare(g, tolerances, name, t)));
+      }
+      const r = report(results);
+      expect(r.failed, r.text).toBe(0);
+      expect(results.length).toBeGreaterThan(50);
+    },
+    120_000,
+  ); // hundreds of .npy files per case; the default 5 s is too short
 });

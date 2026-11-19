@@ -4,12 +4,13 @@
 // Each scenario runs in a new page of one persistent profile, so the second "url" run can use the HTTP
 // cache and the second "cache" run reads Cache Storage. Memory is sampled from outside (sample-memory.ps1).
 import { spawn } from "node:child_process";
-import { createReadStream, mkdirSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { dirname, join, normalize } from "node:path";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { createServer } from "vite";
+import { serveData } from "../../serve-data.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, "../../..");
@@ -27,36 +28,11 @@ const withText = !argv.includes("--no-text");
 const tag = arg("tag", `${channel}-${gpu}-${attention}`);
 const roots = { "/model/": join(repo, "build/webgpu/dit/base"), "/golden/": join(repo, "testdata/webgpu") };
 
-// Serves the model and golden folders with a length and a cache lifetime, so the HTTP cache may keep them
-const serveData = {
-  name: "serve-data",
-  configureServer(server) {
-    server.middlewares.use((req, res, next) => {
-      const url = decodeURIComponent((req.url ?? "").split("?")[0]);
-      const prefix = Object.keys(roots).find((p) => url.startsWith(p));
-      if (!prefix) return next();
-      const file = normalize(join(roots[prefix], url.slice(prefix.length)));
-      if (!file.startsWith(roots[prefix])) return next();
-      let size;
-      try {
-        size = statSync(file).size;
-      } catch {
-        res.statusCode = 404;
-        return res.end();
-      }
-      res.setHeader("Content-Length", size);
-      res.setHeader("Content-Type", "application/octet-stream");
-      res.setHeader("Cache-Control", "max-age=86400");
-      createReadStream(file).pipe(res);
-    });
-  },
-};
-
 const server = await createServer({
   root: here,
   configFile: false,
   logLevel: "warn",
-  plugins: [serveData],
+  plugins: [serveData(roots)],
   server: { port: 0, host: "127.0.0.1", forwardConsole: false, fs: { allow: [join(here, "../..")] } },
   optimizeDeps: { exclude: ["onnxruntime-web"] },
 });

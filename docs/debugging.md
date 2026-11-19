@@ -2,6 +2,20 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-19: rotary cos and sin lose precision on the NVIDIA GPU (plan 01, step 3)
+
+- **Symptom:** the DiT step graph on WebGPU failed `dit.v` and `dit.out` narrowly (relative L2 1.1e-4 to 1.4e-4 against 1e-4) on the RTX 5050, at steps 0 to 4 of a chunk only. The Intel GPU passed. The median error was 2 to 10 percent of the tolerance.
+- **Not:**
+  - A uniformly noisier backend: at the failing steps the error was 30 to 40 times the CUDA floor at the same steps, elsewhere about 2 times.
+  - The attention kernel: fused (`mha`) and unfused attention gave identical errors to three digits.
+  - LayerNorm's one-pass variance: every row's mean was under 0.15 of its spread.
+- **Cause:** rotary embedding computed `cos` and `sin` of angles up to about 1,900 radians (position times frequency) in the graph. The NVIDIA GPU's shader `cos`/`sin` are inaccurate for arguments that large: Q and K after rotary were 5.8e-5 off where the projections were 4.9e-7. Where attention is sharp (logits up to 294, top two scores 0.22 apart; block 4 at step 0), that error grows to 4.4e-4 at the attention output, and later blocks carry it.
+- **Fix:** `export_dit.py` precomputes the cos and sin tables in float64 (`rope_tables`) and swaps upstream's `_apply_rope` for `rope_from_tables` during export only (`precomputed_rope`). The graph keeps one `Cos` and one `Sin`, for the time embedding, whose arguments stay below 1,000. Block 4's output error on NVIDIA went from 1.3e-4 to 1.8e-6 (Intel 1.75e-6, CPU 1.2e-6).
+- **Diagnose:**
+  - Run the browser check with the debug graph (`DIT_DEBUG=1` in `test/browser-local/dit.spec.ts`) to find the first failing block.
+  - Then `tools/webgpu/probe_block.py --block N` exports that block with every intermediate as an output. `web/bench/block-probe/run.mjs --gpu nvidia|intel` compares them with a float64 reference.
+  - Any in-graph `Sin`, `Cos` or `Exp` of a large argument is a suspect on this GPU.
+
 ## 2026-11-19: pyright passes locally but fails in CI on onnxruntime code
 
 - **Symptom:** `pyright` reports 0 errors locally, but the typecheck job fails on `check_dit_ort.py` (`SparseTensor` has no `__getitem__`, and similar).

@@ -145,18 +145,34 @@ export async function compare(
       m = metrics(Float64Array.from(actual.data, Math.exp), Float64Array.from(ref.data, Math.exp));
     else if (check === "vocoder.stft_complex") m = metrics(complexStft(actual), complexStft(ref));
     else m = metrics(actual.data, ref.data);
-    const shared = tolerances.checks[check];
-    if (!shared) throw new Error(`no tolerance for ${check} in tolerances.json`);
-    // the tiny case has its own tolerance where its floor is higher than the real cases' (plan 00, R5)
-    const tol: CheckTolerance = golden.name === "tiny" && shared.tiny ? { ...shared, ...shared.tiny } : shared;
-    const tolerance = { relL2: tol.rel_l2, maxAbs: tol.max_abs };
-    // near-zero golden: relative L2 is undefined, so max abs decides, against the rel_l2 value if there is no max_abs
-    const absLimit = tol.max_abs ?? (m.relL2 === null ? tol.rel_l2 : undefined);
-    const okAbs = absLimit === undefined || m.maxAbs <= absLimit;
-    const okRel = tol.rel_l2 === undefined || m.relL2 === null || m.relL2 <= tol.rel_l2;
-    const pass = !Number.isNaN(m.maxAbs) && okAbs && okRel;
-    return { ...base, check, pass: pass || informational, informational, metrics: m, tolerance };
+    return judge(golden, tolerances, entry.stage, name, check, m);
   });
+}
+
+/**
+ * Applies a check's tolerance to measured metrics. Also used for values derived from golden tensors
+ * (plan 01's dit.v and dit.x_next), which have no golden tensor of their own. Python: parity.judge.
+ */
+export function judge(
+  golden: GoldenCase,
+  tolerances: Tolerances,
+  stage: string,
+  name: string,
+  check: string,
+  m: Metrics,
+): Result {
+  const informational = INFORMATIONAL.has(check);
+  const shared = tolerances.checks[check];
+  if (!shared) throw new Error(`no tolerance for ${check} in tolerances.json`);
+  // the tiny case has its own tolerance where its floor is higher than the real cases' (plan 00, R5)
+  const tol: CheckTolerance = golden.name === "tiny" && shared.tiny ? { ...shared, ...shared.tiny } : shared;
+  const tolerance = { relL2: tol.rel_l2, maxAbs: tol.max_abs };
+  // near-zero golden: relative L2 is undefined, so max abs decides, against the rel_l2 value if there is no max_abs
+  const absLimit = tol.max_abs ?? (m.relL2 === null ? tol.rel_l2 : undefined);
+  const okAbs = absLimit === undefined || m.maxAbs <= absLimit;
+  const okRel = tol.rel_l2 === undefined || m.relL2 === null || m.relL2 <= tol.rel_l2;
+  const pass = !Number.isNaN(m.maxAbs) && okAbs && okRel;
+  return { stage, name, check, pass: pass || informational, informational, metrics: m, tolerance };
 }
 
 function fmt(x: number | null | undefined): string {

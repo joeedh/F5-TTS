@@ -95,6 +95,7 @@ The spike's export was unfused (MatMul, Softmax, MatMul). It writes out a (2, 16
 - `RotaryEmbedding.forward_from_seq_len(n)` gives freqs (1, n, 64) from `arange(n)` and fixed inverse frequencies.
 - Computing it in the graph needs an int64 `Range(n)`, then a cast. With a dynamic n, that chain is likely to land on the CPU (`WebGPU EP enable int64: 0` in the spike's log) and to add a (1, n, 64) copy.
 - Proposal: precompute the table for 8192 positions as a constant (8192 x 64 fp32, 2 MB), and slice it to n, the same pattern as `freqs_cis`. If the dynamic Slice still drags a copy in, fall back to the spike's approach: freqs as a graph input built in JS.
+- Revised in step 3 (2026-11-19): the constant holds cos and sin of the angles (8192 x 64 x 2, computed in float64), not the angles. The angles reach about 1,900 radians at n = 1913, and the NVIDIA GPU's shader cos/sin lose precision there; see `docs/debugging.md`. The exporter swaps upstream's `_apply_rope` for a table lookup during export only.
 
 ### D5. Weights (proposal: fp32 external data; shard before anything else)
 
@@ -186,6 +187,22 @@ The spike's export was unfused (MatMul, Softmax, MatMul). It writes out a (2, 16
   - The real cases run in a local-only Playwright script, `web/test/browser-local/` (skipped where the ONNX files and golden data are absent). It checks every step of every chunk against `dit.out`, `dit.v` and `dit.x_next` on both GPUs.
 - Placement: the criterion above, read from the ORT log.
 - Done when: the tiny test passes in CI, and the real cases pass on both laptop GPUs with the unfused baseline graph.
+- Result, 2026-11-19:
+  - Code:
+    - `web/src/dit/` (`DiT`: `create`, `embedText`, `step`, `release`).
+    - `web/test/dit/run-parity.ts`, the teacher-forced browser twin of `check_dit_ort.py`. It also parses node placement from ORT's verbose log and reports each check's error as a fraction of its tolerance.
+    - `test/browser/dit-tiny.spec.ts` (CI).
+    - `test/browser-local/dit.spec.ts` (`npm run test:browser-local`, with `PW_GPU`, `DIT_ATTENTION`, `DIT_CASES`, `DIT_DEBUG` and `DIT_MAX_STEPS`).
+    - `web/vite.config.ts` serves `testdata/webgpu/` and `build/webgpu/dit/` to the dev server.
+    - The TypeScript runner gained `judge` and `xNextGolden`, twins of the Python ones.
+  - The first run failed narrowly on the NVIDIA GPU only, at the first steps of each chunk. The cause was in-graph rotary cos/sin; D4 is revised and `docs/debugging.md` has the bisection. The exports now carry precomputed cos/sin tables.
+  - After the fix, unfused, every step of every chunk:
+    - NVIDIA: all 1,228 comparisons pass across the 6 real cases. Worst `dit.v` is at 9 percent of its tolerance, worst `dit.out` at 5 percent.
+    - Intel: all 1,228 pass; worst at 7.5 percent.
+    - ORT CPU (`check_dit_ort.py --debug`, re-exported graphs): all 1,586 pass. The tiny graphs pass in all three attention forms.
+  - Placement (tiny step graph): 10 nodes on the CPU, all int64 `Slice` and `Concat` on shapes (checked in the graph), `MemcpyTransformer` modified 0. That meets the criterion. The test fails on any other op type on the CPU.
+  - Step time with the unfused graph, including reading back pred, v and x_next every step, is about 1.3 s on NVIDIA and 4 to 5 s on Intel at n near 2000. Step 4 does the real timing.
+  - Not rerun after the fix: `mha` and `onnx23` on the real cases, in the browser and on the CPU. Step 4 runs every candidate through this runner anyway.
 
 ### Step 4. Attention and sequence-length variants (D2, D3)
 

@@ -12,7 +12,18 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
-  "include": ["src", "test", "spikes", "bench", "vitest.config.ts", "playwright.config.ts"]
+  "include": [
+    "src",
+    "test",
+    "spikes",
+    "bench",
+    "vitest.config.ts",
+    "vite.config.ts",
+    "serve-data.ts",
+    "playwright.config.ts",
+    "playwright.local.config.ts"
+  ]
 }

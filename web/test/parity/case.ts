@@ -88,6 +88,26 @@ export class GoldenCase {
   }
 }
 
+/**
+ * The golden value of the Euler update after step `s` of chunk `c`, and the first frame to compare.
+ * Before the last step it is the next step's x. After it, it is mel_out on the generated frames:
+ * mel_out starts at ref_audio_len = samples / 256, but cond covers n_ref = that + 1 frames, so its
+ * first frame is the reference's last (cfm.py:235). Python twin: parity.x_next_golden.
+ */
+export async function xNextGolden(golden: GoldenCase, c: number, s: number): Promise<{ start: number; ref: Tensor }> {
+  const nfe = golden.manifest.settings.nfe_step as number;
+  if (s + 1 < nfe) return { start: 0, ref: await golden.tensor(`c${c}.dit.s${String(s + 1).padStart(2, "0")}.x`) };
+  const refLen = (golden.manifest.chunks[c] as { ref_audio_len: number }).ref_audio_len;
+  const nRef = (golden.manifest.mel as { n_ref: number }).n_ref;
+  const mel = await golden.tensor(`c${c}.mel_out`); // (1, 100, frames)
+  const [, d = 0, frames = 0] = mel.shape;
+  const off = nRef - refLen;
+  const data = new Float32Array((frames - off) * d);
+  for (let f = off; f < frames; f++)
+    for (let k = 0; k < d; k++) data[(f - off) * d + k] = mel.data[k * frames + f] as number;
+  return { start: nRef, ref: { dtype: "float32", shape: [1, frames - off, d], data } };
+}
+
 /** `read` is rooted at testdata/webgpu/; the case lives in its subfolder. */
 export async function loadCase(read: Reader, caseName: string): Promise<GoldenCase> {
   const inCase: Reader = (path) => read(`${caseName}/${path}`);

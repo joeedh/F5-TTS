@@ -24,7 +24,8 @@ from __future__ import annotations
 import argparse
 import json
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -37,7 +38,9 @@ from onnxscript.values import Op, Opset
 from safetensors.torch import load_file
 from torch import Tensor, nn
 from torch.export import Dim
+from x_transformers.x_transformers import rotate_half
 
+import f5_tts.model.modules as f5_modules
 from f5_tts.model.backbones.dit import DiT, TextEmbedding
 from f5_tts.model.modules import DiTBlock
 from f5_tts.model.utils import get_tokenizer
@@ -93,20 +96,48 @@ class TextGraph(nn.Module):
         return h[:1], h[1:]
 
 
-class StepGraph(nn.Module):
-    """One CFG DiT call plus the Euler update CFM.sample and torchdiffeq apply around it."""
+def rope_tables(dit: DiT) -> Tensor:
+    """(1, MAX_N, rot_dim, 2): cos and sin of the rotary angles, computed in float64 here. The angles reach
+    thousands of radians, and the NVIDIA GPU's shader cos/sin lose precision there (plan 01 D4, step 3)."""
+    freqs, scale = dit.rotary_embed.forward_from_seq_len(MAX_N)
+    assert scale == 1.0
+    f = freqs.detach().double()
+    return torch.stack((f.cos(), f.sin()), dim=-1).float()
 
-    rope_freqs: Tensor
+
+def rope_from_tables(t: Tensor, tables: Tensor, scale: float | Tensor = 1.0) -> Tensor:
+    """x_transformers.apply_rotary_pos_emb for full-width rotary at scale 1, with cos and sin read from
+    rope_tables (sliced to n) instead of computed from the angles."""
+    assert isinstance(scale, float) and scale == 1.0 and t.shape[-1] == tables.shape[-2]
+    cos, sin = tables[..., 0].unsqueeze(1), tables[..., 1].unsqueeze(1)  # (1, 1, n, rot_dim) for the heads
+    return t * cos + rotate_half(t) * sin
+
+
+@contextmanager
+def precomputed_rope() -> Iterator[None]:
+    """While exporting, upstream attention calls rope_from_tables instead of apply_rotary_pos_emb; the
+    `rope` it is handed must then be rope_tables sliced to n. Upstream code is not changed on disk."""
+    saved = f5_modules._apply_rope
+    f5_modules._apply_rope = rope_from_tables
+    try:
+        yield
+    finally:
+        f5_modules._apply_rope = saved
+
+
+class StepGraph(nn.Module):
+    """One CFG DiT call plus the Euler update CFM.sample and torchdiffeq apply around it. Export and run
+    it inside precomputed_rope()."""
+
+    rope_tables: Tensor
 
     def __init__(self, dit: DiT, debug: bool) -> None:
         super().__init__()
         assert dit.long_skip_connection is None and not dit.checkpoint_activations
         self.dit = dit
         self.debug = debug
-        freqs, scale = dit.rotary_embed.forward_from_seq_len(MAX_N)
-        assert scale == 1.0
-        # rotary freqs depend only on the position, so a sliced table equals forward_from_seq_len(n) (D4)
-        self.register_buffer("rope_freqs", freqs.detach().clone(), persistent=False)
+        # rotary angles depend only on the position, so a sliced table equals forward_from_seq_len(n) (D4)
+        self.register_buffer("rope_tables", rope_tables(dit), persistent=False)
 
     def forward(
         self,
@@ -128,7 +159,7 @@ class StepGraph(nn.Module):
         )
         debug = [t, h[:1], h[1:]]
         t2 = torch.cat((t, t), dim=0)
-        rope = (self.rope_freqs[:, : x.shape[1], :], 1.0)
+        rope = (self.rope_tables[:, : x.shape[1]], 1.0)
         for block in d.transformer_blocks:
             h = block(h, t2, mask=None, rope=rope)
             debug.append(h)
@@ -326,16 +357,19 @@ def main() -> None:
     variants = [("step", False)] + ([("step_debug", True)] if args.debug else [])
     for stem, debug in variants:
         t0 = time.perf_counter()
-        m = export(
-            StepGraph(dit, debug),
-            step_args,
-            names,
-            step_output_names(dit.depth, debug),
-            dynamic,
-            out / f"{stem}{suffix}.onnx",
-            opset,
-            table,
-        )
+        with precomputed_rope():
+            m = export(
+                StepGraph(dit, debug),
+                step_args,
+                names,
+                step_output_names(dit.depth, debug),
+                dynamic,
+                out / f"{stem}{suffix}.onnx",
+                opset,
+                table,
+            )
+        trig = [n.op_type for n in m.graph.node if n.op_type in ("Cos", "Sin")]
+        assert sorted(trig) == ["Cos", "Sin"], f"only the time embedding should compute cos and sin, got {trig}"
         summary[f"{stem}{suffix}"] = {**describe(m), "export_s": round(time.perf_counter() - t0, 1)}
         print(f"{stem}{suffix}.onnx", json.dumps(summary[f"{stem}{suffix}"]["ops"]))
     summary["heads"], summary["text_dim"], summary["depth"] = heads, text_dim, dit.depth
