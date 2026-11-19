@@ -56,6 +56,24 @@
       "floor_max_abs": 0.0016783475875854492,
       "floor_max_abs_at": "en-multi/c0.dit.s30.out_cond"
     },
+    "dit.v": {
+      "note": "CFG velocity cond + (cond - uncond) * cfg, against the golden halves (plan 01)",
+      "rel_l2": 0.0001,
+      "floor_rel_l2": 8.404841355150163e-06,
+      "floor_rel_l2_at": "en-multi/c0.dit.s30.v",
+      "max_abs": 0.1,
+      "floor_max_abs": 0.005016326904296875,
+      "floor_max_abs_at": "en-multi/c0.dit.s30.v"
+    },
+    "dit.x_next": {
+      "note": "Euler update x + dt * v, against the next golden x or mel_out (plan 01)",
+      "rel_l2": 1e-05,
+      "floor_rel_l2": 8.350188987172065e-07,
+      "floor_rel_l2_at": "en-epss16/c0.dit.s12.x_next",
+      "max_abs": 0.01,
+      "floor_max_abs": 0.0002455711364746094,
+      "floor_max_abs_at": "en-multi/c0.dit.s30.x_next"
+    },
     "dit_internal.text_embed": {
       "note": "TextEmbedding output",
       "rel_l2": 0.0001,

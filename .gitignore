@@ -187,3 +187,6 @@ web/playwright-report/
 !testdata/webgpu/floors.json
 # CUDA outputs saved by measure_floor.py --dump, for the parity smoke test
 testdata/webgpu/*/cuda/
+# plan 01: only the unfused tiny graphs are committed; export_dit.py --attention mha|onnx23 rebuilds the rest
+testdata/webgpu/tiny/onnx/*_mha*
+testdata/webgpu/tiny/onnx/*_onnx23*

@@ -37,6 +37,24 @@
    "ref_abs_max": 12.677433013916016
   },
   {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s00.v",
+   "max_abs": 0.0002932548522949219,
+   "rel_l2": 1.844343075882168e-06,
+   "cos": 0.9999999999986858,
+   "ref_abs_max": 30.550247192382812
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s00.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 2.665359255126296e-08,
+   "cos": 1.0000000000000007,
+   "ref_abs_max": 4.650657653808594
+  },
+  {
    "check": "dit_internal.time_embed",
    "case": "en-epss16",
    "tensor": "c0.dit_internal.s00.time_embed",
@@ -307,6 +325,24 @@
    "ref_abs_max": 12.571782112121582
   },
   {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s01.v",
+   "max_abs": 0.0002052783966064453,
+   "rel_l2": 2.9026699301386794e-06,
+   "cos": 0.999999999996343,
+   "ref_abs_max": 30.126903533935547
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s01.x_next",
+   "max_abs": 7.152557373046875e-07,
+   "rel_l2": 7.36582149535764e-08,
+   "cos": 0.9999999999999983,
+   "ref_abs_max": 4.6294755935668945
+  },
+  {
    "check": "dit.out",
    "case": "en-epss16",
    "tensor": "c0.dit.s02.out_cond",
@@ -323,6 +359,24 @@
    "rel_l2": 7.235869931431773e-07,
    "cos": 0.9999999999997875,
    "ref_abs_max": 14.049236297607422
+  },
+  {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s02.v",
+   "max_abs": 7.82012939453125e-05,
+   "rel_l2": 1.7300152278158903e-06,
+   "cos": 0.9999999999985109,
+   "ref_abs_max": 23.45534896850586
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s02.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 6.790582626190447e-08,
+   "cos": 0.9999999999999991,
+   "ref_abs_max": 4.598364353179932
   },
   {
    "check": "dit.out",
@@ -343,6 +397,24 @@
    "ref_abs_max": 15.877403259277344
   },
   {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s03.v",
+   "max_abs": 0.00011652708053588867,
+   "rel_l2": 2.6826030593816084e-06,
+   "cos": 0.9999999999964455,
+   "ref_abs_max": 17.81443977355957
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s03.x_next",
+   "max_abs": 9.5367431640625e-07,
+   "rel_l2": 1.091830212888084e-07,
+   "cos": 0.9999999999999952,
+   "ref_abs_max": 4.551878929138184
+  },
+  {
    "check": "dit.out",
    "case": "en-epss16",
    "tensor": "c0.dit.s04.out_cond",
@@ -359,6 +431,24 @@
    "rel_l2": 6.54371992555907e-07,
    "cos": 0.9999999999998009,
    "ref_abs_max": 15.918622970581055
+  },
+  {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s04.v",
+   "max_abs": 8.869171142578125e-05,
+   "rel_l2": 2.358535007587041e-06,
+   "cos": 0.9999999999972258,
+   "ref_abs_max": 16.19045639038086
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s04.x_next",
+   "max_abs": 9.5367431640625e-07,
+   "rel_l2": 1.2269700487471432e-07,
+   "cos": 0.9999999999999938,
+   "ref_abs_max": 4.549912929534912
   },
   {
    "check": "dit.out",
@@ -379,6 +469,24 @@
    "ref_abs_max": 15.894125938415527
   },
   {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s05.v",
+   "max_abs": 0.000110626220703125,
+   "rel_l2": 2.429522243180225e-06,
+   "cos": 0.9999999999970641,
+   "ref_abs_max": 17.16487693786621
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s05.x_next",
+   "max_abs": 1.430511474609375e-06,
+   "rel_l2": 1.466520608499469e-07,
+   "cos": 0.9999999999999906,
+   "ref_abs_max": 4.542840003967285
+  },
+  {
    "check": "dit.out",
    "case": "en-epss16",
    "tensor": "c0.dit.s06.out_cond",
@@ -395,6 +503,24 @@
    "rel_l2": 7.382909938965313e-07,
    "cos": 0.9999999999997332,
    "ref_abs_max": 15.853119850158691
+  },
+  {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s06.v",
+   "max_abs": 9.369850158691406e-05,
+   "rel_l2": 2.506648673376754e-06,
+   "cos": 0.9999999999968606,
+   "ref_abs_max": 19.101726531982422
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s06.x_next",
+   "max_abs": 1.4416873455047607e-06,
+   "rel_l2": 1.6985474908000679e-07,
+   "cos": 0.9999999999999867,
+   "ref_abs_max": 4.52354621887207
   },
   {
    "check": "dit.out",
@@ -415,6 +541,24 @@
    "ref_abs_max": 15.854081153869629
   },
   {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s07.v",
+   "max_abs": 9.679794311523438e-05,
+   "rel_l2": 2.569674981852439e-06,
+   "cos": 0.9999999999967008,
+   "ref_abs_max": 19.432327270507812
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s07.x_next",
+   "max_abs": 1.7285346984863281e-06,
+   "rel_l2": 1.9370799692342472e-07,
+   "cos": 0.9999999999999825,
+   "ref_abs_max": 4.519024848937988
+  },
+  {
    "check": "dit.out",
    "case": "en-epss16",
    "tensor": "c0.dit.s08.out_cond",
@@ -431,6 +575,24 @@
    "rel_l2": 7.624398686317626e-07,
    "cos": 0.9999999999997121,
    "ref_abs_max": 15.892061233520508
+  },
+  {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s08.v",
+   "max_abs": 0.0001372992992401123,
+   "rel_l2": 2.6260768794551013e-06,
+   "cos": 0.9999999999965554,
+   "ref_abs_max": 19.194183349609375
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s08.x_next",
+   "max_abs": 5.751848220825195e-06,
+   "rel_l2": 4.4032464272739687e-07,
+   "cos": 0.9999999999999045,
+   "ref_abs_max": 4.830359935760498
   },
   {
    "check": "dit_internal.time_embed",
@@ -685,6 +847,24 @@
    "ref_abs_max": 15.953327178955078
   },
   {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s09.v",
+   "max_abs": 0.0001366138458251953,
+   "rel_l2": 2.7149136996728185e-06,
+   "cos": 0.9999999999963171,
+   "ref_abs_max": 18.640411376953125
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s09.x_next",
+   "max_abs": 6.9141387939453125e-06,
+   "rel_l2": 5.02189011232332e-07,
+   "cos": 0.9999999999998755,
+   "ref_abs_max": 5.285645008087158
+  },
+  {
    "check": "dit.out",
    "case": "en-epss16",
    "tensor": "c0.dit.s10.out_cond",
@@ -701,6 +881,24 @@
    "rel_l2": 7.936894560250481e-07,
    "cos": 0.9999999999996891,
    "ref_abs_max": 15.961153984069824
+  },
+  {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s10.v",
+   "max_abs": 0.00012890994548797607,
+   "rel_l2": 2.66605841084464e-06,
+   "cos": 0.9999999999964492,
+   "ref_abs_max": 17.918903350830078
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s10.x_next",
+   "max_abs": 7.539987564086914e-06,
+   "rel_l2": 5.106802781917047e-07,
+   "cos": 0.9999999999998715,
+   "ref_abs_max": 6.109598159790039
   },
   {
    "check": "dit.out",
@@ -721,6 +919,24 @@
    "ref_abs_max": 16.178184509277344
   },
   {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s11.v",
+   "max_abs": 0.00014066696166992188,
+   "rel_l2": 2.586160566424725e-06,
+   "cos": 0.9999999999966621,
+   "ref_abs_max": 18.605440139770508
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s11.x_next",
+   "max_abs": 9.238719940185547e-06,
+   "rel_l2": 4.891514549816096e-07,
+   "cos": 0.9999999999998819,
+   "ref_abs_max": 7.126241683959961
+  },
+  {
    "check": "dit.out",
    "case": "en-epss16",
    "tensor": "c0.dit.s12.out_cond",
@@ -737,6 +953,24 @@
    "rel_l2": 8.007508626970652e-07,
    "cos": 0.9999999999996819,
    "ref_abs_max": 16.68326759338379
+  },
+  {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s12.v",
+   "max_abs": 0.00012308359146118164,
+   "rel_l2": 2.5852768310107505e-06,
+   "cos": 0.9999999999966698,
+   "ref_abs_max": 19.852975845336914
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s12.x_next",
+   "max_abs": 1.8656253814697266e-05,
+   "rel_l2": 8.350188987172065e-07,
+   "cos": 0.9999999999996544,
+   "ref_abs_max": 9.901768684387207
   },
   {
    "check": "dit.out",
@@ -757,6 +991,24 @@
    "ref_abs_max": 16.207000732421875
   },
   {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s13.v",
+   "max_abs": 0.00011229515075683594,
+   "rel_l2": 2.644754471805936e-06,
+   "cos": 0.999999999996505,
+   "ref_abs_max": 23.486839294433594
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s13.x_next",
+   "max_abs": 1.9431114196777344e-05,
+   "rel_l2": 7.441568607238458e-07,
+   "cos": 0.9999999999997249,
+   "ref_abs_max": 13.962332725524902
+  },
+  {
    "check": "dit.out",
    "case": "en-epss16",
    "tensor": "c0.dit.s14.out_cond",
@@ -775,6 +1027,24 @@
    "ref_abs_max": 16.828323364257812
   },
   {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s14.v",
+   "max_abs": 0.00012552738189697266,
+   "rel_l2": 2.701698141872101e-06,
+   "cos": 0.9999999999963539,
+   "ref_abs_max": 24.81718635559082
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s14.x_next",
+   "max_abs": 2.3543834686279297e-05,
+   "rel_l2": 6.535062128837721e-07,
+   "cos": 0.9999999999997894,
+   "ref_abs_max": 18.239774703979492
+  },
+  {
    "check": "dit.out",
    "case": "en-epss16",
    "tensor": "c0.dit.s15.out_cond",
@@ -791,6 +1061,24 @@
    "rel_l2": 9.582430323060997e-07,
    "cos": 0.999999999999543,
    "ref_abs_max": 18.903173446655273
+  },
+  {
+   "check": "dit.v",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s15.v",
+   "max_abs": 0.0012559890747070312,
+   "rel_l2": 3.738372835556981e-06,
+   "cos": 0.9999999999930197,
+   "ref_abs_max": 27.435579299926758
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-epss16",
+   "tensor": "c0.dit.s15.x_next",
+   "max_abs": 2.288818359375e-05,
+   "rel_l2": 5.370748604211244e-07,
+   "cos": 0.9999999999998577,
+   "ref_abs_max": 12.372804641723633
   },
   {
    "check": "vocoder.backbone",
@@ -881,6 +1169,24 @@
    "rel_l2": 8.867004108176121e-07,
    "cos": 0.9999999999997109,
    "ref_abs_max": 12.677433013916016
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s00.v",
+   "max_abs": 0.0002932548522949219,
+   "rel_l2": 1.844343075882168e-06,
+   "cos": 0.9999999999986858,
+   "ref_abs_max": 30.550247192382812
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s00.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 2.665359255126296e-08,
+   "cos": 1.0000000000000007,
+   "ref_abs_max": 4.650657653808594
   },
   {
    "check": "dit_internal.time_embed",
@@ -1153,6 +1459,24 @@
    "ref_abs_max": 12.571782112121582
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s01.v",
+   "max_abs": 0.0002052783966064453,
+   "rel_l2": 2.9026699301386794e-06,
+   "cos": 0.999999999996343,
+   "ref_abs_max": 30.126903533935547
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s01.x_next",
+   "max_abs": 7.152557373046875e-07,
+   "rel_l2": 7.36582149535764e-08,
+   "cos": 0.9999999999999983,
+   "ref_abs_max": 4.6294755935668945
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s02.out_cond",
@@ -1169,6 +1493,24 @@
    "rel_l2": 7.235869931431773e-07,
    "cos": 0.9999999999997875,
    "ref_abs_max": 14.049236297607422
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s02.v",
+   "max_abs": 7.82012939453125e-05,
+   "rel_l2": 1.7300152278158903e-06,
+   "cos": 0.9999999999985109,
+   "ref_abs_max": 23.45534896850586
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s02.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 6.790582626190447e-08,
+   "cos": 0.9999999999999991,
+   "ref_abs_max": 4.598364353179932
   },
   {
    "check": "dit.out",
@@ -1189,6 +1531,24 @@
    "ref_abs_max": 15.877403259277344
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s03.v",
+   "max_abs": 0.00011652708053588867,
+   "rel_l2": 2.6826030593816084e-06,
+   "cos": 0.9999999999964455,
+   "ref_abs_max": 17.81443977355957
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s03.x_next",
+   "max_abs": 9.5367431640625e-07,
+   "rel_l2": 1.091830212888084e-07,
+   "cos": 0.9999999999999952,
+   "ref_abs_max": 4.551878929138184
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s04.out_cond",
@@ -1205,6 +1565,24 @@
    "rel_l2": 6.54371992555907e-07,
    "cos": 0.9999999999998009,
    "ref_abs_max": 15.918622970581055
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s04.v",
+   "max_abs": 8.869171142578125e-05,
+   "rel_l2": 2.358535007587041e-06,
+   "cos": 0.9999999999972258,
+   "ref_abs_max": 16.19045639038086
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s04.x_next",
+   "max_abs": 9.5367431640625e-07,
+   "rel_l2": 1.2269700487471432e-07,
+   "cos": 0.9999999999999938,
+   "ref_abs_max": 4.549912929534912
   },
   {
    "check": "dit.out",
@@ -1225,6 +1603,24 @@
    "ref_abs_max": 15.894125938415527
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s05.v",
+   "max_abs": 0.000110626220703125,
+   "rel_l2": 2.429522243180225e-06,
+   "cos": 0.9999999999970641,
+   "ref_abs_max": 17.16487693786621
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s05.x_next",
+   "max_abs": 1.430511474609375e-06,
+   "rel_l2": 1.466520608499469e-07,
+   "cos": 0.9999999999999906,
+   "ref_abs_max": 4.542840003967285
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s06.out_cond",
@@ -1241,6 +1637,24 @@
    "rel_l2": 7.382909938965313e-07,
    "cos": 0.9999999999997332,
    "ref_abs_max": 15.853119850158691
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s06.v",
+   "max_abs": 9.369850158691406e-05,
+   "rel_l2": 2.506648673376754e-06,
+   "cos": 0.9999999999968606,
+   "ref_abs_max": 19.101726531982422
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s06.x_next",
+   "max_abs": 1.4416873455047607e-06,
+   "rel_l2": 1.6985474908000679e-07,
+   "cos": 0.9999999999999867,
+   "ref_abs_max": 4.52354621887207
   },
   {
    "check": "dit.out",
@@ -1261,6 +1675,24 @@
    "ref_abs_max": 15.854081153869629
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s07.v",
+   "max_abs": 9.679794311523438e-05,
+   "rel_l2": 2.569674981852439e-06,
+   "cos": 0.9999999999967008,
+   "ref_abs_max": 19.432327270507812
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s07.x_next",
+   "max_abs": 1.7285346984863281e-06,
+   "rel_l2": 1.9370799692342472e-07,
+   "cos": 0.9999999999999825,
+   "ref_abs_max": 4.519024848937988
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s08.out_cond",
@@ -1277,6 +1709,24 @@
    "rel_l2": 7.624398686317626e-07,
    "cos": 0.9999999999997121,
    "ref_abs_max": 15.892061233520508
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s08.v",
+   "max_abs": 0.0001372992992401123,
+   "rel_l2": 2.6260768794551013e-06,
+   "cos": 0.9999999999965554,
+   "ref_abs_max": 19.194183349609375
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s08.x_next",
+   "max_abs": 2.7418136596679688e-06,
+   "rel_l2": 2.1688816853142773e-07,
+   "cos": 0.999999999999978,
+   "ref_abs_max": 4.656721115112305
   },
   {
    "check": "dit.out",
@@ -1297,6 +1747,24 @@
    "ref_abs_max": 15.929643630981445
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s09.v",
+   "max_abs": 0.00011014938354492188,
+   "rel_l2": 2.5859120891894192e-06,
+   "cos": 0.9999999999966687,
+   "ref_abs_max": 18.74509048461914
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s09.x_next",
+   "max_abs": 2.5033950805664062e-06,
+   "rel_l2": 2.2975535711819882e-07,
+   "cos": 0.999999999999975,
+   "ref_abs_max": 4.810945987701416
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s10.out_cond",
@@ -1313,6 +1781,24 @@
    "rel_l2": 7.885325541184684e-07,
    "cos": 0.9999999999996925,
    "ref_abs_max": 15.95291519165039
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s10.v",
+   "max_abs": 0.0001227855682373047,
+   "rel_l2": 2.6250849009524266e-06,
+   "cos": 0.9999999999965565,
+   "ref_abs_max": 18.684476852416992
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s10.x_next",
+   "max_abs": 2.9802322387695312e-06,
+   "rel_l2": 2.458106444943731e-07,
+   "cos": 0.9999999999999712,
+   "ref_abs_max": 5.0256876945495605
   },
   {
    "check": "dit.out",
@@ -1333,6 +1819,24 @@
    "ref_abs_max": 15.959802627563477
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s11.v",
+   "max_abs": 0.00012612342834472656,
+   "rel_l2": 2.6313089723642234e-06,
+   "cos": 0.9999999999965402,
+   "ref_abs_max": 18.513816833496094
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s11.x_next",
+   "max_abs": 3.337860107421875e-06,
+   "rel_l2": 2.555975393999546e-07,
+   "cos": 0.9999999999999689,
+   "ref_abs_max": 5.2414937019348145
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s12.out_cond",
@@ -1349,6 +1853,24 @@
    "rel_l2": 7.952111478899992e-07,
    "cos": 0.9999999999996886,
    "ref_abs_max": 15.960878372192383
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s12.v",
+   "max_abs": 0.0001227855682373047,
+   "rel_l2": 2.585667212784725e-06,
+   "cos": 0.9999999999966602,
+   "ref_abs_max": 17.713565826416016
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s12.x_next",
+   "max_abs": 3.5762786865234375e-06,
+   "rel_l2": 2.5647570783463415e-07,
+   "cos": 0.999999999999969,
+   "ref_abs_max": 5.655080795288086
   },
   {
    "check": "dit.out",
@@ -1369,6 +1891,24 @@
    "ref_abs_max": 15.963333129882812
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s13.v",
+   "max_abs": 0.00012922286987304688,
+   "rel_l2": 2.614400397128131e-06,
+   "cos": 0.9999999999965876,
+   "ref_abs_max": 18.071430206298828
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s13.x_next",
+   "max_abs": 3.874301910400391e-06,
+   "rel_l2": 2.6061561939272365e-07,
+   "cos": 0.9999999999999677,
+   "ref_abs_max": 6.108628749847412
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s14.out_cond",
@@ -1385,6 +1925,24 @@
    "rel_l2": 8.022546070882129e-07,
    "cos": 0.9999999999996803,
    "ref_abs_max": 16.21092987060547
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s14.v",
+   "max_abs": 0.00018644332885742188,
+   "rel_l2": 2.6123847546383432e-06,
+   "cos": 0.9999999999965938,
+   "ref_abs_max": 18.60757827758789
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s14.x_next",
+   "max_abs": 5.9604644775390625e-06,
+   "rel_l2": 2.597240930375149e-07,
+   "cos": 0.9999999999999676,
+   "ref_abs_max": 6.60292387008667
   },
   {
    "check": "dit.out",
@@ -1405,6 +1963,24 @@
    "ref_abs_max": 16.469106674194336
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s15.v",
+   "max_abs": 0.00012135505676269531,
+   "rel_l2": 2.632223912269541e-06,
+   "cos": 0.9999999999965381,
+   "ref_abs_max": 19.212757110595703
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s15.x_next",
+   "max_abs": 4.0531158447265625e-06,
+   "rel_l2": 2.579979132022579e-07,
+   "cos": 0.999999999999968,
+   "ref_abs_max": 7.142042636871338
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s16.out_cond",
@@ -1421,6 +1997,24 @@
    "rel_l2": 7.953081062596506e-07,
    "cos": 0.9999999999996867,
    "ref_abs_max": 16.669349670410156
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s16.v",
+   "max_abs": 0.00013794004917144775,
+   "rel_l2": 2.5874092173142584e-06,
+   "cos": 0.9999999999966617,
+   "ref_abs_max": 19.93761444091797
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s16.x_next",
+   "max_abs": 5.0067901611328125e-06,
+   "rel_l2": 2.4818199526286056e-07,
+   "cos": 0.9999999999999707,
+   "ref_abs_max": 7.728272914886475
   },
   {
    "check": "dit_internal.time_embed",
@@ -1675,6 +2269,24 @@
    "ref_abs_max": 16.826053619384766
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s17.v",
+   "max_abs": 0.0001246929168701172,
+   "rel_l2": 2.6065968269939007e-06,
+   "cos": 0.9999999999966078,
+   "ref_abs_max": 20.719161987304688
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s17.x_next",
+   "max_abs": 4.589557647705078e-06,
+   "rel_l2": 2.434088040200928e-07,
+   "cos": 0.9999999999999721,
+   "ref_abs_max": 8.374770164489746
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s18.out_cond",
@@ -1691,6 +2303,24 @@
    "rel_l2": 8.198509353491933e-07,
    "cos": 0.9999999999996662,
    "ref_abs_max": 16.921377182006836
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s18.v",
+   "max_abs": 0.0001698136329650879,
+   "rel_l2": 2.697836448083995e-06,
+   "cos": 0.9999999999963667,
+   "ref_abs_max": 21.71516227722168
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s18.x_next",
+   "max_abs": 6.571412086486816e-06,
+   "rel_l2": 2.4401437678882036e-07,
+   "cos": 0.9999999999999724,
+   "ref_abs_max": 9.215015411376953
   },
   {
    "check": "dit.out",
@@ -1711,6 +2341,24 @@
    "ref_abs_max": 16.883651733398438
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s19.v",
+   "max_abs": 0.000194549560546875,
+   "rel_l2": 2.7306389208932224e-06,
+   "cos": 0.9999999999962742,
+   "ref_abs_max": 22.76326560974121
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s19.x_next",
+   "max_abs": 8.106231689453125e-06,
+   "rel_l2": 2.38436083155075e-07,
+   "cos": 0.9999999999999741,
+   "ref_abs_max": 10.128485679626465
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s20.out_cond",
@@ -1727,6 +2375,24 @@
    "rel_l2": 8.618924828032165e-07,
    "cos": 0.9999999999996306,
    "ref_abs_max": 16.638395309448242
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s20.v",
+   "max_abs": 0.0001474618911743164,
+   "rel_l2": 2.6966520016997714e-06,
+   "cos": 0.9999999999963668,
+   "ref_abs_max": 23.80373764038086
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s20.x_next",
+   "max_abs": 6.198883056640625e-06,
+   "rel_l2": 2.2692452630174345e-07,
+   "cos": 0.9999999999999766,
+   "ref_abs_max": 11.10763931274414
   },
   {
    "check": "dit.out",
@@ -1747,6 +2413,24 @@
    "ref_abs_max": 16.16473388671875
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s21.v",
+   "max_abs": 0.00014781951904296875,
+   "rel_l2": 2.707882066154176e-06,
+   "cos": 0.9999999999963358,
+   "ref_abs_max": 24.621442794799805
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s21.x_next",
+   "max_abs": 6.198883056640625e-06,
+   "rel_l2": 2.1918915087795977e-07,
+   "cos": 0.9999999999999779,
+   "ref_abs_max": 12.13226318359375
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s22.out_cond",
@@ -1763,6 +2447,24 @@
    "rel_l2": 8.979548829959682e-07,
    "cos": 0.9999999999995991,
    "ref_abs_max": 15.949295043945312
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s22.v",
+   "max_abs": 0.00014448165893554688,
+   "rel_l2": 2.759201702252874e-06,
+   "cos": 0.9999999999961963,
+   "ref_abs_max": 24.886463165283203
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s22.x_next",
+   "max_abs": 6.198883056640625e-06,
+   "rel_l2": 2.1445605024996193e-07,
+   "cos": 0.9999999999999789,
+   "ref_abs_max": 13.170828819274902
   },
   {
    "check": "dit.out",
@@ -1783,6 +2485,24 @@
    "ref_abs_max": 16.437292098999023
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s23.v",
+   "max_abs": 0.00020122528076171875,
+   "rel_l2": 2.7580345723334016e-06,
+   "cos": 0.9999999999961988,
+   "ref_abs_max": 24.804595947265625
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s23.x_next",
+   "max_abs": 9.059906005859375e-06,
+   "rel_l2": 2.0568147273593954e-07,
+   "cos": 0.9999999999999803,
+   "ref_abs_max": 14.184985160827637
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s24.out_cond",
@@ -1799,6 +2519,24 @@
    "rel_l2": 9.08815810746552e-07,
    "cos": 0.9999999999995917,
    "ref_abs_max": 17.79103660583496
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s24.v",
+   "max_abs": 0.00020503997802734375,
+   "rel_l2": 2.7977040169067624e-06,
+   "cos": 0.9999999999960899,
+   "ref_abs_max": 25.263317108154297
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s24.x_next",
+   "max_abs": 9.5367431640625e-06,
+   "rel_l2": 2.0006805579045673e-07,
+   "cos": 0.9999999999999816,
+   "ref_abs_max": 15.162369728088379
   },
   {
    "check": "dit.out",
@@ -1819,6 +2557,24 @@
    "ref_abs_max": 19.021085739135742
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s25.v",
+   "max_abs": 0.00019097328186035156,
+   "rel_l2": 2.8010629143980882e-06,
+   "cos": 0.9999999999960852,
+   "ref_abs_max": 25.066471099853516
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s25.x_next",
+   "max_abs": 9.059906005859375e-06,
+   "rel_l2": 1.9366410412368255e-07,
+   "cos": 0.9999999999999835,
+   "ref_abs_max": 16.137821197509766
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s26.out_cond",
@@ -1835,6 +2591,24 @@
    "rel_l2": 8.900357255323407e-07,
    "cos": 0.9999999999996061,
    "ref_abs_max": 19.930400848388672
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s26.v",
+   "max_abs": 0.00032520294189453125,
+   "rel_l2": 2.8477595870656405e-06,
+   "cos": 0.9999999999959491,
+   "ref_abs_max": 25.63280487060547
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s26.x_next",
+   "max_abs": 1.5497207641601562e-05,
+   "rel_l2": 1.9054494059688174e-07,
+   "cos": 0.9999999999999846,
+   "ref_abs_max": 17.137670516967773
   },
   {
    "check": "dit.out",
@@ -1855,6 +2629,24 @@
    "ref_abs_max": 19.750286102294922
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s27.v",
+   "max_abs": 0.0002655982971191406,
+   "rel_l2": 2.9033667833627435e-06,
+   "cos": 0.9999999999957874,
+   "ref_abs_max": 25.23891258239746
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s27.x_next",
+   "max_abs": 1.2874603271484375e-05,
+   "rel_l2": 1.8847899203054777e-07,
+   "cos": 0.9999999999999847,
+   "ref_abs_max": 18.141721725463867
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s28.out_cond",
@@ -1871,6 +2663,24 @@
    "rel_l2": 9.499654995958664e-07,
    "cos": 0.9999999999995512,
    "ref_abs_max": 19.003236770629883
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s28.v",
+   "max_abs": 0.0006895065307617188,
+   "rel_l2": 3.269465487675358e-06,
+   "cos": 0.9999999999946612,
+   "ref_abs_max": 26.88963508605957
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s28.x_next",
+   "max_abs": 3.337860107421875e-05,
+   "rel_l2": 2.0793351500964718e-07,
+   "cos": 0.9999999999999806,
+   "ref_abs_max": 19.085168838500977
   },
   {
    "check": "dit.out",
@@ -1891,6 +2701,24 @@
    "ref_abs_max": 18.850555419921875
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s29.v",
+   "max_abs": 0.0008604526519775391,
+   "rel_l2": 3.350577148545515e-06,
+   "cos": 0.9999999999943892,
+   "ref_abs_max": 28.870586395263672
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s29.x_next",
+   "max_abs": 4.1961669921875e-05,
+   "rel_l2": 2.111162361119842e-07,
+   "cos": 0.9999999999999803,
+   "ref_abs_max": 19.973752975463867
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c0.dit.s30.out_cond",
@@ -1907,6 +2735,24 @@
    "rel_l2": 1.0913620201892377e-06,
    "cos": 0.9999999999994079,
    "ref_abs_max": 18.00191879272461
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s30.v",
+   "max_abs": 0.005016326904296875,
+   "rel_l2": 8.404841355150163e-06,
+   "cos": 0.9999999999646813,
+   "ref_abs_max": 29.58233642578125
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s30.x_next",
+   "max_abs": 0.0002455711364746094,
+   "rel_l2": 5.141275721986258e-07,
+   "cos": 0.9999999999998704,
+   "ref_abs_max": 20.836645126342773
   },
   {
    "check": "dit.out",
@@ -1927,6 +2773,24 @@
    "ref_abs_max": 16.052473068237305
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c0.dit.s31.v",
+   "max_abs": 0.0008859634399414062,
+   "rel_l2": 3.5884402901790844e-06,
+   "cos": 0.9999999999935666,
+   "ref_abs_max": 40.275482177734375
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c0.dit.s31.x_next",
+   "max_abs": 1.239776611328125e-05,
+   "rel_l2": 1.8543768360799052e-07,
+   "cos": 0.9999999999999849,
+   "ref_abs_max": 12.614252090454102
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s00.out_cond",
@@ -1943,6 +2807,24 @@
    "rel_l2": 8.873271403227776e-07,
    "cos": 0.9999999999997405,
    "ref_abs_max": 12.761310577392578
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s00.v",
+   "max_abs": 0.00048160552978515625,
+   "rel_l2": 2.128839450668991e-06,
+   "cos": 0.9999999999978358,
+   "ref_abs_max": 30.723148345947266
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s00.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 2.8977316556475216e-08,
+   "cos": 1.0000000000000007,
+   "ref_abs_max": 4.580388069152832
   },
   {
    "check": "dit.out",
@@ -1963,6 +2845,24 @@
    "ref_abs_max": 12.804203033447266
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s01.v",
+   "max_abs": 0.00015354156494140625,
+   "rel_l2": 2.6212108639986113e-06,
+   "cos": 0.9999999999970139,
+   "ref_abs_max": 32.984130859375
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s01.x_next",
+   "max_abs": 5.364418029785156e-07,
+   "rel_l2": 7.071552716048162e-08,
+   "cos": 0.9999999999999988,
+   "ref_abs_max": 4.5652689933776855
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s02.out_cond",
@@ -1979,6 +2879,24 @@
    "rel_l2": 7.415426560389614e-07,
    "cos": 0.9999999999997501,
    "ref_abs_max": 14.577062606811523
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s02.v",
+   "max_abs": 0.000125885009765625,
+   "rel_l2": 2.805626329564332e-06,
+   "cos": 0.9999999999960658,
+   "ref_abs_max": 20.339582443237305
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s02.x_next",
+   "max_abs": 7.152557373046875e-07,
+   "rel_l2": 9.006795569277651e-08,
+   "cos": 0.9999999999999972,
+   "ref_abs_max": 4.542163848876953
   },
   {
    "check": "dit.out",
@@ -1999,6 +2917,24 @@
    "ref_abs_max": 14.742439270019531
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s03.v",
+   "max_abs": 0.0003402233123779297,
+   "rel_l2": 4.57822843755279e-06,
+   "cos": 0.9999999999896592,
+   "ref_abs_max": 19.75469970703125
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s03.x_next",
+   "max_abs": 2.86102294921875e-06,
+   "rel_l2": 1.803546373647788e-07,
+   "cos": 0.9999999999999853,
+   "ref_abs_max": 4.521345138549805
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s04.out_cond",
@@ -2015,6 +2951,24 @@
    "rel_l2": 6.965583152507088e-07,
    "cos": 0.9999999999997738,
    "ref_abs_max": 14.650350570678711
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s04.v",
+   "max_abs": 8.392333984375e-05,
+   "rel_l2": 2.5113422526193267e-06,
+   "cos": 0.9999999999968537,
+   "ref_abs_max": 18.49207305908203
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s04.x_next",
+   "max_abs": 9.08970832824707e-07,
+   "rel_l2": 1.2134815152099554e-07,
+   "cos": 0.9999999999999938,
+   "ref_abs_max": 4.495144367218018
   },
   {
    "check": "dit.out",
@@ -2035,6 +2989,24 @@
    "ref_abs_max": 14.60816764831543
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s05.v",
+   "max_abs": 8.869171142578125e-05,
+   "rel_l2": 2.6176267388572506e-06,
+   "cos": 0.9999999999965801,
+   "ref_abs_max": 20.581680297851562
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s05.x_next",
+   "max_abs": 1.1622905731201172e-06,
+   "rel_l2": 1.4580351837483397e-07,
+   "cos": 0.9999999999999909,
+   "ref_abs_max": 4.4491167068481445
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s06.out_cond",
@@ -2051,6 +3023,24 @@
    "rel_l2": 7.729827397175265e-07,
    "cos": 0.9999999999997056,
    "ref_abs_max": 14.58549976348877
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s06.v",
+   "max_abs": 8.487701416015625e-05,
+   "rel_l2": 2.6116157976758253e-06,
+   "cos": 0.9999999999965945,
+   "ref_abs_max": 19.406150817871094
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s06.x_next",
+   "max_abs": 1.3113021850585938e-06,
+   "rel_l2": 1.6558588173636894e-07,
+   "cos": 0.9999999999999879,
+   "ref_abs_max": 4.388722896575928
   },
   {
    "check": "dit.out",
@@ -2071,6 +3061,24 @@
    "ref_abs_max": 14.587249755859375
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s07.v",
+   "max_abs": 0.00011873245239257812,
+   "rel_l2": 2.737840521652857e-06,
+   "cos": 0.9999999999962553,
+   "ref_abs_max": 18.153362274169922
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s07.x_next",
+   "max_abs": 2.1457672119140625e-06,
+   "rel_l2": 1.9305113875600732e-07,
+   "cos": 0.9999999999999828,
+   "ref_abs_max": 4.362915992736816
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s08.out_cond",
@@ -2087,6 +3095,24 @@
    "rel_l2": 7.919979550825028e-07,
    "cos": 0.9999999999996897,
    "ref_abs_max": 14.618595123291016
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s08.v",
+   "max_abs": 0.0001055002212524414,
+   "rel_l2": 2.7083958023942362e-06,
+   "cos": 0.9999999999963348,
+   "ref_abs_max": 17.114105224609375
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s08.x_next",
+   "max_abs": 2.1457672119140625e-06,
+   "rel_l2": 2.0991600682900995e-07,
+   "cos": 0.9999999999999795,
+   "ref_abs_max": 4.560464382171631
   },
   {
    "check": "dit.out",
@@ -2107,6 +3133,24 @@
    "ref_abs_max": 14.670620918273926
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s09.v",
+   "max_abs": 0.00011134147644042969,
+   "rel_l2": 2.7635637439073743e-06,
+   "cos": 0.9999999999961856,
+   "ref_abs_max": 16.908607482910156
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s09.x_next",
+   "max_abs": 2.5033950805664062e-06,
+   "rel_l2": 2.3123293356541187e-07,
+   "cos": 0.9999999999999746,
+   "ref_abs_max": 4.778794288635254
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s10.out_cond",
@@ -2123,6 +3167,24 @@
    "rel_l2": 8.246830545437074e-07,
    "cos": 0.999999999999663,
    "ref_abs_max": 14.717899322509766
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s10.v",
+   "max_abs": 0.00018346309661865234,
+   "rel_l2": 2.8630218036340096e-06,
+   "cos": 0.9999999999959038,
+   "ref_abs_max": 17.284156799316406
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s10.x_next",
+   "max_abs": 4.4405460357666016e-06,
+   "rel_l2": 2.542619036933545e-07,
+   "cos": 0.999999999999969,
+   "ref_abs_max": 5.014376163482666
   },
   {
    "check": "dit.out",
@@ -2143,6 +3205,24 @@
    "ref_abs_max": 14.760299682617188
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s11.v",
+   "max_abs": 0.00011539459228515625,
+   "rel_l2": 2.773025292340635e-06,
+   "cos": 0.9999999999961591,
+   "ref_abs_max": 17.881099700927734
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s11.x_next",
+   "max_abs": 2.9802322387695312e-06,
+   "rel_l2": 2.5719276230662185e-07,
+   "cos": 0.9999999999999684,
+   "ref_abs_max": 5.267292499542236
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s12.out_cond",
@@ -2159,6 +3239,24 @@
    "rel_l2": 8.444819973251006e-07,
    "cos": 0.9999999999996475,
    "ref_abs_max": 14.791219711303711
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s12.v",
+   "max_abs": 0.00013577938079833984,
+   "rel_l2": 2.7855350528452245e-06,
+   "cos": 0.9999999999961247,
+   "ref_abs_max": 18.67577362060547
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s12.x_next",
+   "max_abs": 3.844499588012695e-06,
+   "rel_l2": 2.654005745991643e-07,
+   "cos": 0.999999999999966,
+   "ref_abs_max": 5.564326763153076
   },
   {
    "check": "dit.out",
@@ -2179,6 +3277,24 @@
    "ref_abs_max": 14.814876556396484
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s13.v",
+   "max_abs": 0.00011479854583740234,
+   "rel_l2": 2.7495372175387023e-06,
+   "cos": 0.9999999999962222,
+   "ref_abs_max": 19.383033752441406
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s13.x_next",
+   "max_abs": 3.4570693969726562e-06,
+   "rel_l2": 2.654626880459694e-07,
+   "cos": 0.9999999999999659,
+   "ref_abs_max": 6.01850700378418
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s14.out_cond",
@@ -2195,6 +3311,24 @@
    "rel_l2": 8.369569713650273e-07,
    "cos": 0.9999999999996518,
    "ref_abs_max": 14.830021858215332
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s14.v",
+   "max_abs": 0.00012952089309692383,
+   "rel_l2": 2.6603275739165148e-06,
+   "cos": 0.9999999999964634,
+   "ref_abs_max": 19.964763641357422
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s14.x_next",
+   "max_abs": 4.157423973083496e-06,
+   "rel_l2": 2.5749215937113893e-07,
+   "cos": 0.9999999999999682,
+   "ref_abs_max": 6.513442516326904
   },
   {
    "check": "dit.out",
@@ -2215,6 +3349,24 @@
    "ref_abs_max": 14.841390609741211
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s15.v",
+   "max_abs": 0.00011754035949707031,
+   "rel_l2": 2.6568777667500476e-06,
+   "cos": 0.9999999999964727,
+   "ref_abs_max": 20.60332489013672
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s15.x_next",
+   "max_abs": 3.978610038757324e-06,
+   "rel_l2": 2.547842806761476e-07,
+   "cos": 0.9999999999999694,
+   "ref_abs_max": 7.173013210296631
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s16.out_cond",
@@ -2231,6 +3383,24 @@
    "rel_l2": 8.418232660562164e-07,
    "cos": 0.9999999999996491,
    "ref_abs_max": 15.0866060256958
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s16.v",
+   "max_abs": 0.00012731552124023438,
+   "rel_l2": 2.7141823359833288e-06,
+   "cos": 0.9999999999963225,
+   "ref_abs_max": 21.664215087890625
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s16.x_next",
+   "max_abs": 4.5299530029296875e-06,
+   "rel_l2": 2.5605743786278193e-07,
+   "cos": 0.9999999999999685,
+   "ref_abs_max": 7.918832302093506
   },
   {
    "check": "dit.out",
@@ -2251,6 +3421,24 @@
    "ref_abs_max": 15.50045394897461
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s17.v",
+   "max_abs": 0.00016498565673828125,
+   "rel_l2": 2.7692507209238434e-06,
+   "cos": 0.9999999999961694,
+   "ref_abs_max": 22.976085662841797
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s17.x_next",
+   "max_abs": 6.198883056640625e-06,
+   "rel_l2": 2.550892262195661e-07,
+   "cos": 0.999999999999969,
+   "ref_abs_max": 8.733582496643066
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s18.out_cond",
@@ -2267,6 +3455,24 @@
    "rel_l2": 8.703161201890858e-07,
    "cos": 0.9999999999996237,
    "ref_abs_max": 15.839015007019043
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s18.v",
+   "max_abs": 0.00017118453979492188,
+   "rel_l2": 2.7641360087304716e-06,
+   "cos": 0.9999999999961845,
+   "ref_abs_max": 24.26422119140625
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s18.x_next",
+   "max_abs": 6.67572021484375e-06,
+   "rel_l2": 2.475384587713805e-07,
+   "cos": 0.9999999999999711,
+   "ref_abs_max": 9.622713088989258
   },
   {
    "check": "dit.out",
@@ -2287,6 +3493,24 @@
    "ref_abs_max": 15.834697723388672
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s19.v",
+   "max_abs": 0.0002090930938720703,
+   "rel_l2": 2.777222806384595e-06,
+   "cos": 0.9999999999961475,
+   "ref_abs_max": 25.480953216552734
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s19.x_next",
+   "max_abs": 8.344650268554688e-06,
+   "rel_l2": 2.407664064239089e-07,
+   "cos": 0.999999999999973,
+   "ref_abs_max": 10.606904029846191
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s20.out_cond",
@@ -2303,6 +3527,24 @@
    "rel_l2": 8.940735096040984e-07,
    "cos": 0.9999999999996023,
    "ref_abs_max": 15.404474258422852
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s20.v",
+   "max_abs": 0.0001468658447265625,
+   "rel_l2": 2.7725474653305777e-06,
+   "cos": 0.9999999999961606,
+   "ref_abs_max": 26.25396728515625
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s20.x_next",
+   "max_abs": 6.198883056640625e-06,
+   "rel_l2": 2.3208568224032626e-07,
+   "cos": 0.9999999999999751,
+   "ref_abs_max": 11.695590019226074
   },
   {
    "check": "dit.out",
@@ -2323,6 +3565,24 @@
    "ref_abs_max": 14.943901062011719
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s21.v",
+   "max_abs": 0.00016999244689941406,
+   "rel_l2": 2.7490516861150317e-06,
+   "cos": 0.9999999999962267,
+   "ref_abs_max": 26.353008270263672
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s21.x_next",
+   "max_abs": 7.256865501403809e-06,
+   "rel_l2": 2.2174764905505582e-07,
+   "cos": 0.9999999999999778,
+   "ref_abs_max": 12.821022033691406
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s22.out_cond",
@@ -2339,6 +3599,24 @@
    "rel_l2": 9.427110859569076e-07,
    "cos": 0.9999999999995582,
    "ref_abs_max": 15.659741401672363
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s22.v",
+   "max_abs": 0.00014019012451171875,
+   "rel_l2": 2.8145534506031896e-06,
+   "cos": 0.999999999996044,
+   "ref_abs_max": 25.853267669677734
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s22.x_next",
+   "max_abs": 6.198883056640625e-06,
+   "rel_l2": 2.1857342485740715e-07,
+   "cos": 0.9999999999999784,
+   "ref_abs_max": 13.95447063446045
   },
   {
    "check": "dit.out",
@@ -2359,6 +3637,24 @@
    "ref_abs_max": 16.503021240234375
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s23.v",
+   "max_abs": 0.00015354156494140625,
+   "rel_l2": 2.807074436768269e-06,
+   "cos": 0.9999999999960629,
+   "ref_abs_max": 25.480335235595703
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s23.x_next",
+   "max_abs": 6.9141387939453125e-06,
+   "rel_l2": 2.0942333873718727e-07,
+   "cos": 0.9999999999999799,
+   "ref_abs_max": 15.064570426940918
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s24.out_cond",
@@ -2375,6 +3671,24 @@
    "rel_l2": 9.294727966092671e-07,
    "cos": 0.9999999999995722,
    "ref_abs_max": 17.93080711364746
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s24.v",
+   "max_abs": 0.00016307830810546875,
+   "rel_l2": 2.8256034105786027e-06,
+   "cos": 0.9999999999960116,
+   "ref_abs_max": 24.786211013793945
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s24.x_next",
+   "max_abs": 7.510185241699219e-06,
+   "rel_l2": 2.027950314565238e-07,
+   "cos": 0.9999999999999808,
+   "ref_abs_max": 16.116846084594727
   },
   {
    "check": "dit.out",
@@ -2395,6 +3709,24 @@
    "ref_abs_max": 18.165447235107422
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s25.v",
+   "max_abs": 0.00014734268188476562,
+   "rel_l2": 2.864867456324221e-06,
+   "cos": 0.9999999999959025,
+   "ref_abs_max": 24.579607009887695
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s25.x_next",
+   "max_abs": 6.67572021484375e-06,
+   "rel_l2": 1.9895326997466204e-07,
+   "cos": 0.9999999999999819,
+   "ref_abs_max": 17.096139907836914
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s26.out_cond",
@@ -2411,6 +3743,24 @@
    "rel_l2": 9.56956088024009e-07,
    "cos": 0.9999999999995445,
    "ref_abs_max": 19.082775115966797
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s26.v",
+   "max_abs": 0.0006869733333587646,
+   "rel_l2": 3.009258121980542e-06,
+   "cos": 0.9999999999954768,
+   "ref_abs_max": 24.23977279663086
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s26.x_next",
+   "max_abs": 3.24249267578125e-05,
+   "rel_l2": 2.0197653821887117e-07,
+   "cos": 0.9999999999999813,
+   "ref_abs_max": 18.048828125
   },
   {
    "check": "dit.out",
@@ -2431,6 +3781,24 @@
    "ref_abs_max": 20.277297973632812
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s27.v",
+   "max_abs": 0.00037860870361328125,
+   "rel_l2": 2.9910586720523776e-06,
+   "cos": 0.9999999999955295,
+   "ref_abs_max": 23.88409996032715
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s27.x_next",
+   "max_abs": 1.811981201171875e-05,
+   "rel_l2": 1.9548102120389631e-07,
+   "cos": 0.9999999999999825,
+   "ref_abs_max": 18.881479263305664
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s28.out_cond",
@@ -2447,6 +3815,24 @@
    "rel_l2": 1.1865268576335261e-06,
    "cos": 0.999999999999298,
    "ref_abs_max": 20.781024932861328
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s28.v",
+   "max_abs": 0.0005388259887695312,
+   "rel_l2": 3.033615478796669e-06,
+   "cos": 0.9999999999954033,
+   "ref_abs_max": 23.98505401611328
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s28.x_next",
+   "max_abs": 2.5987625122070312e-05,
+   "rel_l2": 1.9500156934615596e-07,
+   "cos": 0.999999999999983,
+   "ref_abs_max": 19.582292556762695
   },
   {
    "check": "dit.out",
@@ -2467,6 +3853,24 @@
    "ref_abs_max": 19.863615036010742
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s29.v",
+   "max_abs": 0.0007610321044921875,
+   "rel_l2": 3.179500993304673e-06,
+   "cos": 0.9999999999949489,
+   "ref_abs_max": 25.072154998779297
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s29.x_next",
+   "max_abs": 3.719329833984375e-05,
+   "rel_l2": 2.0289932172509334e-07,
+   "cos": 0.9999999999999818,
+   "ref_abs_max": 20.160400390625
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c1.dit.s30.out_cond",
@@ -2483,6 +3887,24 @@
    "rel_l2": 1.1834018916623139e-06,
    "cos": 0.999999999999303,
    "ref_abs_max": 20.042621612548828
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s30.v",
+   "max_abs": 0.00041556358337402344,
+   "rel_l2": 3.1029750689520345e-06,
+   "cos": 0.9999999999951908,
+   "ref_abs_max": 29.843599319458008
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s30.x_next",
+   "max_abs": 2.0503997802734375e-05,
+   "rel_l2": 1.9575874076739524e-07,
+   "cos": 0.9999999999999835,
+   "ref_abs_max": 20.600831985473633
   },
   {
    "check": "dit.out",
@@ -2503,6 +3925,24 @@
    "ref_abs_max": 16.967430114746094
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c1.dit.s31.v",
+   "max_abs": 0.0012736320495605469,
+   "rel_l2": 3.6041836147267714e-06,
+   "cos": 0.9999999999935125,
+   "ref_abs_max": 30.86461639404297
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c1.dit.s31.x_next",
+   "max_abs": 9.775161743164062e-06,
+   "rel_l2": 1.85384239035277e-07,
+   "cos": 0.9999999999999849,
+   "ref_abs_max": 12.282703399658203
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s00.out_cond",
@@ -2519,6 +3959,24 @@
    "rel_l2": 5.296436145699819e-07,
    "cos": 0.9999999999998795,
    "ref_abs_max": 11.855050086975098
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s00.v",
+   "max_abs": 4.374980926513672e-05,
+   "rel_l2": 7.260206065917604e-07,
+   "cos": 0.9999999999997888,
+   "ref_abs_max": 30.831432342529297
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s00.x_next",
+   "max_abs": 2.384185791015625e-07,
+   "rel_l2": 2.107751546829561e-08,
+   "cos": 1.0000000000000004,
+   "ref_abs_max": 4.225492000579834
   },
   {
    "check": "dit.out",
@@ -2539,6 +3997,24 @@
    "ref_abs_max": 11.739809036254883
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s01.v",
+   "max_abs": 3.814697265625e-05,
+   "rel_l2": 6.910260388224633e-07,
+   "cos": 0.99999999999982,
+   "ref_abs_max": 32.25356674194336
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s01.x_next",
+   "max_abs": 2.384185791015625e-07,
+   "rel_l2": 3.8278195237350834e-08,
+   "cos": 1.0000000000000002,
+   "ref_abs_max": 4.205490589141846
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s02.out_cond",
@@ -2555,6 +4031,24 @@
    "rel_l2": 3.245816809989017e-07,
    "cos": 0.9999999999999566,
    "ref_abs_max": 15.10110092163086
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s02.v",
+   "max_abs": 6.866455078125e-05,
+   "rel_l2": 8.953127235119467e-07,
+   "cos": 0.9999999999996164,
+   "ref_abs_max": 21.81219482421875
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s02.x_next",
+   "max_abs": 4.172325134277344e-07,
+   "rel_l2": 5.03664547116812e-08,
+   "cos": 0.9999999999999996,
+   "ref_abs_max": 4.172906875610352
   },
   {
    "check": "dit.out",
@@ -2575,6 +4069,24 @@
    "ref_abs_max": 15.16264533996582
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s03.v",
+   "max_abs": 4.696846008300781e-05,
+   "rel_l2": 1.0670615168858267e-06,
+   "cos": 0.9999999999994413,
+   "ref_abs_max": 18.112653732299805
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s03.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 6.821510802718711e-08,
+   "cos": 0.9999999999999984,
+   "ref_abs_max": 4.123363971710205
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s04.out_cond",
@@ -2591,6 +4103,24 @@
    "rel_l2": 3.384039521246465e-07,
    "cos": 0.9999999999999468,
    "ref_abs_max": 15.19078540802002
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s04.v",
+   "max_abs": 6.642937660217285e-05,
+   "rel_l2": 1.1225566842592955e-06,
+   "cos": 0.999999999999373,
+   "ref_abs_max": 17.48265838623047
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s04.x_next",
+   "max_abs": 7.152557373046875e-07,
+   "rel_l2": 7.806021254358833e-08,
+   "cos": 0.9999999999999979,
+   "ref_abs_max": 4.138481140136719
   },
   {
    "check": "dit.out",
@@ -2611,6 +4141,24 @@
    "ref_abs_max": 15.172682762145996
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s05.v",
+   "max_abs": 6.866455078125e-05,
+   "rel_l2": 1.2963547953026625e-06,
+   "cos": 0.9999999999991613,
+   "ref_abs_max": 19.20709800720215
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s05.x_next",
+   "max_abs": 9.5367431640625e-07,
+   "rel_l2": 1.0031927300986947e-07,
+   "cos": 0.9999999999999959,
+   "ref_abs_max": 4.2129011154174805
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s06.out_cond",
@@ -2627,6 +4175,24 @@
    "rel_l2": 4.208544956991597e-07,
    "cos": 0.9999999999999147,
    "ref_abs_max": 15.14279842376709
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s06.v",
+   "max_abs": 8.58306884765625e-05,
+   "rel_l2": 1.3381238237347152e-06,
+   "cos": 0.9999999999991068,
+   "ref_abs_max": 18.222383499145508
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s06.x_next",
+   "max_abs": 1.3113021850585938e-06,
+   "rel_l2": 1.1475521460070882e-07,
+   "cos": 0.9999999999999941,
+   "ref_abs_max": 4.3495402336120605
   },
   {
    "check": "dit.out",
@@ -2647,6 +4213,24 @@
    "ref_abs_max": 15.132099151611328
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s07.v",
+   "max_abs": 8.630752563476562e-05,
+   "rel_l2": 1.3713259946072068e-06,
+   "cos": 0.9999999999990647,
+   "ref_abs_max": 17.43941307067871
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s07.x_next",
+   "max_abs": 1.430511474609375e-06,
+   "rel_l2": 1.2851605459069078e-07,
+   "cos": 0.9999999999999927,
+   "ref_abs_max": 4.50901985168457
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s08.out_cond",
@@ -2663,6 +4247,24 @@
    "rel_l2": 4.3210353277787785e-07,
    "cos": 0.9999999999999083,
    "ref_abs_max": 15.142699241638184
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s08.v",
+   "max_abs": 7.486343383789062e-05,
+   "rel_l2": 1.3874578187417192e-06,
+   "cos": 0.9999999999990397,
+   "ref_abs_max": 16.786663055419922
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s08.x_next",
+   "max_abs": 1.430511474609375e-06,
+   "rel_l2": 1.3887679596528087e-07,
+   "cos": 0.9999999999999911,
+   "ref_abs_max": 4.680078983306885
   },
   {
    "check": "dit.out",
@@ -2683,6 +4285,24 @@
    "ref_abs_max": 15.167391777038574
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s09.v",
+   "max_abs": 0.00011682510375976562,
+   "rel_l2": 1.5019592213225283e-06,
+   "cos": 0.9999999999988755,
+   "ref_abs_max": 16.51007080078125
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s09.x_next",
+   "max_abs": 2.562999725341797e-06,
+   "rel_l2": 1.5608545009183936e-07,
+   "cos": 0.9999999999999888,
+   "ref_abs_max": 4.863729953765869
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s10.out_cond",
@@ -2699,6 +4319,24 @@
    "rel_l2": 4.876566729196661e-07,
    "cos": 0.9999999999998831,
    "ref_abs_max": 15.19357681274414
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s10.v",
+   "max_abs": 0.000125885009765625,
+   "rel_l2": 1.5790398689894182e-06,
+   "cos": 0.999999999998763,
+   "ref_abs_max": 16.46218490600586
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s10.x_next",
+   "max_abs": 3.069639205932617e-06,
+   "rel_l2": 1.681847741228012e-07,
+   "cos": 0.9999999999999869,
+   "ref_abs_max": 5.053997993469238
   },
   {
    "check": "dit.out",
@@ -2719,6 +4357,24 @@
    "ref_abs_max": 15.215981483459473
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s11.v",
+   "max_abs": 0.0001246929168701172,
+   "rel_l2": 1.6267921438269536e-06,
+   "cos": 0.9999999999986794,
+   "ref_abs_max": 16.49755096435547
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s11.x_next",
+   "max_abs": 3.2782554626464844e-06,
+   "rel_l2": 1.74772878993301e-07,
+   "cos": 0.9999999999999858,
+   "ref_abs_max": 5.237925052642822
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s12.out_cond",
@@ -2735,6 +4391,24 @@
    "rel_l2": 5.005348255025862e-07,
    "cos": 0.9999999999998768,
    "ref_abs_max": 15.232977867126465
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s12.v",
+   "max_abs": 0.00010466575622558594,
+   "rel_l2": 1.521028550204831e-06,
+   "cos": 0.9999999999988459,
+   "ref_abs_max": 16.775714874267578
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s12.x_next",
+   "max_abs": 2.9802322387695312e-06,
+   "rel_l2": 1.632481952628605e-07,
+   "cos": 0.999999999999988,
+   "ref_abs_max": 5.4303693771362305
   },
   {
    "check": "dit.out",
@@ -2755,6 +4429,24 @@
    "ref_abs_max": 15.248010635375977
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s13.v",
+   "max_abs": 9.72747802734375e-05,
+   "rel_l2": 1.5156822185745895e-06,
+   "cos": 0.9999999999988545,
+   "ref_abs_max": 17.20756721496582
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s13.x_next",
+   "max_abs": 2.9355287551879883e-06,
+   "rel_l2": 1.6103407419576995e-07,
+   "cos": 0.9999999999999882,
+   "ref_abs_max": 5.891153335571289
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s14.out_cond",
@@ -2771,6 +4463,24 @@
    "rel_l2": 5.39696680101747e-07,
    "cos": 0.9999999999998563,
    "ref_abs_max": 15.258440017700195
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s14.v",
+   "max_abs": 0.0001461505889892578,
+   "rel_l2": 1.6029506384460622e-06,
+   "cos": 0.9999999999987171,
+   "ref_abs_max": 17.817981719970703
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s14.x_next",
+   "max_abs": 4.76837158203125e-06,
+   "rel_l2": 1.664908906341237e-07,
+   "cos": 0.9999999999999873,
+   "ref_abs_max": 6.3901238441467285
   },
   {
    "check": "dit.out",
@@ -2791,6 +4501,24 @@
    "ref_abs_max": 15.271026611328125
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s15.v",
+   "max_abs": 9.34600830078125e-05,
+   "rel_l2": 1.561829828287098e-06,
+   "cos": 0.9999999999987824,
+   "ref_abs_max": 18.52970314025879
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s15.x_next",
+   "max_abs": 3.2186508178710938e-06,
+   "rel_l2": 1.5861951830650806e-07,
+   "cos": 0.9999999999999887,
+   "ref_abs_max": 6.928041934967041
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s16.out_cond",
@@ -2807,6 +4535,24 @@
    "rel_l2": 5.780559308821945e-07,
    "cos": 0.9999999999998377,
    "ref_abs_max": 15.282121658325195
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s16.v",
+   "max_abs": 0.00011730194091796875,
+   "rel_l2": 1.6472557909604162e-06,
+   "cos": 0.9999999999986541,
+   "ref_abs_max": 19.30500030517578
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s16.x_next",
+   "max_abs": 4.291534423828125e-06,
+   "rel_l2": 1.6227836537873315e-07,
+   "cos": 0.9999999999999881,
+   "ref_abs_max": 7.5137038230896
   },
   {
    "check": "dit.out",
@@ -2827,6 +4573,24 @@
    "ref_abs_max": 15.29567813873291
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s17.v",
+   "max_abs": 0.0001163482666015625,
+   "rel_l2": 1.6610430392740198e-06,
+   "cos": 0.9999999999986225,
+   "ref_abs_max": 20.248409271240234
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s17.x_next",
+   "max_abs": 4.291534423828125e-06,
+   "rel_l2": 1.5876502181402087e-07,
+   "cos": 0.999999999999989,
+   "ref_abs_max": 8.153563499450684
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s18.out_cond",
@@ -2843,6 +4607,24 @@
    "rel_l2": 6.430600750659e-07,
    "cos": 0.999999999999795,
    "ref_abs_max": 15.309557914733887
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s18.v",
+   "max_abs": 0.00016498565673828125,
+   "rel_l2": 1.7896915549152746e-06,
+   "cos": 0.9999999999984052,
+   "ref_abs_max": 21.449199676513672
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s18.x_next",
+   "max_abs": 6.4373016357421875e-06,
+   "rel_l2": 1.6404078525508235e-07,
+   "cos": 0.9999999999999881,
+   "ref_abs_max": 8.852191925048828
   },
   {
    "check": "dit.out",
@@ -2863,6 +4645,24 @@
    "ref_abs_max": 15.316543579101562
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s19.v",
+   "max_abs": 0.00019741058349609375,
+   "rel_l2": 1.801613479202312e-06,
+   "cos": 0.9999999999983792,
+   "ref_abs_max": 22.678150177001953
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s19.x_next",
+   "max_abs": 7.987022399902344e-06,
+   "rel_l2": 1.5937479668919517e-07,
+   "cos": 0.9999999999999891,
+   "ref_abs_max": 9.612770080566406
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s20.out_cond",
@@ -2879,6 +4679,24 @@
    "rel_l2": 7.200543111894213e-07,
    "cos": 0.999999999999743,
    "ref_abs_max": 15.325326919555664
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s20.v",
+   "max_abs": 0.000141143798828125,
+   "rel_l2": 1.889044318331942e-06,
+   "cos": 0.9999999999982203,
+   "ref_abs_max": 23.66165542602539
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s20.x_next",
+   "max_abs": 5.9604644775390625e-06,
+   "rel_l2": 1.6023519822131336e-07,
+   "cos": 0.9999999999999889,
+   "ref_abs_max": 10.436485290527344
   },
   {
    "check": "dit.out",
@@ -2899,6 +4717,24 @@
    "ref_abs_max": 15.325677871704102
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s21.v",
+   "max_abs": 0.00011539459228515625,
+   "rel_l2": 1.98431252029297e-06,
+   "cos": 0.9999999999980359,
+   "ref_abs_max": 24.33722686767578
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s21.x_next",
+   "max_abs": 5.0067901611328125e-06,
+   "rel_l2": 1.6136151315443707e-07,
+   "cos": 0.9999999999999888,
+   "ref_abs_max": 11.322273254394531
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s22.out_cond",
@@ -2915,6 +4751,24 @@
    "rel_l2": 8.021430517578393e-07,
    "cos": 0.9999999999996845,
    "ref_abs_max": 16.14383316040039
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s22.v",
+   "max_abs": 0.000194549560546875,
+   "rel_l2": 2.0455755706125023e-06,
+   "cos": 0.9999999999979144,
+   "ref_abs_max": 24.668956756591797
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s22.x_next",
+   "max_abs": 8.58306884765625e-06,
+   "rel_l2": 1.5996233587096e-07,
+   "cos": 0.9999999999999889,
+   "ref_abs_max": 12.262492179870605
   },
   {
    "check": "dit.out",
@@ -2935,6 +4789,24 @@
    "ref_abs_max": 17.467376708984375
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s23.v",
+   "max_abs": 0.0001347064971923828,
+   "rel_l2": 1.9729965907822566e-06,
+   "cos": 0.9999999999980558,
+   "ref_abs_max": 24.46554183959961
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s23.x_next",
+   "max_abs": 5.7220458984375e-06,
+   "rel_l2": 1.485994520494735e-07,
+   "cos": 0.9999999999999908,
+   "ref_abs_max": 13.238662719726562
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s24.out_cond",
@@ -2951,6 +4823,24 @@
    "rel_l2": 7.421148988900993e-07,
    "cos": 0.9999999999997328,
    "ref_abs_max": 18.33094596862793
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s24.v",
+   "max_abs": 0.00011169910430908203,
+   "rel_l2": 1.9332875323693825e-06,
+   "cos": 0.9999999999981363,
+   "ref_abs_max": 24.408832550048828
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s24.x_next",
+   "max_abs": 5.125999450683594e-06,
+   "rel_l2": 1.4110719439124995e-07,
+   "cos": 0.9999999999999916,
+   "ref_abs_max": 14.284061431884766
   },
   {
    "check": "dit.out",
@@ -2971,6 +4861,24 @@
    "ref_abs_max": 19.099519729614258
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s25.v",
+   "max_abs": 0.000213623046875,
+   "rel_l2": 2.124423101603254e-06,
+   "cos": 0.999999999997745,
+   "ref_abs_max": 24.02434539794922
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s25.x_next",
+   "max_abs": 1.0013580322265625e-05,
+   "rel_l2": 1.5164141279369373e-07,
+   "cos": 0.9999999999999901,
+   "ref_abs_max": 15.308095932006836
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s26.out_cond",
@@ -2987,6 +4895,24 @@
    "rel_l2": 9.44845008713243e-07,
    "cos": 0.9999999999995566,
    "ref_abs_max": 19.550704956054688
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s26.v",
+   "max_abs": 0.00046181678771972656,
+   "rel_l2": 2.3087245535214488e-06,
+   "cos": 0.9999999999973467,
+   "ref_abs_max": 23.440967559814453
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s26.x_next",
+   "max_abs": 2.193450927734375e-05,
+   "rel_l2": 1.5997264253280566e-07,
+   "cos": 0.9999999999999893,
+   "ref_abs_max": 16.249088287353516
   },
   {
    "check": "dit.out",
@@ -3007,6 +4933,24 @@
    "ref_abs_max": 20.421485900878906
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s27.v",
+   "max_abs": 0.0005941390991210938,
+   "rel_l2": 2.4233521130338015e-06,
+   "cos": 0.9999999999970669,
+   "ref_abs_max": 22.183879852294922
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s27.x_next",
+   "max_abs": 2.86102294921875e-05,
+   "rel_l2": 1.6417999536372594e-07,
+   "cos": 0.9999999999999887,
+   "ref_abs_max": 17.089216232299805
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s28.out_cond",
@@ -3023,6 +4967,24 @@
    "rel_l2": 1.185057943124903e-06,
    "cos": 0.9999999999993013,
    "ref_abs_max": 22.10364532470703
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s28.v",
+   "max_abs": 0.0009922981262207031,
+   "rel_l2": 3.048946423792038e-06,
+   "cos": 0.9999999999953669,
+   "ref_abs_max": 24.684127807617188
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s28.x_next",
+   "max_abs": 4.8041343688964844e-05,
+   "rel_l2": 2.0311247188254678e-07,
+   "cos": 0.9999999999999816,
+   "ref_abs_max": 17.888586044311523
   },
   {
    "check": "dit.out",
@@ -3043,6 +5005,24 @@
    "ref_abs_max": 23.215147018432617
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s29.v",
+   "max_abs": 0.0019483566284179688,
+   "rel_l2": 4.169250638908335e-06,
+   "cos": 0.9999999999913173,
+   "ref_abs_max": 33.7249755859375
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s29.x_next",
+   "max_abs": 9.489059448242188e-05,
+   "rel_l2": 2.768816634675631e-07,
+   "cos": 0.9999999999999635,
+   "ref_abs_max": 18.55412483215332
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s30.out_cond",
@@ -3061,6 +5041,24 @@
    "ref_abs_max": 21.435199737548828
   },
   {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s30.v",
+   "max_abs": 0.00048089027404785156,
+   "rel_l2": 2.6493400427734973e-06,
+   "cos": 0.999999999996497,
+   "ref_abs_max": 31.016342163085938
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s30.x_next",
+   "max_abs": 2.3543834686279297e-05,
+   "rel_l2": 1.7674970334915902e-07,
+   "cos": 0.9999999999999863,
+   "ref_abs_max": 19.22950553894043
+  },
+  {
    "check": "dit.out",
    "case": "en-multi",
    "tensor": "c2.dit.s31.out_cond",
@@ -3077,6 +5075,24 @@
    "rel_l2": 1.269169906102957e-06,
    "cos": 0.9999999999992576,
    "ref_abs_max": 17.821773529052734
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi",
+   "tensor": "c2.dit.s31.v",
+   "max_abs": 0.0024690628051757812,
+   "rel_l2": 5.488033715962451e-06,
+   "cos": 0.9999999999850717,
+   "ref_abs_max": 26.852489471435547
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi",
+   "tensor": "c2.dit.s31.x_next",
+   "max_abs": 1.52587890625e-05,
+   "rel_l2": 1.6047822302394102e-07,
+   "cos": 0.9999999999999879,
+   "ref_abs_max": 12.421965599060059
   },
   {
    "check": "vocoder.backbone",
@@ -3275,6 +5291,24 @@
    "rel_l2": 8.005199047751753e-07,
    "cos": 0.9999999999997431,
    "ref_abs_max": 12.35396671295166
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s00.v",
+   "max_abs": 0.00011110305786132812,
+   "rel_l2": 2.1318854733350557e-06,
+   "cos": 0.9999999999979844,
+   "ref_abs_max": 30.483518600463867
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s00.x_next",
+   "max_abs": 2.384185791015625e-07,
+   "rel_l2": 2.9123332089810214e-08,
+   "cos": 1.0000000000000009,
+   "ref_abs_max": 4.565439701080322
   },
   {
    "check": "dit_internal.time_embed",
@@ -3547,6 +5581,24 @@
    "ref_abs_max": 12.122640609741211
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s01.v",
+   "max_abs": 0.0004911422729492188,
+   "rel_l2": 3.4228840056276927e-06,
+   "cos": 0.9999999999944151,
+   "ref_abs_max": 31.27519416809082
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s01.x_next",
+   "max_abs": 1.773238182067871e-06,
+   "rel_l2": 8.213616161934417e-08,
+   "cos": 0.9999999999999979,
+   "ref_abs_max": 4.5702900886535645
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s02.out_cond",
@@ -3563,6 +5615,24 @@
    "rel_l2": 1.2321174515472584e-06,
    "cos": 0.9999999999995679,
    "ref_abs_max": 14.125971794128418
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s02.v",
+   "max_abs": 9.250640869140625e-05,
+   "rel_l2": 2.1153062478134216e-06,
+   "cos": 0.9999999999977649,
+   "ref_abs_max": 23.43032455444336
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s02.x_next",
+   "max_abs": 5.364418029785156e-07,
+   "rel_l2": 7.839499269714612e-08,
+   "cos": 0.9999999999999981,
+   "ref_abs_max": 4.559581756591797
   },
   {
    "check": "dit.out",
@@ -3583,6 +5653,24 @@
    "ref_abs_max": 14.612438201904297
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s03.v",
+   "max_abs": 7.82012939453125e-05,
+   "rel_l2": 2.3304771392731153e-06,
+   "cos": 0.9999999999973265,
+   "ref_abs_max": 20.786643981933594
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s03.x_next",
+   "max_abs": 6.556510925292969e-07,
+   "rel_l2": 8.89765762580144e-08,
+   "cos": 0.9999999999999972,
+   "ref_abs_max": 4.548282146453857
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s04.out_cond",
@@ -3599,6 +5687,24 @@
    "rel_l2": 6.847694844009166e-07,
    "cos": 0.9999999999997785,
    "ref_abs_max": 14.648280143737793
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s04.v",
+   "max_abs": 9.393692016601562e-05,
+   "rel_l2": 2.4675344930866046e-06,
+   "cos": 0.9999999999969629,
+   "ref_abs_max": 16.345088958740234
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s04.x_next",
+   "max_abs": 1.0132789611816406e-06,
+   "rel_l2": 1.1473874448695858e-07,
+   "cos": 0.9999999999999948,
+   "ref_abs_max": 4.54013204574585
   },
   {
    "check": "dit.out",
@@ -3619,6 +5725,24 @@
    "ref_abs_max": 14.586057662963867
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s05.v",
+   "max_abs": 0.00010204315185546875,
+   "rel_l2": 2.416403356983733e-06,
+   "cos": 0.9999999999970843,
+   "ref_abs_max": 18.16077995300293
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s05.x_next",
+   "max_abs": 1.3709068298339844e-06,
+   "rel_l2": 1.304654938712128e-07,
+   "cos": 0.9999999999999927,
+   "ref_abs_max": 4.534639358520508
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s06.out_cond",
@@ -3635,6 +5759,24 @@
    "rel_l2": 8.040271425664967e-07,
    "cos": 0.9999999999996835,
    "ref_abs_max": 14.527652740478516
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s06.v",
+   "max_abs": 0.00010824203491210938,
+   "rel_l2": 2.709403708025337e-06,
+   "cos": 0.9999999999963336,
+   "ref_abs_max": 19.118165969848633
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s06.x_next",
+   "max_abs": 1.6689300537109375e-06,
+   "rel_l2": 1.637596328929579e-07,
+   "cos": 0.9999999999999878,
+   "ref_abs_max": 4.5152177810668945
   },
   {
    "check": "dit.out",
@@ -3655,6 +5797,24 @@
    "ref_abs_max": 14.525337219238281
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s07.v",
+   "max_abs": 0.00013184547424316406,
+   "rel_l2": 2.7324374746718666e-06,
+   "cos": 0.9999999999962699,
+   "ref_abs_max": 19.077823638916016
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s07.x_next",
+   "max_abs": 2.3245811462402344e-06,
+   "rel_l2": 1.8326685905774336e-07,
+   "cos": 0.9999999999999845,
+   "ref_abs_max": 4.494911193847656
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s08.out_cond",
@@ -3671,6 +5831,24 @@
    "rel_l2": 8.108529100108446e-07,
    "cos": 0.9999999999996745,
    "ref_abs_max": 14.6107816696167
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s08.v",
+   "max_abs": 0.00011831521987915039,
+   "rel_l2": 2.800672170512683e-06,
+   "cos": 0.999999999996083,
+   "ref_abs_max": 18.882902145385742
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s08.x_next",
+   "max_abs": 2.384185791015625e-06,
+   "rel_l2": 2.0616045873027354e-07,
+   "cos": 0.9999999999999799,
+   "ref_abs_max": 4.618306636810303
   },
   {
    "check": "dit.out",
@@ -3691,6 +5869,24 @@
    "ref_abs_max": 14.70671272277832
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s09.v",
+   "max_abs": 0.00014400482177734375,
+   "rel_l2": 2.847432900143918e-06,
+   "cos": 0.9999999999959494,
+   "ref_abs_max": 18.591285705566406
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s09.x_next",
+   "max_abs": 3.2186508178710938e-06,
+   "rel_l2": 2.2678722342233014e-07,
+   "cos": 0.9999999999999756,
+   "ref_abs_max": 4.789061546325684
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s10.out_cond",
@@ -3707,6 +5903,24 @@
    "rel_l2": 8.212231987018223e-07,
    "cos": 0.9999999999996666,
    "ref_abs_max": 14.779350280761719
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s10.v",
+   "max_abs": 0.00014531612396240234,
+   "rel_l2": 2.8490959840895223e-06,
+   "cos": 0.9999999999959439,
+   "ref_abs_max": 18.67615509033203
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s10.x_next",
+   "max_abs": 3.516674041748047e-06,
+   "rel_l2": 2.4155935337854213e-07,
+   "cos": 0.9999999999999719,
+   "ref_abs_max": 5.00527811050415
   },
   {
    "check": "dit.out",
@@ -3727,6 +5941,24 @@
    "ref_abs_max": 15.138172149658203
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s11.v",
+   "max_abs": 0.00011795759201049805,
+   "rel_l2": 2.8368605314982154e-06,
+   "cos": 0.9999999999959787,
+   "ref_abs_max": 18.182777404785156
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s11.x_next",
+   "max_abs": 3.0994415283203125e-06,
+   "rel_l2": 2.5211661871644124e-07,
+   "cos": 0.9999999999999697,
+   "ref_abs_max": 5.234152317047119
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s12.out_cond",
@@ -3743,6 +5975,24 @@
    "rel_l2": 8.830367204259096e-07,
    "cos": 0.999999999999615,
    "ref_abs_max": 15.638955116271973
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s12.v",
+   "max_abs": 0.00014412403106689453,
+   "rel_l2": 2.8114754298385108e-06,
+   "cos": 0.9999999999960504,
+   "ref_abs_max": 17.625213623046875
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s12.x_next",
+   "max_abs": 4.112720489501953e-06,
+   "rel_l2": 2.5779899672247887e-07,
+   "cos": 0.9999999999999685,
+   "ref_abs_max": 5.642179012298584
   },
   {
    "check": "dit.out",
@@ -3763,6 +6013,24 @@
    "ref_abs_max": 15.935636520385742
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s13.v",
+   "max_abs": 0.000133514404296875,
+   "rel_l2": 2.7260192611826513e-06,
+   "cos": 0.9999999999962872,
+   "ref_abs_max": 18.162389755249023
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s13.x_next",
+   "max_abs": 4.0531158447265625e-06,
+   "rel_l2": 2.5458960992355704e-07,
+   "cos": 0.9999999999999691,
+   "ref_abs_max": 6.094465732574463
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s14.out_cond",
@@ -3779,6 +6047,24 @@
    "rel_l2": 8.651493903337429e-07,
    "cos": 0.999999999999628,
    "ref_abs_max": 16.21857261657715
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s14.v",
+   "max_abs": 0.00012028217315673828,
+   "rel_l2": 2.783994612163538e-06,
+   "cos": 0.9999999999961285,
+   "ref_abs_max": 18.756027221679688
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s14.x_next",
+   "max_abs": 3.933906555175781e-06,
+   "rel_l2": 2.6191005811150336e-07,
+   "cos": 0.999999999999967,
+   "ref_abs_max": 6.5860443115234375
   },
   {
    "check": "dit.out",
@@ -3799,6 +6085,24 @@
    "ref_abs_max": 16.503084182739258
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s15.v",
+   "max_abs": 0.00018131732940673828,
+   "rel_l2": 2.7057306266993245e-06,
+   "cos": 0.9999999999963417,
+   "ref_abs_max": 19.370128631591797
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s15.x_next",
+   "max_abs": 6.139278411865234e-06,
+   "rel_l2": 2.536246541831223e-07,
+   "cos": 0.9999999999999694,
+   "ref_abs_max": 7.121387958526611
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s16.out_cond",
@@ -3815,6 +6119,24 @@
    "rel_l2": 8.830606532199635e-07,
    "cos": 0.9999999999996133,
    "ref_abs_max": 16.717634201049805
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s16.v",
+   "max_abs": 0.00013387203216552734,
+   "rel_l2": 2.742581754909105e-06,
+   "cos": 0.999999999996247,
+   "ref_abs_max": 20.112125396728516
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s16.x_next",
+   "max_abs": 4.76837158203125e-06,
+   "rel_l2": 2.539778510646122e-07,
+   "cos": 0.9999999999999689,
+   "ref_abs_max": 7.705362796783447
   },
   {
    "check": "dit_internal.time_embed",
@@ -4069,6 +6391,24 @@
    "ref_abs_max": 16.77605438232422
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s17.v",
+   "max_abs": 0.00014495849609375,
+   "rel_l2": 2.7348236146280783e-06,
+   "cos": 0.9999999999962665,
+   "ref_abs_max": 20.86640739440918
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s17.x_next",
+   "max_abs": 5.245208740234375e-06,
+   "rel_l2": 2.485754959043119e-07,
+   "cos": 0.9999999999999705,
+   "ref_abs_max": 8.40229320526123
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s18.out_cond",
@@ -4085,6 +6425,24 @@
    "rel_l2": 8.913055852812429e-07,
    "cos": 0.9999999999996049,
    "ref_abs_max": 16.749374389648438
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s18.v",
+   "max_abs": 0.00011932849884033203,
+   "rel_l2": 2.809213399624503e-06,
+   "cos": 0.999999999996059,
+   "ref_abs_max": 21.83478546142578
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s18.x_next",
+   "max_abs": 4.6193599700927734e-06,
+   "rel_l2": 2.4916210732717946e-07,
+   "cos": 0.9999999999999707,
+   "ref_abs_max": 9.247167587280273
   },
   {
    "check": "dit.out",
@@ -4105,6 +6463,24 @@
    "ref_abs_max": 16.60154151916504
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s19.v",
+   "max_abs": 0.00015807151794433594,
+   "rel_l2": 2.8140988032119678e-06,
+   "cos": 0.9999999999960432,
+   "ref_abs_max": 22.877700805664062
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s19.x_next",
+   "max_abs": 6.318092346191406e-06,
+   "rel_l2": 2.4258577126047916e-07,
+   "cos": 0.9999999999999727,
+   "ref_abs_max": 10.165229797363281
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s20.out_cond",
@@ -4121,6 +6497,24 @@
    "rel_l2": 9.081387351502735e-07,
    "cos": 0.9999999999995907,
    "ref_abs_max": 16.256816864013672
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s20.v",
+   "max_abs": 0.00011157989501953125,
+   "rel_l2": 2.8234795712214104e-06,
+   "cos": 0.9999999999960166,
+   "ref_abs_max": 23.780887603759766
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s20.x_next",
+   "max_abs": 4.5299530029296875e-06,
+   "rel_l2": 2.3537406033298944e-07,
+   "cos": 0.9999999999999746,
+   "ref_abs_max": 11.147489547729492
   },
   {
    "check": "dit.out",
@@ -4141,6 +6535,24 @@
    "ref_abs_max": 15.672741889953613
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s21.v",
+   "max_abs": 0.00012230873107910156,
+   "rel_l2": 2.8376316399178274e-06,
+   "cos": 0.9999999999959766,
+   "ref_abs_max": 24.607406616210938
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s21.x_next",
+   "max_abs": 5.245208740234375e-06,
+   "rel_l2": 2.28632114835303e-07,
+   "cos": 0.9999999999999758,
+   "ref_abs_max": 12.172953605651855
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s22.out_cond",
@@ -4157,6 +6569,24 @@
    "rel_l2": 9.890925019993235e-07,
    "cos": 0.9999999999995137,
    "ref_abs_max": 15.644047737121582
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s22.v",
+   "max_abs": 0.00011539459228515625,
+   "rel_l2": 2.904546729925589e-06,
+   "cos": 0.9999999999957864,
+   "ref_abs_max": 24.854873657226562
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s22.x_next",
+   "max_abs": 5.0067901611328125e-06,
+   "rel_l2": 2.2567812380294177e-07,
+   "cos": 0.9999999999999757,
+   "ref_abs_max": 13.21146297454834
   },
   {
    "check": "dit.out",
@@ -4177,6 +6607,24 @@
    "ref_abs_max": 16.359275817871094
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s23.v",
+   "max_abs": 0.00018310546875,
+   "rel_l2": 2.8565965743048835e-06,
+   "cos": 0.9999999999959228,
+   "ref_abs_max": 24.853784561157227
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s23.x_next",
+   "max_abs": 8.106231689453125e-06,
+   "rel_l2": 2.136128916097342e-07,
+   "cos": 0.9999999999999785,
+   "ref_abs_max": 14.227028846740723
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s24.out_cond",
@@ -4193,6 +6641,24 @@
    "rel_l2": 9.55313153736037e-07,
    "cos": 0.9999999999995488,
    "ref_abs_max": 17.782928466796875
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s24.v",
+   "max_abs": 0.00016307830810546875,
+   "rel_l2": 2.8461569450137926e-06,
+   "cos": 0.9999999999959527,
+   "ref_abs_max": 25.294565200805664
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s24.x_next",
+   "max_abs": 7.62939453125e-06,
+   "rel_l2": 2.0490026496596433e-07,
+   "cos": 0.9999999999999805,
+   "ref_abs_max": 15.184807777404785
   },
   {
    "check": "dit.out",
@@ -4213,6 +6679,24 @@
    "ref_abs_max": 18.9217472076416
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s25.v",
+   "max_abs": 0.00013780593872070312,
+   "rel_l2": 2.9031841621890776e-06,
+   "cos": 0.9999999999957943,
+   "ref_abs_max": 24.969158172607422
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s25.x_next",
+   "max_abs": 6.4373016357421875e-06,
+   "rel_l2": 2.0203511064628447e-07,
+   "cos": 0.9999999999999811,
+   "ref_abs_max": 16.094505310058594
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s26.out_cond",
@@ -4229,6 +6713,24 @@
    "rel_l2": 1.1140390206506906e-06,
    "cos": 0.9999999999993838,
    "ref_abs_max": 19.91213035583496
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s26.v",
+   "max_abs": 0.0001201629638671875,
+   "rel_l2": 3.052694323640426e-06,
+   "cos": 0.9999999999953444,
+   "ref_abs_max": 25.586597442626953
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s26.x_next",
+   "max_abs": 5.7220458984375e-06,
+   "rel_l2": 2.0582802115858376e-07,
+   "cos": 0.9999999999999807,
+   "ref_abs_max": 17.184486389160156
   },
   {
    "check": "dit.out",
@@ -4249,6 +6751,24 @@
    "ref_abs_max": 19.824628829956055
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s27.v",
+   "max_abs": 0.0003223419189453125,
+   "rel_l2": 3.0496461266621416e-06,
+   "cos": 0.9999999999953523,
+   "ref_abs_max": 24.975387573242188
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s27.x_next",
+   "max_abs": 1.52587890625e-05,
+   "rel_l2": 2.0116359673877682e-07,
+   "cos": 0.9999999999999816,
+   "ref_abs_max": 18.207782745361328
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s28.out_cond",
@@ -4265,6 +6785,24 @@
    "rel_l2": 1.0528595871898922e-06,
    "cos": 0.9999999999994484,
    "ref_abs_max": 19.187419891357422
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s28.v",
+   "max_abs": 0.0025796890258789062,
+   "rel_l2": 5.883155256111996e-06,
+   "cos": 0.9999999999827002,
+   "ref_abs_max": 27.499629974365234
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s28.x_next",
+   "max_abs": 0.00012493133544921875,
+   "rel_l2": 3.801834837698902e-07,
+   "cos": 0.9999999999999298,
+   "ref_abs_max": 19.16888999938965
   },
   {
    "check": "dit.out",
@@ -4285,6 +6823,24 @@
    "ref_abs_max": 19.01769256591797
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s29.v",
+   "max_abs": 0.0015726089477539062,
+   "rel_l2": 4.668212899344363e-06,
+   "cos": 0.9999999999891064,
+   "ref_abs_max": 28.650798797607422
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s29.x_next",
+   "max_abs": 7.677078247070312e-05,
+   "rel_l2": 3.029106115013839e-07,
+   "cos": 0.9999999999999565,
+   "ref_abs_max": 20.07152557373047
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c0.dit.s30.out_cond",
@@ -4301,6 +6857,24 @@
    "rel_l2": 1.126561747189136e-06,
    "cos": 0.999999999999368,
    "ref_abs_max": 18.209243774414062
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s30.v",
+   "max_abs": 0.0004901885986328125,
+   "rel_l2": 3.4244767353554324e-06,
+   "cos": 0.9999999999941384,
+   "ref_abs_max": 29.246597290039062
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s30.x_next",
+   "max_abs": 2.3990869522094727e-05,
+   "rel_l2": 2.2148928344216263e-07,
+   "cos": 0.9999999999999781,
+   "ref_abs_max": 20.95059585571289
   },
   {
    "check": "dit.out",
@@ -4321,6 +6895,24 @@
    "ref_abs_max": 16.158098220825195
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s31.v",
+   "max_abs": 0.000400543212890625,
+   "rel_l2": 3.4377784963649245e-06,
+   "cos": 0.9999999999941219,
+   "ref_abs_max": 40.11809539794922
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c0.dit.s31.x_next",
+   "max_abs": 1.049041748046875e-05,
+   "rel_l2": 1.865371139081698e-07,
+   "cos": 0.9999999999999843,
+   "ref_abs_max": 12.500879287719727
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s00.out_cond",
@@ -4337,6 +6929,24 @@
    "rel_l2": 8.277573961042753e-07,
    "cos": 0.9999999999997544,
    "ref_abs_max": 12.67141056060791
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s00.v",
+   "max_abs": 0.00018596649169921875,
+   "rel_l2": 2.077058703654166e-06,
+   "cos": 0.9999999999979313,
+   "ref_abs_max": 29.775768280029297
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s00.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 2.898659213222527e-08,
+   "cos": 1.0000000000000007,
+   "ref_abs_max": 4.6471734046936035
   },
   {
    "check": "dit.out",
@@ -4357,6 +6967,24 @@
    "ref_abs_max": 12.696758270263672
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s01.v",
+   "max_abs": 0.0003204345703125,
+   "rel_l2": 1.827303260934646e-06,
+   "cos": 0.9999999999984168,
+   "ref_abs_max": 31.206836700439453
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s01.x_next",
+   "max_abs": 1.1920928955078125e-06,
+   "rel_l2": 5.285585709658554e-08,
+   "cos": 1.0,
+   "ref_abs_max": 4.617208957672119
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s02.out_cond",
@@ -4373,6 +7001,24 @@
    "rel_l2": 7.421850960449793e-07,
    "cos": 0.99999999999976,
    "ref_abs_max": 15.03023910522461
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s02.v",
+   "max_abs": 8.106231689453125e-05,
+   "rel_l2": 2.2343011335041287e-06,
+   "cos": 0.999999999997508,
+   "ref_abs_max": 18.170085906982422
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s02.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 7.169654042247727e-08,
+   "cos": 0.9999999999999986,
+   "ref_abs_max": 4.574113368988037
   },
   {
    "check": "dit.out",
@@ -4393,6 +7039,24 @@
    "ref_abs_max": 14.960226058959961
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s03.v",
+   "max_abs": 9.965896606445312e-05,
+   "rel_l2": 2.4136325799377207e-06,
+   "cos": 0.9999999999970899,
+   "ref_abs_max": 15.379709243774414
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s03.x_next",
+   "max_abs": 8.344650268554688e-07,
+   "rel_l2": 1.0067745771624436e-07,
+   "cos": 0.999999999999996,
+   "ref_abs_max": 4.552845478057861
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s04.out_cond",
@@ -4409,6 +7073,24 @@
    "rel_l2": 7.065383422611183e-07,
    "cos": 0.9999999999997689,
    "ref_abs_max": 14.871647834777832
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s04.v",
+   "max_abs": 0.0001323223114013672,
+   "rel_l2": 2.6689679412577316e-06,
+   "cos": 0.9999999999964417,
+   "ref_abs_max": 17.762706756591797
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s04.x_next",
+   "max_abs": 1.430511474609375e-06,
+   "rel_l2": 1.3264879555051647e-07,
+   "cos": 0.9999999999999927,
+   "ref_abs_max": 4.516929626464844
   },
   {
    "check": "dit.out",
@@ -4429,6 +7111,24 @@
    "ref_abs_max": 14.822684288024902
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s05.v",
+   "max_abs": 0.00010329484939575195,
+   "rel_l2": 2.5502589560476034e-06,
+   "cos": 0.9999999999967558,
+   "ref_abs_max": 17.812118530273438
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s05.x_next",
+   "max_abs": 1.341104507446289e-06,
+   "rel_l2": 1.5107178759305344e-07,
+   "cos": 0.99999999999999,
+   "ref_abs_max": 4.472136497497559
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s06.out_cond",
@@ -4445,6 +7145,24 @@
    "rel_l2": 7.422747203993719e-07,
    "cos": 0.9999999999997276,
    "ref_abs_max": 14.781347274780273
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s06.v",
+   "max_abs": 8.96453857421875e-05,
+   "rel_l2": 2.4607405290181294e-06,
+   "cos": 0.9999999999969769,
+   "ref_abs_max": 18.29560089111328
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s06.x_next",
+   "max_abs": 1.3709068298339844e-06,
+   "rel_l2": 1.6520687298503634e-07,
+   "cos": 0.9999999999999877,
+   "ref_abs_max": 4.438408374786377
   },
   {
    "check": "dit.out",
@@ -4465,6 +7183,24 @@
    "ref_abs_max": 14.779302597045898
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s07.v",
+   "max_abs": 0.0001004636287689209,
+   "rel_l2": 2.625652698453933e-06,
+   "cos": 0.9999999999965555,
+   "ref_abs_max": 18.388870239257812
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s07.x_next",
+   "max_abs": 1.7583370208740234e-06,
+   "rel_l2": 1.9387862267981818e-07,
+   "cos": 0.9999999999999826,
+   "ref_abs_max": 4.419995307922363
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s08.out_cond",
@@ -4481,6 +7217,24 @@
    "rel_l2": 7.82015537652698e-07,
    "cos": 0.9999999999996982,
    "ref_abs_max": 14.810583114624023
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s08.v",
+   "max_abs": 9.512901306152344e-05,
+   "rel_l2": 2.627236437958122e-06,
+   "cos": 0.9999999999965511,
+   "ref_abs_max": 18.427743911743164
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s08.x_next",
+   "max_abs": 1.8477439880371094e-06,
+   "rel_l2": 2.1097803163930895e-07,
+   "cos": 0.999999999999979,
+   "ref_abs_max": 4.6457366943359375
   },
   {
    "check": "dit.out",
@@ -4501,6 +7255,24 @@
    "ref_abs_max": 14.85602855682373
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s09.v",
+   "max_abs": 0.00011396408081054688,
+   "rel_l2": 2.7854098637042883e-06,
+   "cos": 0.9999999999961249,
+   "ref_abs_max": 18.53380584716797
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s09.x_next",
+   "max_abs": 2.518296241760254e-06,
+   "rel_l2": 2.401753916729786e-07,
+   "cos": 0.9999999999999722,
+   "ref_abs_max": 5.007847785949707
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s10.out_cond",
@@ -4517,6 +7289,24 @@
    "rel_l2": 8.022565249843225e-07,
    "cos": 0.9999999999996815,
    "ref_abs_max": 14.897826194763184
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s10.v",
+   "max_abs": 0.00011849403381347656,
+   "rel_l2": 2.8139589540771364e-06,
+   "cos": 0.999999999996044,
+   "ref_abs_max": 18.674243927001953
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s10.x_next",
+   "max_abs": 2.8759241104125977e-06,
+   "rel_l2": 2.5677117434607295e-07,
+   "cos": 0.9999999999999685,
+   "ref_abs_max": 5.386756896972656
   },
   {
    "check": "dit.out",
@@ -4537,6 +7327,24 @@
    "ref_abs_max": 14.923663139343262
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s11.v",
+   "max_abs": 0.00013405084609985352,
+   "rel_l2": 2.867170842966341e-06,
+   "cos": 0.9999999999958924,
+   "ref_abs_max": 18.790626525878906
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s11.x_next",
+   "max_abs": 3.5762786865234375e-06,
+   "rel_l2": 2.7182707220593556e-07,
+   "cos": 0.9999999999999644,
+   "ref_abs_max": 5.768399238586426
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s12.out_cond",
@@ -4553,6 +7361,24 @@
    "rel_l2": 8.302063143297628e-07,
    "cos": 0.9999999999996597,
    "ref_abs_max": 14.943058013916016
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s12.v",
+   "max_abs": 0.00011360645294189453,
+   "rel_l2": 2.657627892696903e-06,
+   "cos": 0.999999999996471,
+   "ref_abs_max": 18.948774337768555
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s12.x_next",
+   "max_abs": 3.203749656677246e-06,
+   "rel_l2": 2.583950641808119e-07,
+   "cos": 0.999999999999968,
+   "ref_abs_max": 6.151139259338379
   },
   {
    "check": "dit.out",
@@ -4573,6 +7399,24 @@
    "ref_abs_max": 14.953640937805176
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s13.v",
+   "max_abs": 0.00016689300537109375,
+   "rel_l2": 2.775463471542864e-06,
+   "cos": 0.999999999996152,
+   "ref_abs_max": 19.24838638305664
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s13.x_next",
+   "max_abs": 5.0067901611328125e-06,
+   "rel_l2": 2.724255442168505e-07,
+   "cos": 0.9999999999999649,
+   "ref_abs_max": 6.542236804962158
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s14.out_cond",
@@ -4589,6 +7433,24 @@
    "rel_l2": 8.069673449452234e-07,
    "cos": 0.9999999999996767,
    "ref_abs_max": 14.961917877197266
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s14.v",
+   "max_abs": 0.00014287233352661133,
+   "rel_l2": 2.6878350136225893e-06,
+   "cos": 0.9999999999963908,
+   "ref_abs_max": 19.730640411376953
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s14.x_next",
+   "max_abs": 4.589557647705078e-06,
+   "rel_l2": 2.6361139952637513e-07,
+   "cos": 0.9999999999999668,
+   "ref_abs_max": 6.946243762969971
   },
   {
    "check": "dit.out",
@@ -4609,6 +7471,24 @@
    "ref_abs_max": 14.966991424560547
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s15.v",
+   "max_abs": 0.0001977682113647461,
+   "rel_l2": 2.7290188129282173e-06,
+   "cos": 0.9999999999962786,
+   "ref_abs_max": 20.384143829345703
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s15.x_next",
+   "max_abs": 6.794929504394531e-06,
+   "rel_l2": 2.64625696593408e-07,
+   "cos": 0.999999999999967,
+   "ref_abs_max": 7.366799354553223
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s16.out_cond",
@@ -4625,6 +7505,24 @@
    "rel_l2": 8.293432180559459e-07,
    "cos": 0.9999999999996585,
    "ref_abs_max": 15.035331726074219
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s16.v",
+   "max_abs": 0.00016689300537109375,
+   "rel_l2": 2.7006044597918786e-06,
+   "cos": 0.9999999999963586,
+   "ref_abs_max": 21.160503387451172
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s16.x_next",
+   "max_abs": 6.198883056640625e-06,
+   "rel_l2": 2.5684713788495167e-07,
+   "cos": 0.9999999999999685,
+   "ref_abs_max": 8.078453063964844
   },
   {
    "check": "dit.out",
@@ -4645,6 +7543,24 @@
    "ref_abs_max": 15.384552955627441
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s17.v",
+   "max_abs": 0.0001895427703857422,
+   "rel_l2": 2.7436325200405493e-06,
+   "cos": 0.9999999999962407,
+   "ref_abs_max": 22.11539649963379
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s17.x_next",
+   "max_abs": 7.152557373046875e-06,
+   "rel_l2": 2.5438155776086345e-07,
+   "cos": 0.999999999999969,
+   "ref_abs_max": 8.900385856628418
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s18.out_cond",
@@ -4661,6 +7577,24 @@
    "rel_l2": 8.624435997470945e-07,
    "cos": 0.9999999999996309,
    "ref_abs_max": 15.65732479095459
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s18.v",
+   "max_abs": 0.0002002716064453125,
+   "rel_l2": 2.8070280231971995e-06,
+   "cos": 0.9999999999960636,
+   "ref_abs_max": 23.289897918701172
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s18.x_next",
+   "max_abs": 7.867813110351562e-06,
+   "rel_l2": 2.5233265912863174e-07,
+   "cos": 0.99999999999997,
+   "ref_abs_max": 9.80156421661377
   },
   {
    "check": "dit.out",
@@ -4681,6 +7615,24 @@
    "ref_abs_max": 15.738330841064453
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s19.v",
+   "max_abs": 0.00018680095672607422,
+   "rel_l2": 2.7526586114774918e-06,
+   "cos": 0.9999999999962145,
+   "ref_abs_max": 24.663150787353516
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s19.x_next",
+   "max_abs": 7.62939453125e-06,
+   "rel_l2": 2.393164970119694e-07,
+   "cos": 0.9999999999999734,
+   "ref_abs_max": 10.791275024414062
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s20.out_cond",
@@ -4697,6 +7649,24 @@
    "rel_l2": 8.714618171298953e-07,
    "cos": 0.9999999999996224,
    "ref_abs_max": 15.528934478759766
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s20.v",
+   "max_abs": 0.0001766681671142578,
+   "rel_l2": 2.7475214922728615e-06,
+   "cos": 0.9999999999962309,
+   "ref_abs_max": 26.11843490600586
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s20.x_next",
+   "max_abs": 7.3909759521484375e-06,
+   "rel_l2": 2.302599336635532e-07,
+   "cos": 0.9999999999999756,
+   "ref_abs_max": 11.874341011047363
   },
   {
    "check": "dit.out",
@@ -4717,6 +7687,24 @@
    "ref_abs_max": 15.016326904296875
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s21.v",
+   "max_abs": 0.00022017955780029297,
+   "rel_l2": 2.76548767636168e-06,
+   "cos": 0.9999999999961786,
+   "ref_abs_max": 27.351118087768555
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s21.x_next",
+   "max_abs": 9.5367431640625e-06,
+   "rel_l2": 2.231334428536726e-07,
+   "cos": 0.9999999999999771,
+   "ref_abs_max": 13.042398452758789
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s22.out_cond",
@@ -4733,6 +7721,24 @@
    "rel_l2": 9.253876484284946e-07,
    "cos": 0.9999999999995756,
    "ref_abs_max": 15.026651382446289
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s22.v",
+   "max_abs": 0.00020503997802734375,
+   "rel_l2": 2.8364561536885513e-06,
+   "cos": 0.99999999999598,
+   "ref_abs_max": 27.783737182617188
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s22.x_next",
+   "max_abs": 9.059906005859375e-06,
+   "rel_l2": 2.2014705634734848e-07,
+   "cos": 0.9999999999999776,
+   "ref_abs_max": 14.260481834411621
   },
   {
    "check": "dit.out",
@@ -4753,6 +7759,24 @@
    "ref_abs_max": 15.956127166748047
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s23.v",
+   "max_abs": 0.00012254714965820312,
+   "rel_l2": 2.784702782908484e-06,
+   "cos": 0.9999999999961252,
+   "ref_abs_max": 27.097171783447266
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s23.x_next",
+   "max_abs": 5.7220458984375e-06,
+   "rel_l2": 2.0788481016082706e-07,
+   "cos": 0.9999999999999802,
+   "ref_abs_max": 15.476377487182617
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s24.out_cond",
@@ -4769,6 +7793,24 @@
    "rel_l2": 9.220318691551784e-07,
    "cos": 0.9999999999995791,
    "ref_abs_max": 17.719799041748047
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s24.v",
+   "max_abs": 0.0001602470874786377,
+   "rel_l2": 2.7669939280408684e-06,
+   "cos": 0.9999999999961743,
+   "ref_abs_max": 25.874767303466797
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s24.x_next",
+   "max_abs": 7.331371307373047e-06,
+   "rel_l2": 1.987591904795107e-07,
+   "cos": 0.9999999999999818,
+   "ref_abs_max": 16.650060653686523
   },
   {
    "check": "dit.out",
@@ -4789,6 +7831,24 @@
    "ref_abs_max": 19.223573684692383
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s25.v",
+   "max_abs": 0.00017762184143066406,
+   "rel_l2": 2.8327101273137965e-06,
+   "cos": 0.9999999999959972,
+   "ref_abs_max": 24.807950973510742
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s25.x_next",
+   "max_abs": 8.285045623779297e-06,
+   "rel_l2": 1.961571685422248e-07,
+   "cos": 0.9999999999999827,
+   "ref_abs_max": 17.748884201049805
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s26.out_cond",
@@ -4805,6 +7865,24 @@
    "rel_l2": 1.0765457278063006e-06,
    "cos": 0.999999999999423,
    "ref_abs_max": 19.926774978637695
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s26.v",
+   "max_abs": 0.00037741661071777344,
+   "rel_l2": 2.9920475395193465e-06,
+   "cos": 0.9999999999955275,
+   "ref_abs_max": 25.48569107055664
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s26.x_next",
+   "max_abs": 1.811981201171875e-05,
+   "rel_l2": 2.002025558713493e-07,
+   "cos": 0.999999999999982,
+   "ref_abs_max": 18.746057510375977
   },
   {
    "check": "dit.out",
@@ -4825,6 +7903,24 @@
    "ref_abs_max": 19.860488891601562
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s27.v",
+   "max_abs": 0.0006239414215087891,
+   "rel_l2": 3.039612004352158e-06,
+   "cos": 0.9999999999953832,
+   "ref_abs_max": 24.550004959106445
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s27.x_next",
+   "max_abs": 2.956390380859375e-05,
+   "rel_l2": 1.9806531758624286e-07,
+   "cos": 0.9999999999999825,
+   "ref_abs_max": 19.625938415527344
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s28.out_cond",
@@ -4841,6 +7937,24 @@
    "rel_l2": 1.0297849556919645e-06,
    "cos": 0.9999999999994721,
    "ref_abs_max": 19.139081954956055
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s28.v",
+   "max_abs": 0.00030040740966796875,
+   "rel_l2": 2.891259167042383e-06,
+   "cos": 0.9999999999958257,
+   "ref_abs_max": 25.772911071777344
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s28.x_next",
+   "max_abs": 1.4483928680419922e-05,
+   "rel_l2": 1.8603747645480118e-07,
+   "cos": 0.9999999999999848,
+   "ref_abs_max": 20.37535285949707
   },
   {
    "check": "dit.out",
@@ -4861,6 +7975,24 @@
    "ref_abs_max": 18.442188262939453
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s29.v",
+   "max_abs": 0.0008494853973388672,
+   "rel_l2": 3.270031063464388e-06,
+   "cos": 0.9999999999946556,
+   "ref_abs_max": 27.12628173828125
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s29.x_next",
+   "max_abs": 4.1484832763671875e-05,
+   "rel_l2": 2.0907159442952272e-07,
+   "cos": 0.9999999999999802,
+   "ref_abs_max": 20.979251861572266
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c1.dit.s30.out_cond",
@@ -4877,6 +8009,24 @@
    "rel_l2": 1.0776531047760465e-06,
    "cos": 0.9999999999994217,
    "ref_abs_max": 17.009706497192383
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s30.v",
+   "max_abs": 0.002376079559326172,
+   "rel_l2": 4.754341638473013e-06,
+   "cos": 0.9999999999887004,
+   "ref_abs_max": 29.85342025756836
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s30.x_next",
+   "max_abs": 0.0001163482666015625,
+   "rel_l2": 2.9942011988834e-07,
+   "cos": 0.9999999999999575,
+   "ref_abs_max": 21.391590118408203
   },
   {
    "check": "dit.out",
@@ -4897,6 +8047,24 @@
    "ref_abs_max": 14.689325332641602
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s31.v",
+   "max_abs": 0.0004968643188476562,
+   "rel_l2": 3.3941249379525732e-06,
+   "cos": 0.9999999999942473,
+   "ref_abs_max": 29.94908332824707
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c1.dit.s31.x_next",
+   "max_abs": 1.1444091796875e-05,
+   "rel_l2": 1.8927562109956264e-07,
+   "cos": 0.999999999999984,
+   "ref_abs_max": 12.409703254699707
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s00.out_cond",
@@ -4913,6 +8081,24 @@
    "rel_l2": 5.712553017031174e-07,
    "cos": 0.9999999999998377,
    "ref_abs_max": 12.788324356079102
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s00.v",
+   "max_abs": 6.103515625e-05,
+   "rel_l2": 1.042220738746576e-06,
+   "cos": 0.9999999999994748,
+   "ref_abs_max": 32.381378173828125
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s00.x_next",
+   "max_abs": 2.384185791015625e-07,
+   "rel_l2": 2.34987085493712e-08,
+   "cos": 1.0000000000000004,
+   "ref_abs_max": 4.276294231414795
   },
   {
    "check": "dit.out",
@@ -4933,6 +8119,24 @@
    "ref_abs_max": 12.822864532470703
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s01.v",
+   "max_abs": 5.7220458984375e-05,
+   "rel_l2": 8.946371061801636e-07,
+   "cos": 0.9999999999996054,
+   "ref_abs_max": 34.07172393798828
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s01.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 4.08102961133451e-08,
+   "cos": 1.0,
+   "ref_abs_max": 4.327517986297607
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s02.out_cond",
@@ -4949,6 +8153,24 @@
    "rel_l2": 1.018063649393009e-06,
    "cos": 0.9999999999996004,
    "ref_abs_max": 13.169561386108398
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s02.v",
+   "max_abs": 6.103515625e-05,
+   "rel_l2": 1.2891508800455348e-06,
+   "cos": 0.9999999999992132,
+   "ref_abs_max": 25.33136749267578
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s02.x_next",
+   "max_abs": 3.5762786865234375e-07,
+   "rel_l2": 6.223835154135034e-08,
+   "cos": 0.9999999999999989,
+   "ref_abs_max": 4.370712757110596
   },
   {
    "check": "dit.out",
@@ -4969,6 +8191,24 @@
    "ref_abs_max": 14.986919403076172
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s03.v",
+   "max_abs": 8.7738037109375e-05,
+   "rel_l2": 2.091698238404409e-06,
+   "cos": 0.9999999999978146,
+   "ref_abs_max": 20.777650833129883
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s03.x_next",
+   "max_abs": 7.301568984985352e-07,
+   "rel_l2": 8.682609790268624e-08,
+   "cos": 0.999999999999997,
+   "ref_abs_max": 4.361751079559326
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s04.out_cond",
@@ -4985,6 +8225,24 @@
    "rel_l2": 6.701590794718765e-07,
    "cos": 0.9999999999997822,
    "ref_abs_max": 13.716346740722656
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s04.v",
+   "max_abs": 7.82012939453125e-05,
+   "rel_l2": 2.2102382335459997e-06,
+   "cos": 0.9999999999975604,
+   "ref_abs_max": 14.931477546691895
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s04.x_next",
+   "max_abs": 8.344650268554688e-07,
+   "rel_l2": 1.0268292016525483e-07,
+   "cos": 0.9999999999999956,
+   "ref_abs_max": 4.435332775115967
   },
   {
    "check": "dit.out",
@@ -5005,6 +8263,24 @@
    "ref_abs_max": 13.578498840332031
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s05.v",
+   "max_abs": 6.866455078125e-05,
+   "rel_l2": 2.4524022003752063e-06,
+   "cos": 0.9999999999970317,
+   "ref_abs_max": 15.102994918823242
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s05.x_next",
+   "max_abs": 8.940696716308594e-07,
+   "rel_l2": 1.2518427453389048e-07,
+   "cos": 0.999999999999993,
+   "ref_abs_max": 4.531670570373535
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s06.out_cond",
@@ -5021,6 +8297,24 @@
    "rel_l2": 7.858971195461457e-07,
    "cos": 0.9999999999996955,
    "ref_abs_max": 13.637909889221191
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s06.v",
+   "max_abs": 6.771087646484375e-05,
+   "rel_l2": 2.42375881311235e-06,
+   "cos": 0.9999999999970642,
+   "ref_abs_max": 14.887006759643555
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s06.x_next",
+   "max_abs": 1.0132789611816406e-06,
+   "rel_l2": 1.3706931692444988e-07,
+   "cos": 0.9999999999999913,
+   "ref_abs_max": 4.652982711791992
   },
   {
    "check": "dit.out",
@@ -5041,6 +8335,24 @@
    "ref_abs_max": 13.766599655151367
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s07.v",
+   "max_abs": 9.083747863769531e-05,
+   "rel_l2": 2.618971727592711e-06,
+   "cos": 0.9999999999965753,
+   "ref_abs_max": 14.729333877563477
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s07.x_next",
+   "max_abs": 1.6093254089355469e-06,
+   "rel_l2": 1.6170401003136326e-07,
+   "cos": 0.9999999999999878,
+   "ref_abs_max": 4.798670768737793
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s08.out_cond",
@@ -5057,6 +8369,24 @@
    "rel_l2": 7.904100055840466e-07,
    "cos": 0.999999999999689,
    "ref_abs_max": 13.86186408996582
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s08.v",
+   "max_abs": 9.703636169433594e-05,
+   "rel_l2": 2.602615849265585e-06,
+   "cos": 0.999999999996615,
+   "ref_abs_max": 14.660065650939941
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s08.x_next",
+   "max_abs": 1.9371509552001953e-06,
+   "rel_l2": 1.7459397535083061e-07,
+   "cos": 0.9999999999999856,
+   "ref_abs_max": 4.965550899505615
   },
   {
    "check": "dit.out",
@@ -5077,6 +8407,24 @@
    "ref_abs_max": 13.934762001037598
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s09.v",
+   "max_abs": 9.202957153320312e-05,
+   "rel_l2": 2.876425453770168e-06,
+   "cos": 0.9999999999958648,
+   "ref_abs_max": 15.1162109375
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s09.x_next",
+   "max_abs": 2.086162567138672e-06,
+   "rel_l2": 2.0518198033484996e-07,
+   "cos": 0.9999999999999799,
+   "ref_abs_max": 5.150588035583496
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s10.out_cond",
@@ -5093,6 +8441,24 @@
    "rel_l2": 9.117885844564294e-07,
    "cos": 0.9999999999995854,
    "ref_abs_max": 14.021260261535645
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s10.v",
+   "max_abs": 0.00013947486877441406,
+   "rel_l2": 2.954666763936189e-06,
+   "cos": 0.9999999999956437,
+   "ref_abs_max": 15.556626319885254
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s10.x_next",
+   "max_abs": 3.3974647521972656e-06,
+   "rel_l2": 2.2214413381696845e-07,
+   "cos": 0.9999999999999761,
+   "ref_abs_max": 5.3511152267456055
   },
   {
    "check": "dit.out",
@@ -5113,6 +8479,24 @@
    "ref_abs_max": 14.091022491455078
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s11.v",
+   "max_abs": 9.78708267211914e-05,
+   "rel_l2": 2.8037427296902982e-06,
+   "cos": 0.9999999999960801,
+   "ref_abs_max": 15.996207237243652
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s11.x_next",
+   "max_abs": 2.6226043701171875e-06,
+   "rel_l2": 2.2024807772520993e-07,
+   "cos": 0.9999999999999766,
+   "ref_abs_max": 5.559582710266113
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s12.out_cond",
@@ -5129,6 +8513,24 @@
    "rel_l2": 9.277657373191432e-07,
    "cos": 0.9999999999995784,
    "ref_abs_max": 14.281089782714844
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s12.v",
+   "max_abs": 8.487701416015625e-05,
+   "rel_l2": 2.837609915736331e-06,
+   "cos": 0.9999999999959756,
+   "ref_abs_max": 16.440141677856445
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s12.x_next",
+   "max_abs": 2.384185791015625e-06,
+   "rel_l2": 2.2930807164584226e-07,
+   "cos": 0.9999999999999745,
+   "ref_abs_max": 5.774930953979492
   },
   {
    "check": "dit.out",
@@ -5149,6 +8551,24 @@
    "ref_abs_max": 14.664710998535156
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s13.v",
+   "max_abs": 0.00012683868408203125,
+   "rel_l2": 2.877581559808396e-06,
+   "cos": 0.9999999999958633,
+   "ref_abs_max": 16.841617584228516
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s13.x_next",
+   "max_abs": 3.814697265625e-06,
+   "rel_l2": 2.3766627303967054e-07,
+   "cos": 0.9999999999999724,
+   "ref_abs_max": 5.9982829093933105
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s14.out_cond",
@@ -5165,6 +8585,24 @@
    "rel_l2": 9.58431798819851e-07,
    "cos": 0.9999999999995424,
    "ref_abs_max": 15.016362190246582
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s14.v",
+   "max_abs": 0.00010991096496582031,
+   "rel_l2": 2.8528860529293866e-06,
+   "cos": 0.9999999999959408,
+   "ref_abs_max": 17.302379608154297
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s14.x_next",
+   "max_abs": 3.4570693969726562e-06,
+   "rel_l2": 2.392517168243166e-07,
+   "cos": 0.9999999999999722,
+   "ref_abs_max": 6.228207111358643
   },
   {
    "check": "dit.out",
@@ -5185,6 +8623,24 @@
    "ref_abs_max": 15.150997161865234
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s15.v",
+   "max_abs": 0.0001373291015625,
+   "rel_l2": 2.873089927556883e-06,
+   "cos": 0.9999999999958799,
+   "ref_abs_max": 17.81024169921875
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s15.x_next",
+   "max_abs": 4.589557647705078e-06,
+   "rel_l2": 2.420161447787666e-07,
+   "cos": 0.9999999999999715,
+   "ref_abs_max": 6.663954734802246
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s16.out_cond",
@@ -5201,6 +8657,24 @@
    "rel_l2": 9.97684521776915e-07,
    "cos": 0.9999999999995041,
    "ref_abs_max": 15.0121488571167
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s16.v",
+   "max_abs": 0.00017642974853515625,
+   "rel_l2": 2.827394377852695e-06,
+   "cos": 0.9999999999960274,
+   "ref_abs_max": 18.418628692626953
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s16.x_next",
+   "max_abs": 6.273388862609863e-06,
+   "rel_l2": 2.3868762437303584e-07,
+   "cos": 0.9999999999999724,
+   "ref_abs_max": 7.318697452545166
   },
   {
    "check": "dit.out",
@@ -5221,6 +8695,24 @@
    "ref_abs_max": 15.289820671081543
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s17.v",
+   "max_abs": 0.00014102458953857422,
+   "rel_l2": 2.984052594103244e-06,
+   "cos": 0.9999999999955591,
+   "ref_abs_max": 18.86251449584961
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s17.x_next",
+   "max_abs": 5.245208740234375e-06,
+   "rel_l2": 2.504383226819945e-07,
+   "cos": 0.9999999999999694,
+   "ref_abs_max": 8.019735336303711
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s18.out_cond",
@@ -5237,6 +8729,24 @@
    "rel_l2": 1.2197648995743167e-06,
    "cos": 0.9999999999992577,
    "ref_abs_max": 15.610638618469238
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s18.v",
+   "max_abs": 0.000141143798828125,
+   "rel_l2": 3.132115940886664e-06,
+   "cos": 0.9999999999951036,
+   "ref_abs_max": 19.789915084838867
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s18.x_next",
+   "max_abs": 5.4836273193359375e-06,
+   "rel_l2": 2.599945296836777e-07,
+   "cos": 0.999999999999967,
+   "ref_abs_max": 8.765722274780273
   },
   {
    "check": "dit.out",
@@ -5257,6 +8767,24 @@
    "ref_abs_max": 15.75651741027832
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s19.v",
+   "max_abs": 0.00011444091796875,
+   "rel_l2": 3.1483053013194297e-06,
+   "cos": 0.999999999995067,
+   "ref_abs_max": 20.861257553100586
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s19.x_next",
+   "max_abs": 4.5299530029296875e-06,
+   "rel_l2": 2.577523764681479e-07,
+   "cos": 0.9999999999999676,
+   "ref_abs_max": 9.563501358032227
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s20.out_cond",
@@ -5273,6 +8801,24 @@
    "rel_l2": 1.2400444698179078e-06,
    "cos": 0.9999999999992325,
    "ref_abs_max": 15.86046028137207
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s20.v",
+   "max_abs": 0.00011372566223144531,
+   "rel_l2": 3.1769813064354397e-06,
+   "cos": 0.9999999999949571,
+   "ref_abs_max": 22.027992248535156
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s20.x_next",
+   "max_abs": 4.76837158203125e-06,
+   "rel_l2": 2.556163324195362e-07,
+   "cos": 0.9999999999999685,
+   "ref_abs_max": 10.426902770996094
   },
   {
    "check": "dit.out",
@@ -5293,6 +8839,24 @@
    "ref_abs_max": 15.876052856445312
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s21.v",
+   "max_abs": 0.0001544952392578125,
+   "rel_l2": 3.2973837997213012e-06,
+   "cos": 0.9999999999945695,
+   "ref_abs_max": 23.25103759765625
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s21.x_next",
+   "max_abs": 6.67572021484375e-06,
+   "rel_l2": 2.599603507275807e-07,
+   "cos": 0.999999999999967,
+   "ref_abs_max": 11.368705749511719
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s22.out_cond",
@@ -5309,6 +8873,24 @@
    "rel_l2": 1.3347096289727617e-06,
    "cos": 0.9999999999991117,
    "ref_abs_max": 15.669998168945312
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s22.v",
+   "max_abs": 0.00017023086547851562,
+   "rel_l2": 3.295383408642771e-06,
+   "cos": 0.9999999999945826,
+   "ref_abs_max": 24.249980926513672
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s22.x_next",
+   "max_abs": 7.62939453125e-06,
+   "rel_l2": 2.5433252531000075e-07,
+   "cos": 0.9999999999999686,
+   "ref_abs_max": 12.398015975952148
   },
   {
    "check": "dit.out",
@@ -5329,6 +8911,24 @@
    "ref_abs_max": 15.488961219787598
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s23.v",
+   "max_abs": 0.0001659393310546875,
+   "rel_l2": 3.3041896418893745e-06,
+   "cos": 0.9999999999945459,
+   "ref_abs_max": 24.73061180114746
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s23.x_next",
+   "max_abs": 7.3909759521484375e-06,
+   "rel_l2": 2.496459498472448e-07,
+   "cos": 0.99999999999997,
+   "ref_abs_max": 13.507719993591309
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s24.out_cond",
@@ -5345,6 +8945,24 @@
    "rel_l2": 1.2671693058685394e-06,
    "cos": 0.9999999999992049,
    "ref_abs_max": 17.06597137451172
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s24.v",
+   "max_abs": 0.00014591217041015625,
+   "rel_l2": 3.165624746611877e-06,
+   "cos": 0.9999999999949939,
+   "ref_abs_max": 25.315425872802734
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s24.x_next",
+   "max_abs": 6.67572021484375e-06,
+   "rel_l2": 2.350423529123579e-07,
+   "cos": 0.9999999999999731,
+   "ref_abs_max": 14.66700267791748
   },
   {
    "check": "dit.out",
@@ -5365,6 +8983,24 @@
    "ref_abs_max": 18.0927734375
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s25.v",
+   "max_abs": 0.00022983551025390625,
+   "rel_l2": 3.1873744842165617e-06,
+   "cos": 0.9999999999949217,
+   "ref_abs_max": 25.484649658203125
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s25.x_next",
+   "max_abs": 1.0609626770019531e-05,
+   "rel_l2": 2.344850518151248e-07,
+   "cos": 0.9999999999999732,
+   "ref_abs_max": 15.82335090637207
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s26.out_cond",
@@ -5381,6 +9017,24 @@
    "rel_l2": 1.2948161927254252e-06,
    "cos": 0.9999999999991713,
    "ref_abs_max": 18.252145767211914
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s26.v",
+   "max_abs": 0.000202178955078125,
+   "rel_l2": 3.1374907990845667e-06,
+   "cos": 0.9999999999950845,
+   "ref_abs_max": 24.396099090576172
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s26.x_next",
+   "max_abs": 9.5367431640625e-06,
+   "rel_l2": 2.3017997109603828e-07,
+   "cos": 0.9999999999999741,
+   "ref_abs_max": 16.90886688232422
   },
   {
    "check": "dit.out",
@@ -5401,6 +9055,24 @@
    "ref_abs_max": 19.718067169189453
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s27.v",
+   "max_abs": 0.00038814544677734375,
+   "rel_l2": 3.2301653145971122e-06,
+   "cos": 0.9999999999947925,
+   "ref_abs_max": 23.25396728515625
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s27.x_next",
+   "max_abs": 1.8596649169921875e-05,
+   "rel_l2": 2.3990935942945077e-07,
+   "cos": 0.9999999999999726,
+   "ref_abs_max": 17.876529693603516
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s28.out_cond",
@@ -5417,6 +9089,24 @@
    "rel_l2": 1.6193002625585335e-06,
    "cos": 0.9999999999986943,
    "ref_abs_max": 19.210285186767578
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s28.v",
+   "max_abs": 0.0006237030029296875,
+   "rel_l2": 3.645909747338951e-06,
+   "cos": 0.9999999999933652,
+   "ref_abs_max": 21.88490867614746
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s28.x_next",
+   "max_abs": 3.0159950256347656e-05,
+   "rel_l2": 2.7841698658497376e-07,
+   "cos": 0.9999999999999626,
+   "ref_abs_max": 18.739953994750977
   },
   {
    "check": "dit.out",
@@ -5437,6 +9127,24 @@
    "ref_abs_max": 18.027681350708008
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s29.v",
+   "max_abs": 0.0006775856018066406,
+   "rel_l2": 3.231601399102128e-06,
+   "cos": 0.9999999999947816,
+   "ref_abs_max": 26.496593475341797
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s29.x_next",
+   "max_abs": 3.337860107421875e-05,
+   "rel_l2": 2.574128543421603e-07,
+   "cos": 0.999999999999968,
+   "ref_abs_max": 19.555505752563477
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s30.out_cond",
@@ -5455,6 +9163,24 @@
    "ref_abs_max": 17.636699676513672
   },
   {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s30.v",
+   "max_abs": 0.0013933181762695312,
+   "rel_l2": 3.6652432713794403e-06,
+   "cos": 0.9999999999932943,
+   "ref_abs_max": 29.889265060424805
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s30.x_next",
+   "max_abs": 6.818771362304688e-05,
+   "rel_l2": 2.9160772769760185e-07,
+   "cos": 0.999999999999959,
+   "ref_abs_max": 20.39851188659668
+  },
+  {
    "check": "dit.out",
    "case": "en-multi-fixdur",
    "tensor": "c2.dit.s31.out_cond",
@@ -5471,6 +9197,24 @@
    "rel_l2": 1.9563755959415852e-06,
    "cos": 0.9999999999980972,
    "ref_abs_max": 16.404678344726562
+  },
+  {
+   "check": "dit.v",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s31.v",
+   "max_abs": 0.0006554126739501953,
+   "rel_l2": 2.9872222374219804e-06,
+   "cos": 0.9999999999955943,
+   "ref_abs_max": 29.16175079345703
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-multi-fixdur",
+   "tensor": "c2.dit.s31.x_next",
+   "max_abs": 9.059906005859375e-06,
+   "rel_l2": 1.702340726837488e-07,
+   "cos": 0.9999999999999875,
+   "ref_abs_max": 12.463397026062012
   },
   {
    "check": "vocoder.backbone",
@@ -5678,6 +9422,24 @@
    "rel_l2": 7.8932284816461e-07,
    "cos": 0.9999999999996905,
    "ref_abs_max": 12.387065887451172
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s00.v",
+   "max_abs": 0.0001544952392578125,
+   "rel_l2": 1.6622788510294363e-06,
+   "cos": 0.9999999999986541,
+   "ref_abs_max": 28.027721405029297
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s00.x_next",
+   "max_abs": 2.384185791015625e-07,
+   "rel_l2": 2.8327604175451493e-08,
+   "cos": 1.0000000000000002,
+   "ref_abs_max": 4.5656418800354
   },
   {
    "check": "dit_internal.time_embed",
@@ -5950,6 +9712,24 @@
    "ref_abs_max": 12.466859817504883
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s01.v",
+   "max_abs": 0.00012493133544921875,
+   "rel_l2": 1.3935568574140553e-06,
+   "cos": 0.9999999999990903,
+   "ref_abs_max": 30.170352935791016
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s01.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 5.046835748429815e-08,
+   "cos": 0.9999999999999994,
+   "ref_abs_max": 4.572678565979004
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s02.out_cond",
@@ -5966,6 +9746,24 @@
    "rel_l2": 6.180591393799078e-07,
    "cos": 0.9999999999998125,
    "ref_abs_max": 14.80699634552002
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s02.v",
+   "max_abs": 0.000316619873046875,
+   "rel_l2": 5.362922537497748e-06,
+   "cos": 0.9999999999859542,
+   "ref_abs_max": 21.518579483032227
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s02.x_next",
+   "max_abs": 1.9073486328125e-06,
+   "rel_l2": 1.7674755089771593e-07,
+   "cos": 0.9999999999999857,
+   "ref_abs_max": 4.56701135635376
   },
   {
    "check": "dit.out",
@@ -5986,6 +9784,24 @@
    "ref_abs_max": 14.952317237854004
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s03.v",
+   "max_abs": 8.20159912109375e-05,
+   "rel_l2": 1.9015511384659398e-06,
+   "cos": 0.9999999999981954,
+   "ref_abs_max": 17.736068725585938
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s03.x_next",
+   "max_abs": 6.854534149169922e-07,
+   "rel_l2": 9.096898123481299e-08,
+   "cos": 0.9999999999999968,
+   "ref_abs_max": 4.551614761352539
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s04.out_cond",
@@ -6002,6 +9818,24 @@
    "rel_l2": 8.366828677326464e-07,
    "cos": 0.9999999999996622,
    "ref_abs_max": 14.881327629089355
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s04.v",
+   "max_abs": 8.630752563476562e-05,
+   "rel_l2": 2.4311826927923316e-06,
+   "cos": 0.9999999999970515,
+   "ref_abs_max": 17.21944808959961
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s04.x_next",
+   "max_abs": 8.922070264816284e-07,
+   "rel_l2": 1.257325325432813e-07,
+   "cos": 0.999999999999993,
+   "ref_abs_max": 4.530101776123047
   },
   {
    "check": "dit.out",
@@ -6022,6 +9856,24 @@
    "ref_abs_max": 14.747035026550293
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s05.v",
+   "max_abs": 8.392333984375e-05,
+   "rel_l2": 2.3610306820111593e-06,
+   "cos": 0.9999999999972168,
+   "ref_abs_max": 20.17538070678711
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s05.x_next",
+   "max_abs": 1.0728836059570312e-06,
+   "rel_l2": 1.4046983200276957e-07,
+   "cos": 0.9999999999999909,
+   "ref_abs_max": 4.541261672973633
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s06.out_cond",
@@ -6038,6 +9890,24 @@
    "rel_l2": 8.006224371288332e-07,
    "cos": 0.999999999999683,
    "ref_abs_max": 14.72855281829834
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s06.v",
+   "max_abs": 8.0108642578125e-05,
+   "rel_l2": 2.3906468789272076e-06,
+   "cos": 0.9999999999971447,
+   "ref_abs_max": 19.050844192504883
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s06.x_next",
+   "max_abs": 1.3113021850585938e-06,
+   "rel_l2": 1.5905543690790585e-07,
+   "cos": 0.9999999999999881,
+   "ref_abs_max": 4.607666969299316
   },
   {
    "check": "dit.out",
@@ -6058,6 +9928,24 @@
    "ref_abs_max": 14.759681701660156
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s07.v",
+   "max_abs": 8.20159912109375e-05,
+   "rel_l2": 2.5471200829775352e-06,
+   "cos": 0.9999999999967598,
+   "ref_abs_max": 17.436603546142578
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s07.x_next",
+   "max_abs": 1.4603137969970703e-06,
+   "rel_l2": 1.8642530225965008e-07,
+   "cos": 0.9999999999999835,
+   "ref_abs_max": 4.648070812225342
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s08.out_cond",
@@ -6074,6 +9962,24 @@
    "rel_l2": 8.018965307852604e-07,
    "cos": 0.9999999999996814,
    "ref_abs_max": 14.806278228759766
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s08.v",
+   "max_abs": 0.00011146068572998047,
+   "rel_l2": 2.55576378140498e-06,
+   "cos": 0.9999999999967362,
+   "ref_abs_max": 16.305530548095703
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s08.x_next",
+   "max_abs": 2.1457672119140625e-06,
+   "rel_l2": 2.0227227636362028e-07,
+   "cos": 0.9999999999999808,
+   "ref_abs_max": 4.793386936187744
   },
   {
    "check": "dit.out",
@@ -6094,6 +10000,24 @@
    "ref_abs_max": 14.856088638305664
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s09.v",
+   "max_abs": 0.00014084577560424805,
+   "rel_l2": 2.603149805044542e-06,
+   "cos": 0.9999999999966152,
+   "ref_abs_max": 15.895198822021484
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s09.x_next",
+   "max_abs": 3.0994415283203125e-06,
+   "rel_l2": 2.1972780315594466e-07,
+   "cos": 0.999999999999977,
+   "ref_abs_max": 5.018354892730713
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s10.out_cond",
@@ -6110,6 +10034,24 @@
    "rel_l2": 7.982007198513285e-07,
    "cos": 0.9999999999996841,
    "ref_abs_max": 14.924941062927246
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s10.v",
+   "max_abs": 0.00016433000564575195,
+   "rel_l2": 2.565307106179756e-06,
+   "cos": 0.9999999999967127,
+   "ref_abs_max": 15.99821662902832
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s10.x_next",
+   "max_abs": 3.993511199951172e-06,
+   "rel_l2": 2.2772317041687633e-07,
+   "cos": 0.9999999999999749,
+   "ref_abs_max": 5.264894008636475
   },
   {
    "check": "dit.out",
@@ -6130,6 +10072,24 @@
    "ref_abs_max": 14.959681510925293
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s11.v",
+   "max_abs": 0.00013315677642822266,
+   "rel_l2": 2.6233533281647147e-06,
+   "cos": 0.9999999999965671,
+   "ref_abs_max": 16.322216033935547
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s11.x_next",
+   "max_abs": 3.4570693969726562e-06,
+   "rel_l2": 2.402296736838022e-07,
+   "cos": 0.9999999999999726,
+   "ref_abs_max": 5.530967712402344
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s12.out_cond",
@@ -6146,6 +10106,24 @@
    "rel_l2": 8.468048491270234e-07,
    "cos": 0.9999999999996435,
    "ref_abs_max": 14.969154357910156
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s12.v",
+   "max_abs": 8.791685104370117e-05,
+   "rel_l2": 2.559956669889397e-06,
+   "cos": 0.9999999999967256,
+   "ref_abs_max": 16.630245208740234
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s12.x_next",
+   "max_abs": 2.384185791015625e-06,
+   "rel_l2": 2.3902922364204905e-07,
+   "cos": 0.9999999999999726,
+   "ref_abs_max": 5.916980743408203
   },
   {
    "check": "dit.out",
@@ -6166,6 +10144,24 @@
    "ref_abs_max": 14.974072456359863
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s13.v",
+   "max_abs": 0.00010645389556884766,
+   "rel_l2": 2.5379279721260132e-06,
+   "cos": 0.999999999996783,
+   "ref_abs_max": 17.535568237304688
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s13.x_next",
+   "max_abs": 3.2186508178710938e-06,
+   "rel_l2": 2.390873567223999e-07,
+   "cos": 0.9999999999999729,
+   "ref_abs_max": 6.348949432373047
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s14.out_cond",
@@ -6182,6 +10178,24 @@
    "rel_l2": 8.269444095566861e-07,
    "cos": 0.9999999999996607,
    "ref_abs_max": 14.974800109863281
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s14.v",
+   "max_abs": 0.00011420249938964844,
+   "rel_l2": 2.477279997037665e-06,
+   "cos": 0.9999999999969368,
+   "ref_abs_max": 18.91427230834961
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s14.x_next",
+   "max_abs": 3.6656856536865234e-06,
+   "rel_l2": 2.3336951815141146e-07,
+   "cos": 0.9999999999999742,
+   "ref_abs_max": 6.8129191398620605
   },
   {
    "check": "dit.out",
@@ -6202,6 +10216,24 @@
    "ref_abs_max": 15.012847900390625
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s15.v",
+   "max_abs": 0.00011146068572998047,
+   "rel_l2": 2.549723059645557e-06,
+   "cos": 0.9999999999967549,
+   "ref_abs_max": 19.35638427734375
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s15.x_next",
+   "max_abs": 3.773719072341919e-06,
+   "rel_l2": 2.381228511044221e-07,
+   "cos": 0.9999999999999734,
+   "ref_abs_max": 7.303717613220215
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s16.out_cond",
@@ -6218,6 +10250,24 @@
    "rel_l2": 8.650403893564214e-07,
    "cos": 0.9999999999996295,
    "ref_abs_max": 15.05368709564209
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s16.v",
+   "max_abs": 0.00017011165618896484,
+   "rel_l2": 2.6014524220874117e-06,
+   "cos": 0.9999999999966291,
+   "ref_abs_max": 19.162322998046875
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s16.x_next",
+   "max_abs": 6.0498714447021484e-06,
+   "rel_l2": 2.392665380823293e-07,
+   "cos": 0.999999999999973,
+   "ref_abs_max": 7.816202640533447
   },
   {
    "check": "dit_internal.time_embed",
@@ -6472,6 +10522,24 @@
    "ref_abs_max": 15.098151206970215
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s17.v",
+   "max_abs": 0.000141143798828125,
+   "rel_l2": 2.5864888265360033e-06,
+   "cos": 0.9999999999966585,
+   "ref_abs_max": 17.839427947998047
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s17.x_next",
+   "max_abs": 5.245208740234375e-06,
+   "rel_l2": 2.333179146049114e-07,
+   "cos": 0.9999999999999745,
+   "ref_abs_max": 8.361821174621582
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s18.out_cond",
@@ -6488,6 +10556,24 @@
    "rel_l2": 9.079081422541808e-07,
    "cos": 0.9999999999995904,
    "ref_abs_max": 15.325061798095703
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s18.v",
+   "max_abs": 0.00012934207916259766,
+   "rel_l2": 2.6251361915057763e-06,
+   "cos": 0.9999999999965572,
+   "ref_abs_max": 17.933109283447266
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s18.x_next",
+   "max_abs": 5.0067901611328125e-06,
+   "rel_l2": 2.308928429153947e-07,
+   "cos": 0.9999999999999748,
+   "ref_abs_max": 9.055724143981934
   },
   {
    "check": "dit.out",
@@ -6508,6 +10594,24 @@
    "ref_abs_max": 15.63710880279541
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s19.v",
+   "max_abs": 0.00017881393432617188,
+   "rel_l2": 2.7617964538743084e-06,
+   "cos": 0.9999999999961887,
+   "ref_abs_max": 18.52652359008789
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s19.x_next",
+   "max_abs": 7.152557373046875e-06,
+   "rel_l2": 2.3564345170310215e-07,
+   "cos": 0.9999999999999739,
+   "ref_abs_max": 9.799177169799805
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s20.out_cond",
@@ -6524,6 +10628,24 @@
    "rel_l2": 1.0226594810003827e-06,
    "cos": 0.999999999999479,
    "ref_abs_max": 15.78507137298584
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s20.v",
+   "max_abs": 0.0001775696873664856,
+   "rel_l2": 2.7977935079279644e-06,
+   "cos": 0.9999999999960886,
+   "ref_abs_max": 19.29849624633789
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s20.x_next",
+   "max_abs": 7.361173629760742e-06,
+   "rel_l2": 2.3105023496084048e-07,
+   "cos": 0.9999999999999751,
+   "ref_abs_max": 10.599437713623047
   },
   {
    "check": "dit.out",
@@ -6544,6 +10666,24 @@
    "ref_abs_max": 15.612735748291016
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s21.v",
+   "max_abs": 0.00014829635620117188,
+   "rel_l2": 2.8985474700044756e-06,
+   "cos": 0.9999999999958011,
+   "ref_abs_max": 20.153209686279297
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s21.x_next",
+   "max_abs": 6.332993507385254e-06,
+   "rel_l2": 2.3148735607762862e-07,
+   "cos": 0.9999999999999749,
+   "ref_abs_max": 11.460101127624512
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s22.out_cond",
@@ -6560,6 +10700,24 @@
    "rel_l2": 1.0637537310018483e-06,
    "cos": 0.9999999999994372,
    "ref_abs_max": 16.873455047607422
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s22.v",
+   "max_abs": 0.00011920928955078125,
+   "rel_l2": 2.8536856385464164e-06,
+   "cos": 0.9999999999959307,
+   "ref_abs_max": 21.115909576416016
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s22.x_next",
+   "max_abs": 5.245208740234375e-06,
+   "rel_l2": 2.205123458142202e-07,
+   "cos": 0.9999999999999777,
+   "ref_abs_max": 12.381875038146973
   },
   {
    "check": "dit.out",
@@ -6580,6 +10738,24 @@
    "ref_abs_max": 18.6562442779541
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s23.v",
+   "max_abs": 0.00014090538024902344,
+   "rel_l2": 2.876513301817937e-06,
+   "cos": 0.9999999999958673,
+   "ref_abs_max": 22.03384017944336
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s23.x_next",
+   "max_abs": 6.4373016357421875e-06,
+   "rel_l2": 2.1454049185100007e-07,
+   "cos": 0.999999999999979,
+   "ref_abs_max": 13.361601829528809
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s24.out_cond",
@@ -6596,6 +10772,24 @@
    "rel_l2": 1.0490462195003192e-06,
    "cos": 0.9999999999994535,
    "ref_abs_max": 19.99367904663086
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s24.v",
+   "max_abs": 0.00014925003051757812,
+   "rel_l2": 2.8648648663046203e-06,
+   "cos": 0.9999999999959064,
+   "ref_abs_max": 22.916282653808594
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s24.x_next",
+   "max_abs": 6.794929504394531e-06,
+   "rel_l2": 2.0755061534573387e-07,
+   "cos": 0.9999999999999801,
+   "ref_abs_max": 14.391412734985352
   },
   {
    "check": "dit.out",
@@ -6616,6 +10810,24 @@
    "ref_abs_max": 21.438629150390625
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s25.v",
+   "max_abs": 0.0001825094223022461,
+   "rel_l2": 2.816421215744706e-06,
+   "cos": 0.9999999999960362,
+   "ref_abs_max": 24.230266571044922
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s25.x_next",
+   "max_abs": 8.58306884765625e-06,
+   "rel_l2": 2.0100906718655342e-07,
+   "cos": 0.9999999999999818,
+   "ref_abs_max": 15.453981399536133
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s26.out_cond",
@@ -6632,6 +10844,24 @@
    "rel_l2": 1.0435018768784042e-06,
    "cos": 0.9999999999994599,
    "ref_abs_max": 23.024187088012695
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s26.v",
+   "max_abs": 0.00013637542724609375,
+   "rel_l2": 2.7334525677146952e-06,
+   "cos": 0.9999999999962752,
+   "ref_abs_max": 24.642414093017578
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s26.x_next",
+   "max_abs": 6.67572021484375e-06,
+   "rel_l2": 1.930218289928353e-07,
+   "cos": 0.9999999999999839,
+   "ref_abs_max": 16.521564483642578
   },
   {
    "check": "dit.out",
@@ -6652,6 +10882,24 @@
    "ref_abs_max": 21.96738052368164
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s27.v",
+   "max_abs": 0.0002894401550292969,
+   "rel_l2": 2.8715888350918264e-06,
+   "cos": 0.9999999999958796,
+   "ref_abs_max": 24.276168823242188
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s27.x_next",
+   "max_abs": 1.3887882232666016e-05,
+   "rel_l2": 2.0198012562587626e-07,
+   "cos": 0.9999999999999817,
+   "ref_abs_max": 17.560274124145508
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s28.out_cond",
@@ -6668,6 +10916,24 @@
    "rel_l2": 1.2443141385523535e-06,
    "cos": 0.9999999999992281,
    "ref_abs_max": 18.429126739501953
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s28.v",
+   "max_abs": 0.00038909912109375,
+   "rel_l2": 3.151219781947344e-06,
+   "cos": 0.9999999999950377,
+   "ref_abs_max": 24.477825164794922
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s28.x_next",
+   "max_abs": 1.8775463104248047e-05,
+   "rel_l2": 2.239939896170114e-07,
+   "cos": 0.9999999999999768,
+   "ref_abs_max": 18.549636840820312
   },
   {
    "check": "dit.out",
@@ -6688,6 +10954,24 @@
    "ref_abs_max": 17.914386749267578
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s29.v",
+   "max_abs": 0.00033473968505859375,
+   "rel_l2": 2.7441050205941154e-06,
+   "cos": 0.9999999999962368,
+   "ref_abs_max": 28.888710021972656
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s29.x_next",
+   "max_abs": 1.627206802368164e-05,
+   "rel_l2": 2.0055327356777647e-07,
+   "cos": 0.999999999999982,
+   "ref_abs_max": 19.497013092041016
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s30.out_cond",
@@ -6706,6 +10990,24 @@
    "ref_abs_max": 16.799484252929688
   },
   {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s30.v",
+   "max_abs": 0.0007305145263671875,
+   "rel_l2": 3.2430342223535282e-06,
+   "cos": 0.9999999999947508,
+   "ref_abs_max": 34.89028549194336
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s30.x_next",
+   "max_abs": 3.5762786865234375e-05,
+   "rel_l2": 2.3736217224669127e-07,
+   "cos": 0.9999999999999739,
+   "ref_abs_max": 20.436447143554688
+  },
+  {
    "check": "dit.out",
    "case": "en-prep",
    "tensor": "c0.dit.s31.out_cond",
@@ -6722,6 +11024,24 @@
    "rel_l2": 1.4436766221419226e-06,
    "cos": 0.9999999999989793,
    "ref_abs_max": 15.29490852355957
+  },
+  {
+   "check": "dit.v",
+   "case": "en-prep",
+   "tensor": "c0.dit.s31.v",
+   "max_abs": 0.0003826618194580078,
+   "rel_l2": 2.885180113356631e-06,
+   "cos": 0.9999999999958692,
+   "ref_abs_max": 30.55752182006836
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-prep",
+   "tensor": "c0.dit.s31.x_next",
+   "max_abs": 1.1444091796875e-05,
+   "rel_l2": 1.8279869876052787e-07,
+   "cos": 0.9999999999999847,
+   "ref_abs_max": 12.491390228271484
   },
   {
    "check": "vocoder.backbone",
@@ -6812,6 +11132,24 @@
    "rel_l2": 8.867004108176121e-07,
    "cos": 0.9999999999997109,
    "ref_abs_max": 12.677433013916016
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s00.v",
+   "max_abs": 0.0002932548522949219,
+   "rel_l2": 1.844343075882168e-06,
+   "cos": 0.9999999999986858,
+   "ref_abs_max": 30.550247192382812
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s00.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 2.665359255126296e-08,
+   "cos": 1.0000000000000007,
+   "ref_abs_max": 4.650657653808594
   },
   {
    "check": "dit_internal.time_embed",
@@ -7084,6 +11422,24 @@
    "ref_abs_max": 12.571782112121582
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s01.v",
+   "max_abs": 0.0002052783966064453,
+   "rel_l2": 2.9026699301386794e-06,
+   "cos": 0.999999999996343,
+   "ref_abs_max": 30.126903533935547
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s01.x_next",
+   "max_abs": 7.152557373046875e-07,
+   "rel_l2": 7.36582149535764e-08,
+   "cos": 0.9999999999999983,
+   "ref_abs_max": 4.6294755935668945
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s02.out_cond",
@@ -7100,6 +11456,24 @@
    "rel_l2": 7.235869931431773e-07,
    "cos": 0.9999999999997875,
    "ref_abs_max": 14.049236297607422
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s02.v",
+   "max_abs": 7.82012939453125e-05,
+   "rel_l2": 1.7300152278158903e-06,
+   "cos": 0.9999999999985109,
+   "ref_abs_max": 23.45534896850586
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s02.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 6.790582626190447e-08,
+   "cos": 0.9999999999999991,
+   "ref_abs_max": 4.598364353179932
   },
   {
    "check": "dit.out",
@@ -7120,6 +11494,24 @@
    "ref_abs_max": 15.877403259277344
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s03.v",
+   "max_abs": 0.00011652708053588867,
+   "rel_l2": 2.6826030593816084e-06,
+   "cos": 0.9999999999964455,
+   "ref_abs_max": 17.81443977355957
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s03.x_next",
+   "max_abs": 9.5367431640625e-07,
+   "rel_l2": 1.091830212888084e-07,
+   "cos": 0.9999999999999952,
+   "ref_abs_max": 4.551878929138184
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s04.out_cond",
@@ -7136,6 +11528,24 @@
    "rel_l2": 6.54371992555907e-07,
    "cos": 0.9999999999998009,
    "ref_abs_max": 15.918622970581055
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s04.v",
+   "max_abs": 8.869171142578125e-05,
+   "rel_l2": 2.358535007587041e-06,
+   "cos": 0.9999999999972258,
+   "ref_abs_max": 16.19045639038086
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s04.x_next",
+   "max_abs": 9.5367431640625e-07,
+   "rel_l2": 1.2269700487471432e-07,
+   "cos": 0.9999999999999938,
+   "ref_abs_max": 4.549912929534912
   },
   {
    "check": "dit.out",
@@ -7156,6 +11566,24 @@
    "ref_abs_max": 15.894125938415527
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s05.v",
+   "max_abs": 0.000110626220703125,
+   "rel_l2": 2.429522243180225e-06,
+   "cos": 0.9999999999970641,
+   "ref_abs_max": 17.16487693786621
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s05.x_next",
+   "max_abs": 1.430511474609375e-06,
+   "rel_l2": 1.466520608499469e-07,
+   "cos": 0.9999999999999906,
+   "ref_abs_max": 4.542840003967285
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s06.out_cond",
@@ -7172,6 +11600,24 @@
    "rel_l2": 7.382909938965313e-07,
    "cos": 0.9999999999997332,
    "ref_abs_max": 15.853119850158691
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s06.v",
+   "max_abs": 9.369850158691406e-05,
+   "rel_l2": 2.506648673376754e-06,
+   "cos": 0.9999999999968606,
+   "ref_abs_max": 19.101726531982422
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s06.x_next",
+   "max_abs": 1.4416873455047607e-06,
+   "rel_l2": 1.6985474908000679e-07,
+   "cos": 0.9999999999999867,
+   "ref_abs_max": 4.52354621887207
   },
   {
    "check": "dit.out",
@@ -7192,6 +11638,24 @@
    "ref_abs_max": 15.854081153869629
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s07.v",
+   "max_abs": 9.679794311523438e-05,
+   "rel_l2": 2.569674981852439e-06,
+   "cos": 0.9999999999967008,
+   "ref_abs_max": 19.432327270507812
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s07.x_next",
+   "max_abs": 1.7285346984863281e-06,
+   "rel_l2": 1.9370799692342472e-07,
+   "cos": 0.9999999999999825,
+   "ref_abs_max": 4.519024848937988
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s08.out_cond",
@@ -7208,6 +11672,24 @@
    "rel_l2": 7.624398686317626e-07,
    "cos": 0.9999999999997121,
    "ref_abs_max": 15.892061233520508
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s08.v",
+   "max_abs": 0.0001372992992401123,
+   "rel_l2": 2.6260768794551013e-06,
+   "cos": 0.9999999999965554,
+   "ref_abs_max": 19.194183349609375
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s08.x_next",
+   "max_abs": 2.7418136596679688e-06,
+   "rel_l2": 2.1688816853142773e-07,
+   "cos": 0.999999999999978,
+   "ref_abs_max": 4.656721115112305
   },
   {
    "check": "dit.out",
@@ -7228,6 +11710,24 @@
    "ref_abs_max": 15.929643630981445
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s09.v",
+   "max_abs": 0.00011014938354492188,
+   "rel_l2": 2.5859120891894192e-06,
+   "cos": 0.9999999999966687,
+   "ref_abs_max": 18.74509048461914
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s09.x_next",
+   "max_abs": 2.5033950805664062e-06,
+   "rel_l2": 2.2975535711819882e-07,
+   "cos": 0.999999999999975,
+   "ref_abs_max": 4.810945987701416
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s10.out_cond",
@@ -7244,6 +11744,24 @@
    "rel_l2": 7.885325541184684e-07,
    "cos": 0.9999999999996925,
    "ref_abs_max": 15.95291519165039
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s10.v",
+   "max_abs": 0.0001227855682373047,
+   "rel_l2": 2.6250849009524266e-06,
+   "cos": 0.9999999999965565,
+   "ref_abs_max": 18.684476852416992
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s10.x_next",
+   "max_abs": 2.9802322387695312e-06,
+   "rel_l2": 2.458106444943731e-07,
+   "cos": 0.9999999999999712,
+   "ref_abs_max": 5.0256876945495605
   },
   {
    "check": "dit.out",
@@ -7264,6 +11782,24 @@
    "ref_abs_max": 15.959802627563477
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s11.v",
+   "max_abs": 0.00012612342834472656,
+   "rel_l2": 2.6313089723642234e-06,
+   "cos": 0.9999999999965402,
+   "ref_abs_max": 18.513816833496094
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s11.x_next",
+   "max_abs": 3.337860107421875e-06,
+   "rel_l2": 2.555975393999546e-07,
+   "cos": 0.9999999999999689,
+   "ref_abs_max": 5.2414937019348145
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s12.out_cond",
@@ -7280,6 +11816,24 @@
    "rel_l2": 7.952111478899992e-07,
    "cos": 0.9999999999996886,
    "ref_abs_max": 15.960878372192383
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s12.v",
+   "max_abs": 0.0001227855682373047,
+   "rel_l2": 2.585667212784725e-06,
+   "cos": 0.9999999999966602,
+   "ref_abs_max": 17.713565826416016
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s12.x_next",
+   "max_abs": 3.5762786865234375e-06,
+   "rel_l2": 2.5647570783463415e-07,
+   "cos": 0.999999999999969,
+   "ref_abs_max": 5.655080795288086
   },
   {
    "check": "dit.out",
@@ -7300,6 +11854,24 @@
    "ref_abs_max": 15.963333129882812
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s13.v",
+   "max_abs": 0.00012922286987304688,
+   "rel_l2": 2.614400397128131e-06,
+   "cos": 0.9999999999965876,
+   "ref_abs_max": 18.071430206298828
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s13.x_next",
+   "max_abs": 3.874301910400391e-06,
+   "rel_l2": 2.6061561939272365e-07,
+   "cos": 0.9999999999999677,
+   "ref_abs_max": 6.108628749847412
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s14.out_cond",
@@ -7316,6 +11888,24 @@
    "rel_l2": 8.022546070882129e-07,
    "cos": 0.9999999999996803,
    "ref_abs_max": 16.21092987060547
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s14.v",
+   "max_abs": 0.00018644332885742188,
+   "rel_l2": 2.6123847546383432e-06,
+   "cos": 0.9999999999965938,
+   "ref_abs_max": 18.60757827758789
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s14.x_next",
+   "max_abs": 5.9604644775390625e-06,
+   "rel_l2": 2.597240930375149e-07,
+   "cos": 0.9999999999999676,
+   "ref_abs_max": 6.60292387008667
   },
   {
    "check": "dit.out",
@@ -7336,6 +11926,24 @@
    "ref_abs_max": 16.469106674194336
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s15.v",
+   "max_abs": 0.00012135505676269531,
+   "rel_l2": 2.632223912269541e-06,
+   "cos": 0.9999999999965381,
+   "ref_abs_max": 19.212757110595703
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s15.x_next",
+   "max_abs": 4.0531158447265625e-06,
+   "rel_l2": 2.579979132022579e-07,
+   "cos": 0.999999999999968,
+   "ref_abs_max": 7.142042636871338
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s16.out_cond",
@@ -7352,6 +11960,24 @@
    "rel_l2": 7.953081062596506e-07,
    "cos": 0.9999999999996867,
    "ref_abs_max": 16.669349670410156
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s16.v",
+   "max_abs": 0.00013794004917144775,
+   "rel_l2": 2.5874092173142584e-06,
+   "cos": 0.9999999999966617,
+   "ref_abs_max": 19.93761444091797
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s16.x_next",
+   "max_abs": 5.0067901611328125e-06,
+   "rel_l2": 2.4818199526286056e-07,
+   "cos": 0.9999999999999707,
+   "ref_abs_max": 7.728272914886475
   },
   {
    "check": "dit_internal.time_embed",
@@ -7606,6 +12232,24 @@
    "ref_abs_max": 16.826053619384766
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s17.v",
+   "max_abs": 0.0001246929168701172,
+   "rel_l2": 2.6065968269939007e-06,
+   "cos": 0.9999999999966078,
+   "ref_abs_max": 20.719161987304688
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s17.x_next",
+   "max_abs": 4.589557647705078e-06,
+   "rel_l2": 2.434088040200928e-07,
+   "cos": 0.9999999999999721,
+   "ref_abs_max": 8.374770164489746
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s18.out_cond",
@@ -7622,6 +12266,24 @@
    "rel_l2": 8.198509353491933e-07,
    "cos": 0.9999999999996662,
    "ref_abs_max": 16.921377182006836
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s18.v",
+   "max_abs": 0.0001698136329650879,
+   "rel_l2": 2.697836448083995e-06,
+   "cos": 0.9999999999963667,
+   "ref_abs_max": 21.71516227722168
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s18.x_next",
+   "max_abs": 6.571412086486816e-06,
+   "rel_l2": 2.4401437678882036e-07,
+   "cos": 0.9999999999999724,
+   "ref_abs_max": 9.215015411376953
   },
   {
    "check": "dit.out",
@@ -7642,6 +12304,24 @@
    "ref_abs_max": 16.883651733398438
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s19.v",
+   "max_abs": 0.000194549560546875,
+   "rel_l2": 2.7306389208932224e-06,
+   "cos": 0.9999999999962742,
+   "ref_abs_max": 22.76326560974121
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s19.x_next",
+   "max_abs": 8.106231689453125e-06,
+   "rel_l2": 2.38436083155075e-07,
+   "cos": 0.9999999999999741,
+   "ref_abs_max": 10.128485679626465
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s20.out_cond",
@@ -7658,6 +12338,24 @@
    "rel_l2": 8.618924828032165e-07,
    "cos": 0.9999999999996306,
    "ref_abs_max": 16.638395309448242
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s20.v",
+   "max_abs": 0.0001474618911743164,
+   "rel_l2": 2.6966520016997714e-06,
+   "cos": 0.9999999999963668,
+   "ref_abs_max": 23.80373764038086
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s20.x_next",
+   "max_abs": 6.198883056640625e-06,
+   "rel_l2": 2.2692452630174345e-07,
+   "cos": 0.9999999999999766,
+   "ref_abs_max": 11.10763931274414
   },
   {
    "check": "dit.out",
@@ -7678,6 +12376,24 @@
    "ref_abs_max": 16.16473388671875
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s21.v",
+   "max_abs": 0.00014781951904296875,
+   "rel_l2": 2.707882066154176e-06,
+   "cos": 0.9999999999963358,
+   "ref_abs_max": 24.621442794799805
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s21.x_next",
+   "max_abs": 6.198883056640625e-06,
+   "rel_l2": 2.1918915087795977e-07,
+   "cos": 0.9999999999999779,
+   "ref_abs_max": 12.13226318359375
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s22.out_cond",
@@ -7694,6 +12410,24 @@
    "rel_l2": 8.979548829959682e-07,
    "cos": 0.9999999999995991,
    "ref_abs_max": 15.949295043945312
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s22.v",
+   "max_abs": 0.00014448165893554688,
+   "rel_l2": 2.759201702252874e-06,
+   "cos": 0.9999999999961963,
+   "ref_abs_max": 24.886463165283203
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s22.x_next",
+   "max_abs": 6.198883056640625e-06,
+   "rel_l2": 2.1445605024996193e-07,
+   "cos": 0.9999999999999789,
+   "ref_abs_max": 13.170828819274902
   },
   {
    "check": "dit.out",
@@ -7714,6 +12448,24 @@
    "ref_abs_max": 16.437292098999023
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s23.v",
+   "max_abs": 0.00020122528076171875,
+   "rel_l2": 2.7580345723334016e-06,
+   "cos": 0.9999999999961988,
+   "ref_abs_max": 24.804595947265625
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s23.x_next",
+   "max_abs": 9.059906005859375e-06,
+   "rel_l2": 2.0568147273593954e-07,
+   "cos": 0.9999999999999803,
+   "ref_abs_max": 14.184985160827637
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s24.out_cond",
@@ -7730,6 +12482,24 @@
    "rel_l2": 9.08815810746552e-07,
    "cos": 0.9999999999995917,
    "ref_abs_max": 17.79103660583496
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s24.v",
+   "max_abs": 0.00020503997802734375,
+   "rel_l2": 2.7977040169067624e-06,
+   "cos": 0.9999999999960899,
+   "ref_abs_max": 25.263317108154297
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s24.x_next",
+   "max_abs": 9.5367431640625e-06,
+   "rel_l2": 2.0006805579045673e-07,
+   "cos": 0.9999999999999816,
+   "ref_abs_max": 15.162369728088379
   },
   {
    "check": "dit.out",
@@ -7750,6 +12520,24 @@
    "ref_abs_max": 19.021085739135742
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s25.v",
+   "max_abs": 0.00019097328186035156,
+   "rel_l2": 2.8010629143980882e-06,
+   "cos": 0.9999999999960852,
+   "ref_abs_max": 25.066471099853516
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s25.x_next",
+   "max_abs": 9.059906005859375e-06,
+   "rel_l2": 1.9366410412368255e-07,
+   "cos": 0.9999999999999835,
+   "ref_abs_max": 16.137821197509766
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s26.out_cond",
@@ -7766,6 +12554,24 @@
    "rel_l2": 8.900357255323407e-07,
    "cos": 0.9999999999996061,
    "ref_abs_max": 19.930400848388672
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s26.v",
+   "max_abs": 0.00032520294189453125,
+   "rel_l2": 2.8477595870656405e-06,
+   "cos": 0.9999999999959491,
+   "ref_abs_max": 25.63280487060547
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s26.x_next",
+   "max_abs": 1.5497207641601562e-05,
+   "rel_l2": 1.9054494059688174e-07,
+   "cos": 0.9999999999999846,
+   "ref_abs_max": 17.137670516967773
   },
   {
    "check": "dit.out",
@@ -7786,6 +12592,24 @@
    "ref_abs_max": 19.750286102294922
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s27.v",
+   "max_abs": 0.0002655982971191406,
+   "rel_l2": 2.9033667833627435e-06,
+   "cos": 0.9999999999957874,
+   "ref_abs_max": 25.23891258239746
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s27.x_next",
+   "max_abs": 1.2874603271484375e-05,
+   "rel_l2": 1.8847899203054777e-07,
+   "cos": 0.9999999999999847,
+   "ref_abs_max": 18.141721725463867
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s28.out_cond",
@@ -7802,6 +12626,24 @@
    "rel_l2": 9.499654995958664e-07,
    "cos": 0.9999999999995512,
    "ref_abs_max": 19.003236770629883
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s28.v",
+   "max_abs": 0.0006895065307617188,
+   "rel_l2": 3.269465487675358e-06,
+   "cos": 0.9999999999946612,
+   "ref_abs_max": 26.88963508605957
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s28.x_next",
+   "max_abs": 3.337860107421875e-05,
+   "rel_l2": 2.0793351500964718e-07,
+   "cos": 0.9999999999999806,
+   "ref_abs_max": 19.085168838500977
   },
   {
    "check": "dit.out",
@@ -7822,6 +12664,24 @@
    "ref_abs_max": 18.850555419921875
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s29.v",
+   "max_abs": 0.0008604526519775391,
+   "rel_l2": 3.350577148545515e-06,
+   "cos": 0.9999999999943892,
+   "ref_abs_max": 28.870586395263672
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s29.x_next",
+   "max_abs": 4.1961669921875e-05,
+   "rel_l2": 2.111162361119842e-07,
+   "cos": 0.9999999999999803,
+   "ref_abs_max": 19.973752975463867
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s30.out_cond",
@@ -7840,6 +12700,24 @@
    "ref_abs_max": 18.00191879272461
   },
   {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s30.v",
+   "max_abs": 0.005016326904296875,
+   "rel_l2": 8.404841355150163e-06,
+   "cos": 0.9999999999646813,
+   "ref_abs_max": 29.58233642578125
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s30.x_next",
+   "max_abs": 0.0002455711364746094,
+   "rel_l2": 5.141275721986258e-07,
+   "cos": 0.9999999999998704,
+   "ref_abs_max": 20.836645126342773
+  },
+  {
    "check": "dit.out",
    "case": "en-short",
    "tensor": "c0.dit.s31.out_cond",
@@ -7856,6 +12734,24 @@
    "rel_l2": 1.1235522969263899e-06,
    "cos": 0.9999999999993744,
    "ref_abs_max": 16.052473068237305
+  },
+  {
+   "check": "dit.v",
+   "case": "en-short",
+   "tensor": "c0.dit.s31.v",
+   "max_abs": 0.0008859634399414062,
+   "rel_l2": 3.5884402901790844e-06,
+   "cos": 0.9999999999935666,
+   "ref_abs_max": 40.275482177734375
+  },
+  {
+   "check": "dit.x_next",
+   "case": "en-short",
+   "tensor": "c0.dit.s31.x_next",
+   "max_abs": 1.239776611328125e-05,
+   "rel_l2": 1.8543768360799052e-07,
+   "cos": 0.9999999999999849,
+   "ref_abs_max": 12.614252090454102
   },
   {
    "check": "vocoder.backbone",
@@ -7948,6 +12844,24 @@
    "ref_abs_max": 1.0139819383621216
   },
   {
+   "check": "dit.v",
+   "case": "tiny",
+   "tensor": "c0.dit.s00.v",
+   "max_abs": 1.4901161193847656e-06,
+   "rel_l2": 4.6644134925485047e-07,
+   "cos": 0.9999999999998915,
+   "ref_abs_max": 2.3429980278015137
+  },
+  {
+   "check": "dit.x_next",
+   "case": "tiny",
+   "tensor": "c0.dit.s00.x_next",
+   "max_abs": 2.384185791015625e-07,
+   "rel_l2": 1.4890946475210567e-08,
+   "cos": 1.0,
+   "ref_abs_max": 4.33817720413208
+  },
+  {
    "check": "dit_internal.time_embed",
    "case": "tiny",
    "tensor": "c0.dit_internal.s00.time_embed",
@@ -8038,6 +12952,24 @@
    "ref_abs_max": 1.0209550857543945
   },
   {
+   "check": "dit.v",
+   "case": "tiny",
+   "tensor": "c0.dit.s01.v",
+   "max_abs": 1.430511474609375e-06,
+   "rel_l2": 4.6442701350519126e-07,
+   "cos": 0.9999999999998925,
+   "ref_abs_max": 2.342829704284668
+  },
+  {
+   "check": "dit.x_next",
+   "case": "tiny",
+   "tensor": "c0.dit.s01.x_next",
+   "max_abs": 2.384185791015625e-07,
+   "rel_l2": 2.556941459717151e-08,
+   "cos": 1.0,
+   "ref_abs_max": 4.322945594787598
+  },
+  {
    "check": "dit.out",
    "case": "tiny",
    "tensor": "c0.dit.s02.out_cond",
@@ -8054,6 +12986,24 @@
    "rel_l2": 2.8538751959161587e-07,
    "cos": 0.9999999999999595,
    "ref_abs_max": 1.0358152389526367
+  },
+  {
+   "check": "dit.v",
+   "case": "tiny",
+   "tensor": "c0.dit.s02.v",
+   "max_abs": 1.5497207641601562e-06,
+   "rel_l2": 4.6832125554494823e-07,
+   "cos": 0.9999999999998905,
+   "ref_abs_max": 2.333556890487671
+  },
+  {
+   "check": "dit.x_next",
+   "case": "tiny",
+   "tensor": "c0.dit.s02.x_next",
+   "max_abs": 2.384185791015625e-07,
+   "rel_l2": 3.309476749644344e-08,
+   "cos": 0.9999999999999998,
+   "ref_abs_max": 4.297497272491455
   },
   {
    "check": "dit.out",
@@ -8074,6 +13024,24 @@
    "ref_abs_max": 1.0590471029281616
   },
   {
+   "check": "dit.v",
+   "case": "tiny",
+   "tensor": "c0.dit.s03.v",
+   "max_abs": 1.2516975402832031e-06,
+   "rel_l2": 4.6810046237512135e-07,
+   "cos": 0.9999999999998905,
+   "ref_abs_max": 2.3145992755889893
+  },
+  {
+   "check": "dit.x_next",
+   "case": "tiny",
+   "tensor": "c0.dit.s03.x_next",
+   "max_abs": 2.384185791015625e-07,
+   "rel_l2": 3.957231177204478e-08,
+   "cos": 0.9999999999999994,
+   "ref_abs_max": 4.310304641723633
+  },
+  {
    "check": "dit.out",
    "case": "tiny",
    "tensor": "c0.dit.s04.out_cond",
@@ -8090,6 +13058,24 @@
    "rel_l2": 2.865374077264094e-07,
    "cos": 0.9999999999999591,
    "ref_abs_max": 1.0810084342956543
+  },
+  {
+   "check": "dit.v",
+   "case": "tiny",
+   "tensor": "c0.dit.s04.v",
+   "max_abs": 1.4901161193847656e-06,
+   "rel_l2": 4.6866722051283276e-07,
+   "cos": 0.9999999999998903,
+   "ref_abs_max": 2.284912109375
+  },
+  {
+   "check": "dit.x_next",
+   "case": "tiny",
+   "tensor": "c0.dit.s04.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 4.4421356078845306e-08,
+   "cos": 0.9999999999999991,
+   "ref_abs_max": 4.417386531829834
   },
   {
    "check": "dit_internal.time_embed",
@@ -8164,6 +13150,24 @@
    "ref_abs_max": 1.099086880683899
   },
   {
+   "check": "dit.v",
+   "case": "tiny",
+   "tensor": "c0.dit.s05.v",
+   "max_abs": 1.3113021850585938e-06,
+   "rel_l2": 4.743342869980875e-07,
+   "cos": 0.9999999999998878,
+   "ref_abs_max": 2.2643508911132812
+  },
+  {
+   "check": "dit.x_next",
+   "case": "tiny",
+   "tensor": "c0.dit.s05.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 4.7993165241950284e-08,
+   "cos": 0.9999999999999991,
+   "ref_abs_max": 4.539479732513428
+  },
+  {
    "check": "dit.out",
    "case": "tiny",
    "tensor": "c0.dit.s06.out_cond",
@@ -8182,6 +13186,24 @@
    "ref_abs_max": 1.111444115638733
   },
   {
+   "check": "dit.v",
+   "case": "tiny",
+   "tensor": "c0.dit.s06.v",
+   "max_abs": 1.430511474609375e-06,
+   "rel_l2": 4.808095726548012e-07,
+   "cos": 0.9999999999998846,
+   "ref_abs_max": 2.2499563694000244
+  },
+  {
+   "check": "dit.x_next",
+   "case": "tiny",
+   "tensor": "c0.dit.s06.x_next",
+   "max_abs": 3.5762786865234375e-07,
+   "rel_l2": 4.9876814960358336e-08,
+   "cos": 0.999999999999999,
+   "ref_abs_max": 4.671533107757568
+  },
+  {
    "check": "dit.out",
    "case": "tiny",
    "tensor": "c0.dit.s07.out_cond",
@@ -8198,6 +13220,24 @@
    "rel_l2": 2.939518472698638e-07,
    "cos": 0.9999999999999569,
    "ref_abs_max": 1.1080323457717896
+  },
+  {
+   "check": "dit.v",
+   "case": "tiny",
+   "tensor": "c0.dit.s07.v",
+   "max_abs": 1.5497207641601562e-06,
+   "rel_l2": 4.843125417853501e-07,
+   "cos": 0.9999999999998832,
+   "ref_abs_max": 2.2151265144348145
+  },
+  {
+   "check": "dit.x_next",
+   "case": "tiny",
+   "tensor": "c0.dit.s07.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 5.0542830588702884e-08,
+   "cos": 0.9999999999999988,
+   "ref_abs_max": 4.027040958404541
   },
   {
    "check": "vocoder.backbone",
@@ -8288,6 +13328,24 @@
    "rel_l2": 5.944650292957748e-07,
    "cos": 0.9999999999998469,
    "ref_abs_max": 12.668383598327637
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s00.v",
+   "max_abs": 5.340576171875e-05,
+   "rel_l2": 1.5202559590730258e-06,
+   "cos": 0.9999999999988585,
+   "ref_abs_max": 27.659164428710938
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s00.x_next",
+   "max_abs": 2.384185791015625e-07,
+   "rel_l2": 2.2238119365755783e-08,
+   "cos": 1.0000000000000009,
+   "ref_abs_max": 4.561130523681641
   },
   {
    "check": "dit_internal.time_embed",
@@ -8560,6 +13618,24 @@
    "ref_abs_max": 12.507019996643066
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s01.v",
+   "max_abs": 0.00027179718017578125,
+   "rel_l2": 1.5110283796525478e-06,
+   "cos": 0.9999999999988669,
+   "ref_abs_max": 28.32444953918457
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s01.x_next",
+   "max_abs": 9.5367431640625e-07,
+   "rel_l2": 4.054823831305788e-08,
+   "cos": 1.0000000000000004,
+   "ref_abs_max": 4.5511674880981445
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s02.out_cond",
@@ -8576,6 +13652,24 @@
    "rel_l2": 1.3323386609982565e-06,
    "cos": 0.9999999999992546,
    "ref_abs_max": 12.453444480895996
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s02.v",
+   "max_abs": 6.103515625e-05,
+   "rel_l2": 1.7032958567948238e-06,
+   "cos": 0.9999999999985515,
+   "ref_abs_max": 25.385700225830078
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s02.x_next",
+   "max_abs": 4.76837158203125e-07,
+   "rel_l2": 5.8732035171316596e-08,
+   "cos": 0.9999999999999993,
+   "ref_abs_max": 4.51865816116333
   },
   {
    "check": "dit.out",
@@ -8596,6 +13690,24 @@
    "ref_abs_max": 15.022517204284668
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s03.v",
+   "max_abs": 8.869171142578125e-05,
+   "rel_l2": 3.085614562100963e-06,
+   "cos": 0.9999999999952685,
+   "ref_abs_max": 17.978395462036133
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s03.x_next",
+   "max_abs": 7.152557373046875e-07,
+   "rel_l2": 1.0184931857564696e-07,
+   "cos": 0.999999999999996,
+   "ref_abs_max": 4.510625839233398
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s04.out_cond",
@@ -8612,6 +13724,24 @@
    "rel_l2": 9.170659629535539e-07,
    "cos": 0.9999999999996072,
    "ref_abs_max": 14.399203300476074
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s04.v",
+   "max_abs": 8.475780487060547e-05,
+   "rel_l2": 2.6298107760149856e-06,
+   "cos": 0.9999999999965578,
+   "ref_abs_max": 17.125396728515625
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s04.x_next",
+   "max_abs": 9.238719940185547e-07,
+   "rel_l2": 1.0636671179044793e-07,
+   "cos": 0.9999999999999954,
+   "ref_abs_max": 4.512768268585205
   },
   {
    "check": "dit.out",
@@ -8632,6 +13762,24 @@
    "ref_abs_max": 14.343415260314941
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s05.v",
+   "max_abs": 0.00010597705841064453,
+   "rel_l2": 2.9158756408740216e-06,
+   "cos": 0.9999999999957502,
+   "ref_abs_max": 17.479835510253906
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s05.x_next",
+   "max_abs": 1.430511474609375e-06,
+   "rel_l2": 1.345458260636004e-07,
+   "cos": 0.9999999999999922,
+   "ref_abs_max": 4.519642353057861
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s06.out_cond",
@@ -8648,6 +13796,24 @@
    "rel_l2": 9.77095196303417e-07,
    "cos": 0.99999999999953,
    "ref_abs_max": 14.470047950744629
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s06.v",
+   "max_abs": 8.0108642578125e-05,
+   "rel_l2": 3.07785784766051e-06,
+   "cos": 0.9999999999952651,
+   "ref_abs_max": 17.169414520263672
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s06.x_next",
+   "max_abs": 1.2516975402832031e-06,
+   "rel_l2": 1.577613249541674e-07,
+   "cos": 0.9999999999999888,
+   "ref_abs_max": 4.5505757331848145
   },
   {
    "check": "dit.out",
@@ -8668,6 +13834,24 @@
    "ref_abs_max": 14.547070503234863
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s07.v",
+   "max_abs": 0.00011706352233886719,
+   "rel_l2": 3.3646773101226997e-06,
+   "cos": 0.9999999999943413,
+   "ref_abs_max": 16.66100311279297
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s07.x_next",
+   "max_abs": 2.0265579223632812e-06,
+   "rel_l2": 1.8824152906214004e-07,
+   "cos": 0.9999999999999836,
+   "ref_abs_max": 4.6284685134887695
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s08.out_cond",
@@ -8684,6 +13868,24 @@
    "rel_l2": 1.0878862367202544e-06,
    "cos": 0.9999999999994126,
    "ref_abs_max": 14.600459098815918
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s08.v",
+   "max_abs": 0.000240325927734375,
+   "rel_l2": 3.6230534078132246e-06,
+   "cos": 0.9999999999934382,
+   "ref_abs_max": 16.095760345458984
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s08.x_next",
+   "max_abs": 4.827976226806641e-06,
+   "rel_l2": 2.209519774260646e-07,
+   "cos": 0.9999999999999766,
+   "ref_abs_max": 4.818385601043701
   },
   {
    "check": "dit.out",
@@ -8704,6 +13906,24 @@
    "ref_abs_max": 14.632499694824219
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s09.v",
+   "max_abs": 0.00011831521987915039,
+   "rel_l2": 3.552278553567815e-06,
+   "cos": 0.9999999999936928,
+   "ref_abs_max": 15.77609920501709
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s09.x_next",
+   "max_abs": 2.60770320892334e-06,
+   "rel_l2": 2.356579994141886e-07,
+   "cos": 0.9999999999999734,
+   "ref_abs_max": 5.055895805358887
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s10.out_cond",
@@ -8720,6 +13940,24 @@
    "rel_l2": 1.121266873559502e-06,
    "cos": 0.9999999999993732,
    "ref_abs_max": 14.65613079071045
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s10.v",
+   "max_abs": 0.00017136335372924805,
+   "rel_l2": 3.661432459768713e-06,
+   "cos": 0.9999999999932988,
+   "ref_abs_max": 15.687823295593262
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s10.x_next",
+   "max_abs": 4.14624810218811e-06,
+   "rel_l2": 2.6077072213502404e-07,
+   "cos": 0.9999999999999672,
+   "ref_abs_max": 5.3060736656188965
   },
   {
    "check": "dit.out",
@@ -8740,6 +13978,24 @@
    "ref_abs_max": 14.851134300231934
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s11.v",
+   "max_abs": 0.00018066167831420898,
+   "rel_l2": 3.743782493547442e-06,
+   "cos": 0.9999999999929983,
+   "ref_abs_max": 16.16217613220215
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s11.x_next",
+   "max_abs": 4.7460198402404785e-06,
+   "rel_l2": 2.836359343197976e-07,
+   "cos": 0.9999999999999609,
+   "ref_abs_max": 5.676931858062744
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s12.out_cond",
@@ -8756,6 +14012,24 @@
    "rel_l2": 1.1645717458756086e-06,
    "cos": 0.9999999999993278,
    "ref_abs_max": 15.101247787475586
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s12.v",
+   "max_abs": 0.00016141682863235474,
+   "rel_l2": 3.6140314892277123e-06,
+   "cos": 0.9999999999934731,
+   "ref_abs_max": 16.693960189819336
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s12.x_next",
+   "max_abs": 4.559755325317383e-06,
+   "rel_l2": 2.8793876670925615e-07,
+   "cos": 0.9999999999999595,
+   "ref_abs_max": 6.077508926391602
   },
   {
    "check": "dit.out",
@@ -8776,6 +14050,24 @@
    "ref_abs_max": 15.338557243347168
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s13.v",
+   "max_abs": 0.00013148784637451172,
+   "rel_l2": 3.4978475071673854e-06,
+   "cos": 0.9999999999938839,
+   "ref_abs_max": 17.255207061767578
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s13.x_next",
+   "max_abs": 3.9674341678619385e-06,
+   "rel_l2": 2.8887600751886575e-07,
+   "cos": 0.9999999999999593,
+   "ref_abs_max": 6.514066219329834
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s14.out_cond",
@@ -8792,6 +14084,24 @@
    "rel_l2": 1.1725191211866916e-06,
    "cos": 0.9999999999993137,
    "ref_abs_max": 15.50153636932373
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s14.v",
+   "max_abs": 0.0001697540283203125,
+   "rel_l2": 3.5299075693316834e-06,
+   "cos": 0.9999999999937742,
+   "ref_abs_max": 18.225772857666016
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s14.x_next",
+   "max_abs": 5.364418029785156e-06,
+   "rel_l2": 2.983521104544724e-07,
+   "cos": 0.9999999999999566,
+   "ref_abs_max": 6.96129035949707
   },
   {
    "check": "dit.out",
@@ -8812,6 +14122,24 @@
    "ref_abs_max": 15.588711738586426
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s15.v",
+   "max_abs": 0.00013127923011779785,
+   "rel_l2": 3.493729452184271e-06,
+   "cos": 0.9999999999938984,
+   "ref_abs_max": 19.17055892944336
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s15.x_next",
+   "max_abs": 4.410743713378906e-06,
+   "rel_l2": 2.9882533639740574e-07,
+   "cos": 0.9999999999999565,
+   "ref_abs_max": 7.407939910888672
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s16.out_cond",
@@ -8828,6 +14156,24 @@
    "rel_l2": 1.1611658796296104e-06,
    "cos": 0.9999999999993276,
    "ref_abs_max": 15.650848388671875
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s16.v",
+   "max_abs": 0.00014841556549072266,
+   "rel_l2": 3.4239492477639534e-06,
+   "cos": 0.9999999999941549,
+   "ref_abs_max": 19.668018341064453
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s16.x_next",
+   "max_abs": 5.245208740234375e-06,
+   "rel_l2": 2.939284613592809e-07,
+   "cos": 0.9999999999999583,
+   "ref_abs_max": 7.922704696655273
   },
   {
    "check": "dit_internal.time_embed",
@@ -9082,6 +14428,24 @@
    "ref_abs_max": 15.732440948486328
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s17.v",
+   "max_abs": 0.0001462697982788086,
+   "rel_l2": 3.4540500396484662e-06,
+   "cos": 0.9999999999940441,
+   "ref_abs_max": 19.401060104370117
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s17.x_next",
+   "max_abs": 5.424022674560547e-06,
+   "rel_l2": 2.953281838902198e-07,
+   "cos": 0.9999999999999576,
+   "ref_abs_max": 8.592529296875
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s18.out_cond",
@@ -9098,6 +14462,24 @@
    "rel_l2": 1.167530480593278e-06,
    "cos": 0.9999999999993198,
    "ref_abs_max": 16.07522201538086
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s18.v",
+   "max_abs": 0.00019407272338867188,
+   "rel_l2": 3.548473362291452e-06,
+   "cos": 0.9999999999937075,
+   "ref_abs_max": 20.02893829345703
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s18.x_next",
+   "max_abs": 7.3909759521484375e-06,
+   "rel_l2": 3.0003542596066406e-07,
+   "cos": 0.9999999999999561,
+   "ref_abs_max": 9.297378540039062
   },
   {
    "check": "dit.out",
@@ -9118,6 +14500,24 @@
    "ref_abs_max": 16.15635871887207
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s19.v",
+   "max_abs": 0.00019752979278564453,
+   "rel_l2": 3.652836483027965e-06,
+   "cos": 0.99999999999333,
+   "ref_abs_max": 21.30234146118164
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s19.x_next",
+   "max_abs": 7.927417755126953e-06,
+   "rel_l2": 3.036429384914502e-07,
+   "cos": 0.9999999999999549,
+   "ref_abs_max": 10.039628028869629
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s20.out_cond",
@@ -9134,6 +14534,24 @@
    "rel_l2": 1.2416027673568538e-06,
    "cos": 0.9999999999992305,
    "ref_abs_max": 15.872843742370605
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s20.v",
+   "max_abs": 0.0002460181713104248,
+   "rel_l2": 3.6313601745845165e-06,
+   "cos": 0.9999999999934079,
+   "ref_abs_max": 22.30112648010254
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s20.x_next",
+   "max_abs": 1.0192394256591797e-05,
+   "rel_l2": 2.9560120519412296e-07,
+   "cos": 0.9999999999999577,
+   "ref_abs_max": 10.816488265991211
   },
   {
    "check": "dit.out",
@@ -9154,6 +14572,24 @@
    "ref_abs_max": 15.325575828552246
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s21.v",
+   "max_abs": 0.00020420551300048828,
+   "rel_l2": 3.5584518663233218e-06,
+   "cos": 0.9999999999936731,
+   "ref_abs_max": 23.350547790527344
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s21.x_next",
+   "max_abs": 8.717179298400879e-06,
+   "rel_l2": 2.82792444123566e-07,
+   "cos": 0.9999999999999614,
+   "ref_abs_max": 11.62850570678711
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s22.out_cond",
@@ -9170,6 +14606,24 @@
    "rel_l2": 1.2345844819010742e-06,
    "cos": 0.9999999999992396,
    "ref_abs_max": 16.497053146362305
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s22.v",
+   "max_abs": 0.0002506524324417114,
+   "rel_l2": 3.5564557332400614e-06,
+   "cos": 0.9999999999936797,
+   "ref_abs_max": 24.362485885620117
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s22.x_next",
+   "max_abs": 1.0989606380462646e-05,
+   "rel_l2": 2.746613702977949e-07,
+   "cos": 0.9999999999999633,
+   "ref_abs_max": 12.472559928894043
   },
   {
    "check": "dit.out",
@@ -9190,6 +14644,24 @@
    "ref_abs_max": 17.18830108642578
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s23.v",
+   "max_abs": 0.0002162456512451172,
+   "rel_l2": 3.5850710467699436e-06,
+   "cos": 0.9999999999935755,
+   "ref_abs_max": 24.57427215576172
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s23.x_next",
+   "max_abs": 9.715557098388672e-06,
+   "rel_l2": 2.6823025052062067e-07,
+   "cos": 0.9999999999999651,
+   "ref_abs_max": 13.436013221740723
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s24.out_cond",
@@ -9206,6 +14678,24 @@
    "rel_l2": 1.245261183731434e-06,
    "cos": 0.9999999999992261,
    "ref_abs_max": 18.279447555541992
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s24.v",
+   "max_abs": 0.00020226836204528809,
+   "rel_l2": 3.4849308216521033e-06,
+   "cos": 0.9999999999939303,
+   "ref_abs_max": 24.968791961669922
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s24.x_next",
+   "max_abs": 9.238719940185547e-06,
+   "rel_l2": 2.532819533949157e-07,
+   "cos": 0.999999999999969,
+   "ref_abs_max": 14.524980545043945
   },
   {
    "check": "dit.out",
@@ -9226,6 +14716,24 @@
    "ref_abs_max": 18.803993225097656
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s25.v",
+   "max_abs": 0.0001666545867919922,
+   "rel_l2": 3.5196896958423827e-06,
+   "cos": 0.9999999999938094,
+   "ref_abs_max": 24.962934494018555
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s25.x_next",
+   "max_abs": 7.748603820800781e-06,
+   "rel_l2": 2.499894359358689e-07,
+   "cos": 0.9999999999999701,
+   "ref_abs_max": 15.560613632202148
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s26.out_cond",
@@ -9242,6 +14750,24 @@
    "rel_l2": 1.2244934386401596e-06,
    "cos": 0.9999999999992523,
    "ref_abs_max": 18.695554733276367
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s26.v",
+   "max_abs": 0.0002980232238769531,
+   "rel_l2": 3.387420974893613e-06,
+   "cos": 0.999999999994272,
+   "ref_abs_max": 24.000106811523438
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s26.x_next",
+   "max_abs": 1.3828277587890625e-05,
+   "rel_l2": 2.3763421032641216e-07,
+   "cos": 0.9999999999999736,
+   "ref_abs_max": 16.512948989868164
   },
   {
    "check": "dit.out",
@@ -9262,6 +14788,24 @@
    "ref_abs_max": 18.319520950317383
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s27.v",
+   "max_abs": 0.0006651878356933594,
+   "rel_l2": 3.5932416998729474e-06,
+   "cos": 0.9999999999935465,
+   "ref_abs_max": 22.375934600830078
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s27.x_next",
+   "max_abs": 3.1948089599609375e-05,
+   "rel_l2": 2.49939902219218e-07,
+   "cos": 0.9999999999999701,
+   "ref_abs_max": 17.365562438964844
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s28.out_cond",
@@ -9278,6 +14822,24 @@
    "rel_l2": 1.303504500229578e-06,
    "cos": 0.9999999999991519,
    "ref_abs_max": 18.248647689819336
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s28.v",
+   "max_abs": 0.0023217201232910156,
+   "rel_l2": 5.86197578211974e-06,
+   "cos": 0.99999999998282,
+   "ref_abs_max": 23.06938362121582
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s28.x_next",
+   "max_abs": 0.0001125335693359375,
+   "rel_l2": 4.0668839917779154e-07,
+   "cos": 0.9999999999999185,
+   "ref_abs_max": 18.12447738647461
   },
   {
    "check": "dit.out",
@@ -9298,6 +14860,24 @@
    "ref_abs_max": 18.95293426513672
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s29.v",
+   "max_abs": 0.0006227493286132812,
+   "rel_l2": 3.525518715650595e-06,
+   "cos": 0.9999999999937874,
+   "ref_abs_max": 24.285917282104492
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s29.x_next",
+   "max_abs": 3.0517578125e-05,
+   "rel_l2": 2.4828402754666855e-07,
+   "cos": 0.9999999999999705,
+   "ref_abs_max": 18.834564208984375
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s30.out_cond",
@@ -9316,6 +14896,24 @@
    "ref_abs_max": 18.844202041625977
   },
   {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s30.v",
+   "max_abs": 0.000559687614440918,
+   "rel_l2": 3.3402752177977096e-06,
+   "cos": 0.9999999999944227,
+   "ref_abs_max": 27.202465057373047
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s30.x_next",
+   "max_abs": 2.7418136596679688e-05,
+   "rel_l2": 2.3463904826610848e-07,
+   "cos": 0.9999999999999735,
+   "ref_abs_max": 19.698781967163086
+  },
+  {
    "check": "dit.out",
    "case": "zh-short",
    "tensor": "c0.dit.s31.out_cond",
@@ -9332,6 +14930,24 @@
    "rel_l2": 2.2217130951355066e-06,
    "cos": 0.9999999999975343,
    "ref_abs_max": 17.46167755126953
+  },
+  {
+   "check": "dit.v",
+   "case": "zh-short",
+   "tensor": "c0.dit.s31.v",
+   "max_abs": 0.0013186931610107422,
+   "rel_l2": 4.606583655321687e-06,
+   "cos": 0.9999999999893918,
+   "ref_abs_max": 30.128416061401367
+  },
+  {
+   "check": "dit.x_next",
+   "case": "zh-short",
+   "tensor": "c0.dit.s31.x_next",
+   "max_abs": 2.193450927734375e-05,
+   "rel_l2": 2.406485675823805e-07,
+   "cos": 0.9999999999999719,
+   "ref_abs_max": 12.95133113861084
   },
   {
    "check": "vocoder.backbone",

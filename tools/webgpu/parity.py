@@ -122,6 +122,18 @@ class GoldenCase:
         return self._cache[name]
 
 
+def x_next_golden(golden: GoldenCase, c: int, s: int) -> tuple[int, np.ndarray]:
+    """(first frame to compare, golden) for the Euler update after step s of chunk c. The next step's
+    input is golden; after the last step it is trajectory[-1], which equals the golden mel_out on the
+    generated frames. mel_out starts at ref_audio_len = samples // 256, but cond covers n_ref =
+    samples // 256 + 1 frames, so its first frame is the reference's last mel frame (cfm.py:235)."""
+    if s + 1 < golden.manifest["settings"]["nfe_step"]:
+        return 0, golden.tensor(f"c{c}.dit.s{s + 1:02d}.x")
+    ref_len = golden.manifest["chunks"][c]["ref_audio_len"]
+    n_ref = golden.manifest["mel"]["n_ref"]
+    return n_ref, golden.tensor(f"c{c}.mel_out").transpose(0, 2, 1)[:, n_ref - ref_len :, :]
+
+
 def load_tolerances(root: Path = GOLDEN_ROOT) -> dict[str, Any]:  # Any: json
     return json.loads((root / "tolerances.json").read_text())
 
@@ -156,20 +168,34 @@ def compare(golden: GoldenCase, tolerances: dict[str, Any], name: str, actual: n
             m = metrics(complex_stft(actual), complex_stft(ref))
         else:
             m = metrics(actual, ref)
-        tol = tolerances["checks"][check]
-        if golden.manifest["case"] == "tiny":
-            tol = {**tol, **tol.get("tiny", {})}  # tiny's own tolerance where its floor is higher (R5)
-        rel_tol, abs_tol = tol.get("rel_l2"), tol.get("max_abs")
-        # near-zero golden: relative L2 is undefined, so max abs decides, against rel_l2 if there is no max_abs
-        abs_limit = abs_tol if abs_tol is not None else (rel_tol if m["rel_l2"] is None else None)
-        max_abs = m["max_abs"]
-        assert max_abs is not None
-        ok_abs = abs_limit is None or max_abs <= abs_limit
-        ok_rel = rel_tol is None or m["rel_l2"] is None or m["rel_l2"] <= rel_tol
-        passed = not math.isnan(max_abs) and ok_abs and ok_rel
-        tolerance = {k: v for k, v in (("rel_l2", rel_tol), ("max_abs", abs_tol)) if v is not None}
-        out.append(Result(stage, name, check, passed or info, info, None, m, tolerance))
+        out.append(judge(golden, tolerances, stage, name, check, m))
     return out
+
+
+def judge(
+    golden: GoldenCase,
+    tolerances: dict[str, Any],  # Any: json
+    stage: str,
+    name: str,
+    check: str,
+    m: dict[str, float | None],
+) -> Result:
+    """Applies a check's tolerance to measured metrics. Also used for values derived from golden tensors
+    (plan 01's dit.v and dit.x_next), which have no golden tensor of their own."""
+    info = check in INFORMATIONAL
+    tol = tolerances["checks"][check]
+    if golden.manifest["case"] == "tiny":
+        tol = {**tol, **tol.get("tiny", {})}  # tiny's own tolerance where its floor is higher (R5)
+    rel_tol, abs_tol = tol.get("rel_l2"), tol.get("max_abs")
+    # near-zero golden: relative L2 is undefined, so max abs decides, against rel_l2 if there is no max_abs
+    abs_limit = abs_tol if abs_tol is not None else (rel_tol if m["rel_l2"] is None else None)
+    max_abs = m["max_abs"]
+    assert max_abs is not None
+    ok_abs = abs_limit is None or max_abs <= abs_limit
+    ok_rel = rel_tol is None or m["rel_l2"] is None or m["rel_l2"] <= rel_tol
+    passed = not math.isnan(max_abs) and ok_abs and ok_rel
+    tolerance = {k: v for k, v in (("rel_l2", rel_tol), ("max_abs", abs_tol)) if v is not None}
+    return Result(stage, name, check, passed or info, info, None, m, tolerance)
 
 
 def report(results: list[Result]) -> tuple[str, str | None, int]:

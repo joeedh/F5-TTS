@@ -141,9 +141,14 @@ The spike's export was unfused (MatMul, Softmax, MatMul). It writes out a (2, 16
   - Every step of every chunk of every case.
 - New checks for `tolerances.json`, set by plan 00's 10x rule from a CPU-against-CUDA measurement (the same `measure_floor.py` method):
   - `dit.v`: the CFG formula multiplies the error by up to 3.
-  - `dit.x_next`: the last step of each chunk has no golden `s{k+1}.x`. It is compared with the golden `trajectory[-1]`, which is not dumped today. `make_golden.py` gains a `c*.dit.x_final` tensor, and the cases are regenerated.
-  - Both runners' `checksFor` gain the new names.
+  - `dit.x_next`: the last step of each chunk has no golden `s{k+1}.x`. It is compared with the golden `mel_out` on the generated frames (from `n_ref`), which equals `trajectory[-1]` there. No new golden tensor is needed; `parity.x_next_golden` does the lookup.
+  - Neither check has a golden tensor of its own, so `checksFor` is unchanged. `parity.judge` applies their tolerances to metrics computed from golden tensors.
 - Done when: both graphs, and each D3 candidate's step graph, pass `dit.out`, `dit.v`, `dit.x_next` and `dit_internal.*` for all 7 cases in onnxruntime CPU.
+- Result, 2026-11-19:
+  - Floors (CPU against CUDA): `dit.v` rel L2 8.4e-6 and max abs 0.0050 (tolerances 1e-4 and 0.1); `dit.x_next` 8.4e-7 and 0.00025 (1e-5 and 0.01). Existing tolerances unchanged.
+  - Unfused, `mha` and `onnx23`: each passes all 1,584 comparisons across the 7 cases, internals included. Step 1 is done.
+  - Weights: step graph 1,266.8 MB, text graph 37.1 MB of external data.
+  - A full 7-case run takes about 20 minutes at 8 threads. The check loads one step graph at a time and disables ORT weight prepacking; with both graphs loaded it was stopped for low memory.
 
 ### Step 2. Loading the real weights in a browser (D5)
 
@@ -193,7 +198,7 @@ The spike's export was unfused (MatMul, Softmax, MatMul). It writes out a (2, 16
 - **R4. Cached text embeddings must match upstream's cache semantics.** Upstream caches `text_cond` and `text_uncond` from the first DiT call of a chunk and clears them in `CFM.sample` after the chunk. The text graph is a pure function of the ids and n, so this holds as long as plan 04 reruns it whenever n or the ids change.
 - **R5. `ConvPositionEmbedding` is slow** on WebGPU (about 7 percent of a step in the spike). Speeding it up is plan 07's job, but this plan's numbers should show its share.
 - **R6. Node and Playwright memory.** The real-case browser tests load 1.24 GiB of weights plus golden data. They stay local and are not run in CI.
-- **R7. Regenerating the golden cases for `c*.dit.x_final`** changes `make_golden.py` after plan 00's data was made. Regeneration must keep every existing tensor bit-identical. The determinism rerun and a hash comparison with the old manifests check this.
+- **R7. Regenerating the golden cases for `c*.dit.x_final`.** Retired 2026-11-19: step 1 compares the last `x_next` with the golden `mel_out`, so the golden data is not regenerated.
 
 ## Pressure test, 2026-11-18
 

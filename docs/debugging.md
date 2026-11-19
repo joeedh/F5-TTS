@@ -2,6 +2,39 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-19: exporting the DiT with a dynamic sequence length (plan 01, step 1)
+
+Three problems with `torch.onnx.export(dynamo=True)` (torch 2.15, onnxscript 0.7.2), all handled in `tools/webgpu/export_dit.py`:
+
+- **`TextEmbedding` fixes n.**
+  - **Symptom:** the exported text graph's `n` input dimension is a fixed number, not the `Dim("n")` that was declared.
+  - **Cause:** `TextEmbedding.forward` calls `int(seq_len)` (`dit.py:108`), which turns the symbolic size into a constant.
+  - **Fix:** `TextGraph` calls the submodules (`text_embed`, the `freqs_cis` slice, `text_blocks`) directly with the same masking. The export asserts that n is symbolic, so a regression fails loudly.
+- **`com.microsoft::MultiHeadAttention` has no schema in the `onnx` package.**
+  - **Symptom:** onnxscript refuses to build the op from a `custom_translation_table` entry, because `onnx.defs` does not know it.
+  - **Fix:** build an `onnx.defs.OpSchema` by hand for the inputs and attributes used, and wrap it in `onnxscript.values.Op` (`msft_mha_op`).
+- **Opset 23 `Attention` returns a tuple.**
+  - **Symptom:** the translation function fails when its result is used as a tensor.
+  - **Fix:** take `[0]`; the other outputs are the optional present key and value.
+- **Diagnose:** `export_dit.py` prints each graph's op counts. Check that the fused variants have one attention op per block (22) and no `Softmax`.
+
+## 2026-11-19: onnxruntime CPU check of the real DiT stopped for low memory (plan 01, step 1)
+
+- **Symptom:** `check_dit_ort.py --debug` on the base model was killed for low memory, with about 15 GB free on a 32 GB machine.
+- **Cause:** it held the step graph and its debug twin in two sessions. Each carries 1.27 GB of weights, and ORT prepacks weights into a further copy.
+- **Fix:** with `--debug` only the debug graph is loaded and used for every step; its first three outputs are the normal graph's. Prepacking is disabled (`session.disable_prepacking`). The full 7-case run then completed.
+- **Also:** run the floor measurement, the exports and the checks one at a time, not concurrently.
+
+## 2026-11-18: each chunk's mel starts with the reference's last frame (plan 01, step 1)
+
+- **Symptom:** the Euler update after the last ODE step matched every generated frame of the golden `mel_out` exactly, except frame 0, which was off by up to 14 (tiny case).
+- **Cause:** an off-by-one between two upstream lengths.
+  - The reference mel has `samples // 256 + 1` frames (`center=True`). `CFM.sample` restores that many frames from `cond` after the ODE (`cfm.py:235`).
+  - `infer_batch_process` crops `ref_audio_len = samples // 256` frames (`utils_infer.py:512, 534`).
+  - So frame 0 of every chunk's `mel_out` is the reference's last mel frame, not generated audio. The vocoder renders it as about 10 ms of reference audio at the start of each chunk.
+- **Not a bug to fix here.** The port must reproduce it to match upstream; plan 04 owns this.
+- **Diagnose:** compare the generated part per frame. `parity.x_next_golden` encodes the right offset (`n_ref - ref_audio_len`).
+
 ## 2026-11-18: multi-chunk inference is not reproducible with a fixed seed (plan 00, risk R1)
 
 - **Symptom:** `infer_batch_process` with several text chunks gives different audio from run to run, even after `seed_everything(0)`. Measured on CUDA fp32 with the `en-multi` golden inputs (3 chunks): 6 runs gave 4 different output hashes. The length was the same every time, because durations do not depend on the noise.

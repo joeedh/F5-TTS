@@ -1,0 +1,140 @@
+{
+  "model": "tiny",
+  "torch": "2.15.0+cu132",
+  "onnx": "1.23.2",
+  "text": {
+    "opset": {
+      "ai.onnx": 20
+    },
+    "nodes": 34,
+    "ops": {
+      "Add": 9,
+      "Concat": 1,
+      "Conv": 1,
+      "Div": 1,
+      "Equal": 1,
+      "Expand": 1,
+      "Gather": 2,
+      "Gelu": 1,
+      "LayerNormalization": 1,
+      "MatMul": 2,
+      "Mul": 2,
+      "ReduceL2": 1,
+      "ReduceMean": 1,
+      "Shape": 2,
+      "Slice": 3,
+      "Transpose": 2,
+      "Unsqueeze": 1,
+      "Where": 2
+    },
+    "inputs": [
+      "text"
+    ],
+    "outputs": [
+      "text_cond",
+      "text_uncond"
+    ],
+    "export_s": 1.8
+  },
+  "step": {
+    "opset": {
+      "ai.onnx": 20
+    },
+    "nodes": 212,
+    "ops": {
+      "Add": 35,
+      "Concat": 14,
+      "Conv": 2,
+      "Cos": 2,
+      "Expand": 1,
+      "Gelu": 2,
+      "Gemm": 5,
+      "LayerNormalization": 5,
+      "MatMul": 18,
+      "Mish": 2,
+      "Mul": 27,
+      "Neg": 4,
+      "Reshape": 21,
+      "Shape": 4,
+      "Sigmoid": 2,
+      "Sin": 2,
+      "Slice": 17,
+      "Softmax": 2,
+      "Split": 3,
+      "Squeeze": 8,
+      "Sub": 1,
+      "Transpose": 12,
+      "Unsqueeze": 23
+    },
+    "inputs": [
+      "x",
+      "step_cond",
+      "text_cond",
+      "text_uncond",
+      "time",
+      "cfg_strength",
+      "dt"
+    ],
+    "outputs": [
+      "pred",
+      "v",
+      "x_next"
+    ],
+    "export_s": 2.0
+  },
+  "step_debug": {
+    "opset": {
+      "ai.onnx": 20
+    },
+    "nodes": 214,
+    "ops": {
+      "Add": 35,
+      "Concat": 14,
+      "Conv": 2,
+      "Cos": 2,
+      "Expand": 1,
+      "Gelu": 2,
+      "Gemm": 5,
+      "LayerNormalization": 5,
+      "MatMul": 18,
+      "Mish": 2,
+      "Mul": 27,
+      "Neg": 4,
+      "Reshape": 21,
+      "Shape": 4,
+      "Sigmoid": 2,
+      "Sin": 2,
+      "Slice": 19,
+      "Softmax": 2,
+      "Split": 3,
+      "Squeeze": 8,
+      "Sub": 1,
+      "Transpose": 12,
+      "Unsqueeze": 23
+    },
+    "inputs": [
+      "x",
+      "step_cond",
+      "text_cond",
+      "text_uncond",
+      "time",
+      "cfg_strength",
+      "dt"
+    ],
+    "outputs": [
+      "pred",
+      "v",
+      "x_next",
+      "time_embed",
+      "input_embed",
+      "input_embed_uncond",
+      "block00",
+      "block01",
+      "norm_out"
+    ],
+    "export_s": 2.2
+  },
+  "heads": 2,
+  "text_dim": 64,
+  "depth": 2
+}

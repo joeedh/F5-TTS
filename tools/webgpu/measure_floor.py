@@ -32,6 +32,7 @@ import f5_tts.model.cfm as cfm_module
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from make_golden import CASES, OUT_ROOT, load_models  # noqa: E402
+from parity import GoldenCase, x_next_golden  # noqa: E402
 
 
 LOG_MEL_MIN = math.log(1e-4)  # log-mel bins below this are masked (plan 00, "Tolerances")
@@ -142,24 +143,27 @@ def measure_case(name: str, model: Any, vocoder: Any, dev: torch.device, fl: Flo
         hooks.append(block.register_forward_hook(capture(f"block{i:02d}")))
     hooks.append(dit.norm_out.register_forward_hook(capture("norm_out")))
 
+    cfg = man["settings"]["cfg_strength"]
+    pg = GoldenCase(name, OUT_ROOT)
     for c in range(len(man["chunks"])):
         step_cond = g.t(f"c{c}.dit.step_cond", dev)
         text = g.t(f"c{c}.dit.text_ids", dev)
+        grid_t = g.t(f"c{c}.plan.t", dev)
         for s in range(nfe):
             p = f"c{c}.dit.s{s:02d}"
             captured.clear()
+            x = g.t(f"{p}.x", dev)
             with torch.inference_mode():
-                out = dit(
-                    x=g.t(f"{p}.x", dev),
-                    cond=step_cond,
-                    text=text,
-                    time=g.t(f"{p}.t", dev)[0],
-                    cfg_infer=True,
-                    cache=False,
-                )
+                out = dit(x=x, cond=step_cond, text=text, time=g.t(f"{p}.t", dev)[0], cfg_infer=True, cache=False)
             cond, uncond = torch.chunk(out, 2, dim=0)
             fl.add("dit.out", name, f"{p}.out_cond", metrics(cond, g.np(f"{p}.out_cond")), cond)
             fl.add("dit.out", name, f"{p}.out_uncond", metrics(uncond, g.np(f"{p}.out_uncond")), uncond)
+            # plan 01: the CFG velocity and the Euler update, against the same formulas on the golden halves
+            gc, gu = g.np(f"{p}.out_cond"), g.np(f"{p}.out_uncond")
+            fl.add("dit.v", name, f"{p}.v", metrics(cond + (cond - uncond) * cfg, gc + (gc - gu) * np.float32(cfg)))
+            x_next = x + (grid_t[s + 1] - grid_t[s]) * (cond + (cond - uncond) * cfg)
+            start, ref = x_next_golden(pg, c, s)
+            fl.add("dit.x_next", name, f"{p}.x_next", metrics(x_next[:, start:, :], ref))
             if c == 0 and s in internal_steps:
                 ip = f"c0.dit_internal.s{s:02d}"
                 for key, outs in captured.items():
@@ -235,6 +239,8 @@ CHECKS: dict[str, tuple[list[str], str]] = {
     "mel.log_masked": (["max_abs"], "log mel, bins with golden linear magnitude above 1e-4"),
     "mel.linear": (["rel_l2"], "linear mel magnitude, exp of the log mel"),
     "dit.out": (["rel_l2", "max_abs"], "one DiT call (cond or uncond half), golden inputs"),
+    "dit.v": (["rel_l2", "max_abs"], "CFG velocity cond + (cond - uncond) * cfg, against the golden halves (plan 01)"),
+    "dit.x_next": (["rel_l2", "max_abs"], "Euler update x + dt * v, against the next golden x or mel_out (plan 01)"),
     "dit_internal.text_embed": (["rel_l2", "max_abs"], "TextEmbedding output"),
     "dit_internal.time_embed": (["rel_l2", "max_abs"], "TimestepEmbedding output"),
     "dit_internal.input_embed": (["rel_l2", "max_abs"], "InputEmbedding output"),
