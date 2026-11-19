@@ -17,7 +17,7 @@ import argparse
 import sys
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import onnxruntime as ort  # pyright: ignore[reportMissingImports]  # no Python 3.15 wheel; run in .venv313
@@ -47,6 +47,11 @@ def session(path: Path, threads: int) -> ort.InferenceSession:
     opts.intra_op_num_threads = threads
     opts.add_session_config_entry("session.disable_prepacking", "1")  # no second copy of the 1.3 GB weights
     return ort.InferenceSession(str(path), opts, providers=["CPUExecutionProvider"])
+
+
+def run(sess: ort.InferenceSession, feeds: dict[str, np.ndarray]) -> list[np.ndarray]:
+    """`run` is typed to also return sparse tensors, lists and maps; these graphs return dense arrays."""
+    return cast(list[np.ndarray], sess.run(None, feeds))
 
 
 def pad_ids(ids: np.ndarray, n: int) -> np.ndarray:
@@ -86,7 +91,7 @@ def check_case(
 
     for c, chunk in enumerate(man["chunks"]):
         n = chunk["duration"]
-        tc, tu = text_sess.run(None, {"text": pad_ids(g.tensor(f"c{c}.dit.text_ids"), n)})
+        tc, tu = run(text_sess, {"text": pad_ids(g.tensor(f"c{c}.dit.text_ids"), n)})
         if c == 0:
             out += compare(g, tolerances, "c0.dit_internal.text_embed", tc)
             out += compare(g, tolerances, "c0.dit_internal.text_embed_uncond", tu)
@@ -104,7 +109,7 @@ def check_case(
                 "dt": np.array([grid[s + 1] - grid[s]], dtype=np.float32),
             }
             internal = debug and c == 0 and s in internal_steps
-            res = step_sess.run(None, feeds)
+            res = run(step_sess, feeds)
             pred, v, x_next = res[0], res[1], res[2]
             out += compare(g, tolerances, f"{p}.out_cond", pred[:1])
             out += compare(g, tolerances, f"{p}.out_uncond", pred[1:])

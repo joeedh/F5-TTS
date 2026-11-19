@@ -2,6 +2,13 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-19: pyright passes locally but fails in CI on onnxruntime code
+
+- **Symptom:** `pyright` reports 0 errors locally, but the typecheck job fails on `check_dit_ort.py` (`SparseTensor` has no `__getitem__`, and similar).
+- **Cause:** the local `.venv` (Python 3.15) has no onnxruntime wheel, so the import is unresolved and its types are `Unknown`. CI installs it, and `InferenceSession.run` is typed to return dense arrays, sparse tensors, lists or maps.
+- **Fix:** cast the result in one helper (`check_dit_ort.run`).
+- **Diagnose:** also type check code that uses onnxruntime against `.venv313`: `.venv\Scripts\pyright.exe --pythonpath .venv313\Scripts\python.exe <files>`.
+
 ## 2026-11-19: exporting the DiT with a dynamic sequence length (plan 01, step 1)
 
 Three problems with `torch.onnx.export(dynamo=True)` (torch 2.15, onnxscript 0.7.2), all handled in `tools/webgpu/export_dit.py`:
