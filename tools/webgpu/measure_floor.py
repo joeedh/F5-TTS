@@ -59,9 +59,16 @@ def metrics(got: Tensor | np.ndarray, ref: np.ndarray, mask: np.ndarray | None =
 @dataclass
 class Floors:
     rows: list[dict[str, Any]] = field(default_factory=list)  # Any: json values
+    dump: bool = False  # with --dump, CUDA outputs are saved as testdata/webgpu/<case>/cuda/<golden name>.npy
 
-    def add(self, check: str, case: str, tensor: str, m: dict[str, float | None]) -> None:
+    def add(self, check: str, case: str, tensor: str, m: dict[str, float | None], got: Tensor | None = None) -> None:
         self.rows.append({"check": check, "case": case, "tensor": tensor, **m})
+        if self.dump and got is not None:
+            folder = OUT_ROOT / case / "cuda"
+            folder.mkdir(exist_ok=True)
+            # C order: a permuted tensor would otherwise be saved Fortran-ordered, which the TS reader rejects
+            arr = np.ascontiguousarray(got.detach().float().cpu().numpy().reshape(Golden(case).shape(tensor)))
+            np.save(folder / f"{tensor}.npy", arr)
 
     def worst(self, check: str, key: str, include_tiny: bool = False) -> dict[str, Any] | None:  # Any: a row
         rows = [r for r in self.rows if r["check"] == check and r[key] is not None]
@@ -77,6 +84,9 @@ class Golden:
             (self.dir / "manifest.json").read_text(encoding="utf-8")
         )  # Any: json
         self.names = {t["name"] for t in self.manifest["tensors"]}
+
+    def shape(self, name: str) -> list[int]:
+        return next(t["shape"] for t in self.manifest["tensors"] if t["name"] == name)
 
     def np(self, name: str) -> np.ndarray:
         return np.load(self.dir / f"{name}.npy")
@@ -103,7 +113,7 @@ def measure_case(name: str, model: Any, vocoder: Any, dev: torch.device, fl: Flo
     with torch.inference_mode():
         mel = model.mel_spec(g.t("audio.ref", dev))
     ref_mel = g.np("mel.ref")
-    fl.add("mel.log_masked", name, "mel.ref", metrics(mel, ref_mel, mask=ref_mel > LOG_MEL_MIN))
+    fl.add("mel.log_masked", name, "mel.ref", metrics(mel, ref_mel, mask=ref_mel > LOG_MEL_MIN), mel)
     fl.add("mel.linear", name, "mel.ref", metrics(mel.exp(), np.exp(ref_mel)))
 
     # audio: downmix, RMS raise and resample on CUDA (only en-prep resamples)
@@ -113,7 +123,7 @@ def measure_case(name: str, model: Any, vocoder: Any, dev: torch.device, fl: Flo
         rms = torch.sqrt(torch.mean(torch.square(mono)))
         mono = mono * 0.1 / rms if rms < 0.1 else mono
         res = torchaudio.transforms.Resample(man["prep"]["sample_rate"], 24000).to(dev)(mono)
-        fl.add("audio.resample", name, "audio.ref", metrics(res, g.np("audio.ref")))
+        fl.add("audio.resample", name, "audio.ref", metrics(res, g.np("audio.ref")), res)
 
     # dit: every call teacher-forced; internals at the steps the golden data has
     internal_steps = set(man["settings"]["dit_internal_steps"])
@@ -148,8 +158,8 @@ def measure_case(name: str, model: Any, vocoder: Any, dev: torch.device, fl: Flo
                     cache=False,
                 )
             cond, uncond = torch.chunk(out, 2, dim=0)
-            fl.add("dit.out", name, f"{p}.out_cond", metrics(cond, g.np(f"{p}.out_cond")))
-            fl.add("dit.out", name, f"{p}.out_uncond", metrics(uncond, g.np(f"{p}.out_uncond")))
+            fl.add("dit.out", name, f"{p}.out_cond", metrics(cond, g.np(f"{p}.out_cond")), cond)
+            fl.add("dit.out", name, f"{p}.out_uncond", metrics(uncond, g.np(f"{p}.out_uncond")), uncond)
             if c == 0 and s in internal_steps:
                 ip = f"c0.dit_internal.s{s:02d}"
                 for key, outs in captured.items():
@@ -158,7 +168,7 @@ def measure_case(name: str, model: Any, vocoder: Any, dev: torch.device, fl: Flo
                         gname = f"c0.dit_internal.{key}{suffix}" if key == "text_embed" else f"{ip}.{key}{suffix}"
                         if gname in g.names and (key != "text_embed" or s == 0):
                             check = "dit_internal.block" if key.startswith("block") else f"dit_internal.{key}"
-                            fl.add(check, name, gname, metrics(o, g.np(gname)))
+                            fl.add(check, name, gname, metrics(o, g.np(gname)), o)
     for h in hooks:
         h.remove()
 
@@ -176,12 +186,18 @@ def measure_case(name: str, model: Any, vocoder: Any, dev: torch.device, fl: Flo
             wav = vocoder.decode(mel_out)
         if raised:
             wav = wav * rms / 0.1
-        fl.add("vocoder.backbone", name, f"c{c}.vocoder.backbone", metrics(backbone, g.np(f"c{c}.vocoder.backbone")))
+        fl.add(
+            "vocoder.backbone",
+            name,
+            f"c{c}.vocoder.backbone",
+            metrics(backbone, g.np(f"c{c}.vocoder.backbone")),
+            backbone,
+        )
         ho = head_out_rec[0].float().cpu().numpy()
         gho = g.np(f"c{c}.vocoder.head_out")
-        fl.add("vocoder.head_out", name, f"c{c}.vocoder.head_out", metrics(ho, gho))
+        fl.add("vocoder.head_out", name, f"c{c}.vocoder.head_out", metrics(ho, gho), head_out_rec[0])
         fl.add("vocoder.stft_complex", name, f"c{c}.vocoder.head_out", metrics(complex_stft(ho), complex_stft(gho)))
-        fl.add("vocoder.wav", name, f"c{c}.vocoder.wav", metrics(wav.squeeze(), g.np(f"c{c}.vocoder.wav")))
+        fl.add("vocoder.wav", name, f"c{c}.vocoder.wav", metrics(wav.squeeze(), g.np(f"c{c}.vocoder.wav")), wav)
     head_hook.remove()
 
     # free-running ODE with the golden noise injected; also gives the time grid
@@ -207,9 +223,9 @@ def measure_case(name: str, model: Any, vocoder: Any, dev: torch.device, fl: Flo
                 )
         finally:
             cfm_module.odeint = real_odeint
-        fl.add("plan.t", name, f"c{c}.plan.t", metrics(grid[0], g.np(f"c{c}.plan.t")))
+        fl.add("plan.t", name, f"c{c}.plan.t", metrics(grid[0], g.np(f"c{c}.plan.t")), grid[0])
         mel_out = out[:, chunk["ref_audio_len"] :, :].permute(0, 2, 1)
-        fl.add("mel_out.free_running", name, f"c{c}.mel_out", metrics(mel_out, g.np(f"c{c}.mel_out")))
+        fl.add("mel_out.free_running", name, f"c{c}.mel_out", metrics(mel_out, g.np(f"c{c}.mel_out")), mel_out)
 
 
 # check -> (metrics the pass check uses, how to read it)
@@ -240,6 +256,7 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--case", action="append", choices=sorted(CASES), default=[])
     p.add_argument("--from-floors", action="store_true", help="rebuild tolerances.json from floors.json, no GPU")
+    p.add_argument("--dump", action="store_true", help="save the CUDA outputs to <case>/cuda/ (parity smoke test)")
     args = p.parse_args()
 
     if args.from_floors:
@@ -248,19 +265,19 @@ def main() -> None:
         gpu = json.loads((OUT_ROOT / "tolerances.json").read_text())["measured_with"]["gpu"]
     else:
         names = args.case or sorted(CASES)
-        fl, gpu = measure(names), torch.cuda.get_device_name()
+        fl, gpu = measure(names, args.dump), torch.cuda.get_device_name()
         (OUT_ROOT / "floors.json").write_text(json.dumps({"rows": fl.rows}, indent=1))
     write_tolerances(fl, names, gpu)
 
 
-def measure(names: list[str]) -> Floors:
+def measure(names: list[str], dump: bool = False) -> Floors:
     assert torch.cuda.is_available(), "needs CUDA (run in .venv313)"
     dev = torch.device("cuda")
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
     torch.set_float32_matmul_precision("highest")
 
-    fl = Floors()
+    fl = Floors(dump=dump)
     models: dict[str, tuple[Any, Any]] = {}  # Any: CFM, Vocos
     for name in names:
         case = CASES[name]

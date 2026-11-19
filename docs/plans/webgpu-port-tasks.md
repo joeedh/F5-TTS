@@ -68,7 +68,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 
 | # | Plan (file to be written) | Depends on | Status |
 |---|---|---|---|
-| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | in progress; steps 1 to 5 done (D3: ORT Web; golden data; measured tolerances; 2026-11-18), step 6 (parity runner) next |
+| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | in progress; steps 1 to 6 done (D3: ORT Web; golden data; tolerances; parity runner; 2026-11-18), step 7 (CI) next |
 | 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | plan not written |
 | 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | plan not written |
 | 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | plan not written |
@@ -95,7 +95,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Pick the repo layout for web code (where it lives, build tool, language).
 - [x] Build the golden-data generator: fixed seed, fixed noise tensor, fixed inputs; dump text ids, reference mel, per-step DiT output, final mel, final wav from PyTorch. (Done 2026-11-18: `tools/webgpu/make_golden.py`, 7 cases.)
 - [ ] Define tolerances per stage (mel, DiT output, wav).
-- [ ] Write the test runner that compares any port stage to the golden data.
+- [x] Write the test runner that compares any port stage to the golden data. (Done 2026-11-18: `web/test/parity/` and `tools/webgpu/parity.py`.)
 
 ### 01 DiT export to ONNX
 - [ ] Wrap `DiT.forward` for export (fixed input signature, CFG batch handled outside or inside).

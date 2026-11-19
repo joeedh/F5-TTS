@@ -1,6 +1,6 @@
 # Plan 00: scope, runtime decision and parity harness
 
-Status: `plan pressure-tested` (drafted and reviewed 2026-11-02; findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; steps 1 and 2 done 2026-11-02; step 3 done 2026-11-18 (D3: ORT Web); steps 4 and 5 done 2026-11-18 (golden data; measured tolerances). Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
+Status: `plan pressure-tested` (drafted and reviewed 2026-11-02; findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; steps 1 and 2 done 2026-11-02; step 3 done 2026-11-18 (D3: ORT Web); steps 4 to 6 done 2026-11-18 (golden data; measured tolerances; parity runner, except the cloud SwiftShader check). Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
 
 Task list: [webgpu-port-tasks.md](webgpu-port-tasks.md). Model details: [../architecture.md](../architecture.md).
 
@@ -296,6 +296,28 @@ Measured table (step 5, 2026-11-18). The source of truth is `testdata/webgpu/tol
   - A tensor in the wrong layout (for example a mel transposed to (1, n, 100)) fails with a shape error, not a numeric one.
   - Smoke test, not a proof (it passes by construction, since the tolerances come from it): the CUDA fp32 rerun from step 5 goes through the runner as if it were a port.
 - Done when: the self-tests pass in Node, and the browser loader reads the tiny case in Chrome on the laptop and on SwiftShader in the cloud container.
+- **Done 2026-11-18 on the laptop.** The SwiftShader check in the cloud container is still open; it needs a session there, or the first CI run in step 7, which uses SwiftShader too.
+  - TypeScript runner, `web/test/parity/`:
+    - `npy.ts`: float32 and int32, `.npy` format versions 1 to 3.
+    - `case.ts`: `loadCase` and `loadTolerances` over a `Reader`, with `fsReader` for Node and `httpReader` for the browser.
+    - `compare.ts`: `checksFor`, `compare` and `report`.
+  - Python runner, `tools/webgpu/parity.py`. It can be used as a library, or from the command line (`--case X --actual DIR`).
+  - Rules both runners share:
+    - `checksFor` maps a golden tensor name to its `tolerances.json` checks. Inputs (noise, `x_k`, `step_cond`, raw audio) map to no check, and comparing one is an error.
+    - Token ids are compared exactly.
+    - `audio.resample` and `vocoder.head_out` are informational: they are reported but never fail.
+    - NaN always fails.
+    - Where the golden norm is near zero, max abs decides. If the check has no max-abs tolerance, its relative L2 value is used as the absolute limit.
+    - The earliest failing stage in pipeline order is printed last.
+  - Self-tests, `web/test/parity/parity.test.ts` (Vitest) and `tools/webgpu/parity_selftest.py`, cover the same scenarios on `tiny`:
+    - A shared name-to-check table.
+    - Golden data against itself passes.
+    - A 1 percent change to one DiT output fails exactly one check, in stage `dit`.
+    - With mel, DiT and wav all perturbed, `mel` is reported first.
+    - A transposed mel fails with a shape error and no metrics.
+    - NaN fails; a wrong token id fails; comparing an input is refused.
+  - Smoke test: `measure_floor.py --dump` saves the CUDA outputs as `testdata/webgpu/<case>/cuda/*.npy` (gitignored). Both runners pass all 1,005 comparisons over the six real cases. The Vitest part skips itself where the dumps are missing, as in CI.
+  - Browser: `web/test/browser/parity-loader.spec.ts` serves `testdata/` through Playwright route interception, because it lies outside Vite's root. It loads the tiny case with `httpReader` and runs every comparison in Chrome. It passes on the laptop's Intel GPU.
 
 ### Step 7. CI
 - New workflow `.github/workflows/web.yaml`: `npm ci`, `typecheck`, Vitest, and the Playwright test on the tiny case. GitHub's Ubuntu runners have no GPU, so this is expected to run on SwiftShader as in the cloud container; confirm on the first run.

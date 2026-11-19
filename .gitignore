@@ -185,3 +185,5 @@ web/test-results/
 web/playwright-report/
 !testdata/webgpu/tolerances.json
 !testdata/webgpu/floors.json
+# CUDA outputs saved by measure_floor.py --dump, for the parity smoke test
+testdata/webgpu/*/cuda/

@@ -2,6 +2,12 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-18: .npy files saved from permuted tensors (plan 00, step 6)
+
+- **Symptom:** the TypeScript parity reader throws `fortran-order .npy is not supported` on some files written by `measure_floor.py --dump`.
+- **Cause:** `np.save` of a tensor that was permuted on the torch side (for example `mel_out`, a `permute(0, 2, 1)` view) writes the array in Fortran order, with `'fortran_order': True` in the header, rather than copying it to C order. Reshaping does not always force a copy.
+- **Fix:** wrap anything saved for the web side in `np.ascontiguousarray`. `make_golden.py` already did this; the dump path now does too. The readers reject Fortran order on purpose, rather than silently reading the data transposed.
+
 ## 2026-11-18: recording intermediates without changing model code (plan 00, step 4)
 
 - `tools/webgpu/make_golden.py` shows how to take every intermediate out of the real inference path. The same approach works for a one-off debugging dump:
