@@ -1,6 +1,6 @@
 // Compares a port's tensor with the golden one, using testdata/webgpu/tolerances.json.
 // Python twin: tools/webgpu/parity.py. The two must agree on check names, metrics and pass rules.
-import type { GoldenCase, Tolerances } from "./case";
+import type { CheckTolerance, GoldenCase, Tolerances } from "./case";
 import type { Tensor } from "./npy";
 
 /** Pipeline order; the report names the earliest failing stage, since later ones inherit its error. */
@@ -145,8 +145,10 @@ export async function compare(
       m = metrics(Float64Array.from(actual.data, Math.exp), Float64Array.from(ref.data, Math.exp));
     else if (check === "vocoder.stft_complex") m = metrics(complexStft(actual), complexStft(ref));
     else m = metrics(actual.data, ref.data);
-    const tol = tolerances.checks[check];
-    if (!tol) throw new Error(`no tolerance for ${check} in tolerances.json`);
+    const shared = tolerances.checks[check];
+    if (!shared) throw new Error(`no tolerance for ${check} in tolerances.json`);
+    // the tiny case has its own tolerance where its floor is higher than the real cases' (plan 00, R5)
+    const tol: CheckTolerance = golden.name === "tiny" && shared.tiny ? { ...shared, ...shared.tiny } : shared;
     const tolerance = { relL2: tol.rel_l2, maxAbs: tol.max_abs };
     // near-zero golden: relative L2 is undefined, so max abs decides, against the rel_l2 value if there is no max_abs
     const absLimit = tol.max_abs ?? (m.relL2 === null ? tol.rel_l2 : undefined);

@@ -105,6 +105,16 @@ describe("parity runner", () => {
     expect((await compare(golden, tolerances, "c0.dit.text_ids", ids))[0]?.pass).toBe(false);
   });
 
+  it("uses the tiny case's own tolerance where tolerances.json has one", async () => {
+    // Linux and Windows CPU differ by ~1e-6 here, above the shared 1e-6 (plan 00, step 7)
+    const t = copy(await golden.tensor("c0.dit_internal.s04.time_embed"));
+    for (let i = 0; i < t.data.length; i++) t.data[i] = (t.data[i] as number) * (1 + 3e-6);
+    const [r] = await compare(golden, tolerances, "c0.dit_internal.s04.time_embed", t);
+    expect(r?.tolerance?.relL2).toBe(tolerances.checks["dit_internal.time_embed"]?.tiny?.rel_l2);
+    expect(r?.tolerance?.relL2).toBeGreaterThan(tolerances.checks["dit_internal.time_embed"]?.rel_l2 as number);
+    expect(r?.pass).toBe(true);
+  });
+
   it("refuses to compare an input", async () => {
     await expect(compare(golden, tolerances, "c0.noise.y0", await golden.tensor("c0.noise.y0"))).rejects.toThrow(
       /input/,

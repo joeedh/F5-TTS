@@ -304,7 +304,10 @@ def write_tolerances(fl: Floors, names: list[str], gpu: str) -> None:
             entry[f"floor_{key}_at"] = f"{w['case']}/{w['tensor']}"
             wt = fl.worst(check, key, include_tiny=True)
             if wt is not None and wt["case"] == "tiny":
+                # the tiny case's random weights sit at another scale (R5); it gets its own tolerance by the same
+                # rule, used only for that case. CI compares Linux and Windows CPU runs of it (plan 00, step 7)
                 entry[f"tiny_{key}"] = wt[key]
+                entry.setdefault("tiny", {})[key] = pow10_up(wt[key])
         table[check] = entry
     tolerances = {
         "method": "10x the worst CPU fp32 vs CUDA fp32 (TF32 off) difference over all real cases, rounded up to a"

@@ -26,6 +26,7 @@ export interface CheckTolerance {
   note: string;
   rel_l2?: number;
   max_abs?: number;
+  tiny?: { rel_l2?: number; max_abs?: number }; // used only for the tiny case
   [key: string]: unknown;
 }
 

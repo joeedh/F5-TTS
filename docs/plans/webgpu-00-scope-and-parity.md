@@ -194,7 +194,9 @@ Measured table (step 5, 2026-11-18). The source of truth is `testdata/webgpu/tol
 | `mel_out.free_running` | free-running ODE with golden noise | rel L2 2.8e-5 | rel L2 1e-3 | rel L2 1e-2 |
 | `final` | end to end | - | listening check; metrics deferred to plans 04 and 07 (D2) | same |
 
-- **For step 7:** `tiny`'s `time_embed` floor (rel L2 2.7e-6) is above the tolerance taken from the real cases (1e-6). The CI comparison of a regenerated `tiny` against the committed one may need a tiny-specific allowance for that check (`tiny_rel_l2` in `tolerances.json`).
+- **Tiny-specific tolerances (added in step 7).** Where `tiny`'s floor is above the real cases' floor, `tolerances.json` gives that check a `tiny` entry set by the same 10x rule. Both runners use it only for the `tiny` case.
+  - Today only `dit_internal.time_embed` has one: tiny floor 2.7e-6, so 1e-4, against the shared 1e-6.
+  - The first CI run needed it: Linux and Windows CPU runs of `tiny` differ there by 1.09e-6.
 - `vocoder.head_out` (raw head output, max abs floor 4.9e-2) is in the file as informational only. Its phase half is not meaningful where the magnitude is tiny.
 - The free-running ODE drifts far less than feared: 2.8e-5, so its bound is 10 times tighter than the placeholder.
 - Two floors are much larger than their placeholders, and both come from amplification of ordinary fp32 differences, not from bugs:
@@ -323,6 +325,14 @@ Measured table (step 5, 2026-11-18). The source of truth is `testdata/webgpu/tol
 - New workflow `.github/workflows/web.yaml`: `npm ci`, `typecheck`, Vitest, and the Playwright test on the tiny case. GitHub's Ubuntu runners have no GPU, so this is expected to run on SwiftShader as in the cloud container; confirm on the first run.
 - Python job (in `typecheck.yaml` or a new one): regenerate the tiny case on CPU and compare it with the committed one through `parity.py`. Compare with tolerances, not hashes: the committed case comes from Python 3.15 on Windows and CI runs Python 3.12 on Linux, so the last bits differ. This also flags upstream behaviour changes in the model code.
 - Done when: both pass on GitHub.
+- **2026-11-18, first run** (commit cabcd49, run 44436483794):
+  - The `web` job passed, including both Playwright tests on SwiftShader. That also closes step 6's open "SwiftShader" check.
+  - `typecheck` passed. It now installs the `webgpu` extra, because pyright has checked `tools/webgpu` since step 4.
+  - `pre-commit` passed.
+  - `golden-tiny` regenerated `tiny` on Linux (Python 3.12, CPU torch 2.15.0) and failed one of its 40 comparisons: `dit_internal.time_embed` at step 4, rel L2 1.09e-6 against the shared tolerance of 1e-6.
+    - The fix is the tiny-specific tolerance described under "Tolerances".
+    - All other comparisons passed with wide margins. The DiT output was at 1.4e-6 against 1e-4, for example.
+    - Locally, regenerating with `.venv313`'s torch build and with 1 or 2 threads had given bit-identical `time_embed`. So the gap is a Linux-versus-Windows CPU kernel difference, not thread scheduling.
 
 ### Step 8. Close out
 - Update the task list: plan 00 status, the ticked tasks, the answered open questions (parity, browsers, export entry point).

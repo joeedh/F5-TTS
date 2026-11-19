@@ -157,6 +157,8 @@ def compare(golden: GoldenCase, tolerances: dict[str, Any], name: str, actual: n
         else:
             m = metrics(actual, ref)
         tol = tolerances["checks"][check]
+        if golden.manifest["case"] == "tiny":
+            tol = {**tol, **tol.get("tiny", {})}  # tiny's own tolerance where its floor is higher (R5)
         rel_tol, abs_tol = tol.get("rel_l2"), tol.get("max_abs")
         # near-zero golden: relative L2 is undefined, so max abs decides, against rel_l2 if there is no max_abs
         abs_limit = abs_tol if abs_tol is not None else (rel_tol if m["rel_l2"] is None else None)

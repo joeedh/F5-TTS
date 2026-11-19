@@ -88,6 +88,12 @@ def main() -> None:
     res = compare(g, tol, "mel.ref", mel_t)
     check(all(not r.passed and (r.error or "").startswith("shape") and not r.metrics for r in res), "transposed mel")
 
+    # Linux and Windows CPU differ by ~1e-6 here, above the shared 1e-6 (plan 00, step 7)
+    te = g.tensor("c0.dit_internal.s04.time_embed") * np.float32(1 + 3e-6)
+    r = compare(g, tol, "c0.dit_internal.s04.time_embed", te)[0]
+    shared = tol["checks"]["dit_internal.time_embed"]
+    check(r.passed and r.tolerance["rel_l2"] == shared["tiny"]["rel_l2"] > shared["rel_l2"], "tiny's own tolerance")
+
     wav_nan = g.tensor("c0.vocoder.wav").copy()
     wav_nan[100] = np.nan
     check(not compare(g, tol, "c0.vocoder.wav", wav_nan)[0].passed, "NaN fails")

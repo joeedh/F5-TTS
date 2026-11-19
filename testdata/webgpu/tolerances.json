@@ -71,6 +71,9 @@
       "floor_rel_l2": 7.237210077347413e-08,
       "floor_rel_l2_at": "en-multi/c0.dit_internal.s16.time_embed",
       "tiny_rel_l2": 2.7156256750561472e-06,
+      "tiny": {
+        "rel_l2": 0.0001
+      },
       "max_abs": 1e-05,
       "floor_max_abs": 9.5367431640625e-07,
       "floor_max_abs_at": "en-epss16/c0.dit_internal.s08.time_embed"
