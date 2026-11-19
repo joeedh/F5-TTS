@@ -69,9 +69,9 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 | # | Plan (file to be written) | Depends on | Status |
 |---|---|---|---|
 | 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | done 2026-11-18 (D3: ORT Web; golden data, tolerances, parity runner and CI in place) |
-| 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | plan not written |
-| 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | plan not written |
-| 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | plan not written |
+| 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | plan pressure-tested 2026-11-18 |
+| 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | plan pressure-tested 2026-11-18 |
+| 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | plan pressure-tested 2026-11-18 |
 | 04 | [Sampler and generation pipeline](webgpu-04-sampler-pipeline.md) | 01, 02, 03 | plan not written |
 | 05 | [Weight delivery, precision and quantization](webgpu-05-weights-precision.md) | 01, 02 | plan not written |
 | 06 | [Web app and public API](webgpu-06-web-app.md) | 04, 05 | plan not written |

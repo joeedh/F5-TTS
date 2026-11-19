@@ -10,5 +10,8 @@
 | [research/webgpu-runtime-spike.md](research/webgpu-runtime-spike.md) | Plan 00 step 3: ORT Web vs hand-written WGSL on one DiT block; D3 decided for ORT Web; fp16 accuracy and attention-cost findings |
 | [plans/webgpu-port-tasks.md](plans/webgpu-port-tasks.md) | Task list: Python typing/tooling plan (pyright) and the WebGPU port plans |
 | [plans/webgpu-00-scope-and-parity.md](plans/webgpu-00-scope-and-parity.md) | WebGPU plan 00: scope, ORT Web vs WGSL spike, golden-data generator, tolerances, parity runner |
+| [plans/webgpu-01-dit-export.md](plans/webgpu-01-dit-export.md) | WebGPU plan 01: DiT export to ONNX (text and step graphs), attention and sequence-length choices, browser parity |
+| [plans/webgpu-02-mel-and-vocoder.md](plans/webgpu-02-mel-and-vocoder.md) | WebGPU plan 02: reference audio prep, mel, Vocos graph and inverse STFT in TypeScript |
+| [plans/webgpu-03-text-frontend.md](plans/webgpu-03-text-frontend.md) | WebGPU plan 03: chunking, Chinese segmentation and pinyin, token ids, matched against Python |
 
 Add a row here whenever a doc is added.

@@ -1,0 +1,219 @@
+# Plan 02: Mel spectrogram, reference audio and vocoder
+
+Status: `plan pressure-tested` (written 2026-11-18; review findings folded in, see the end of this file). Depends on: plan 00 (done). Blocks: plans 04 and 05.
+
+Task list: [webgpu-port-tasks.md](webgpu-port-tasks.md). Golden data and tolerances: [webgpu-00-scope-and-parity.md](webgpu-00-scope-and-parity.md).
+
+## What this plan delivers
+
+- TypeScript for the audio ends of the pipeline:
+  - Reference preparation: silence trim and 12 s clip, downmix, RMS raise, resample to 24 kHz.
+  - Mel extraction.
+  - The inverse STFT and the output RMS rescale.
+- A Vocos ONNX graph (backbone plus the head's linear layer) that runs on ORT Web's WebGPU EP.
+- Parity against the golden `prep`, `audio`, `mel` and `vocoder` stages, in Node and in Chrome.
+- Tolerances for the stages plan 00 left to this plan (`prep`, `audio.resample`), plus a tight `vocoder.istft` check.
+
+Out of scope:
+- Decoding compressed audio files (mp3, m4a): the browser's decoder is used, and its output is the input to this plan. Plan 06 owns file handling.
+- Cross-fading chunks (plan 04).
+- The vocoder in fp16 (plan 05).
+
+## What upstream does
+
+### Reference preparation (`infer/utils_infer.py`)
+
+1. `preprocess_ref_audio_text`, which uses pydub on the file:
+   - `split_on_silence` (min 1000 ms of silence at -50 dBFS, keep 1000 ms, seek step 10 ms), with segments concatenated until the result would pass 12 s once it is over 6 s.
+   - If still over 12 s, the same with 100 ms at -40 dBFS.
+   - If still over 12 s, a hard cut at 12 s (`utils_infer.py:355`). No golden case reaches it.
+   - Then `remove_silence_edges` (leading and trailing silence below -42 dBFS) and `AudioSegment.silent(duration=50)` appended.
+     - That silence is made at pydub's default 11025 Hz (551 frames). `append` converts it to the input's rate with `audioop.ratecv`, so it is 1198 samples at 24 kHz and 2201 at 44.1 kHz, not 50 ms exactly. The golden `prep.audio` files confirm both numbers.
+     - `append` syncs to the higher of the two rates. An input below 11025 Hz is therefore upsampled as a whole by `ratecv`'s linear interpolation.
+   - Writes a wav and fixes up the reference text's final punctuation. The text fix-up belongs to plan 03.
+   - pydub keeps the channels. `en-prep`'s `prep.audio` is stereo, shape (2, 304947).
+2. `infer_batch_process`, after that:
+   - Averages channels to mono.
+   - Computes `rms = sqrt(mean(x^2))` and, if it is below 0.1, scales to 0.1.
+   - Resamples to 24 kHz with `torchaudio.transforms.Resample` if needed (`sinc_interp_hann`, `lowpass_filter_width` 6, `rolloff` 0.99). torchaudio builds the kernel in float64 and caches it as float32 (`_transforms.py:931-936`).
+   - The same `rms` later rescales the generated wav: `wave * rms / 0.1` when the raise fired.
+- pydub works on integer samples at the file's own sample width. For a 16-bit wav, the golden `prep.audio` is int16 PCM read back as float: every value is a multiple of 1/32768.
+
+### pydub details that exact parity depends on
+
+- `audioop.rms` returns an integer: the square root of the mean square, truncated.
+- `detect_silence` compares that integer with `db_to_float(thresh) * max_possible_amplitude` (`silence.py:29,44`), a linear comparison. Only `detect_leading_silence` compares in dBFS, where an rms of 0 gives minus infinity.
+- Milliseconds become frames as `int(ms * (frame_rate / 1000.0))` (`audio_segment.py:445-450`, `:991-997`). That is a truncated double-precision expression, and 44.1 is not exact in binary. The port must evaluate the same expression, not exact integer arithmetic.
+- `len(segment)` in ms uses Python's `round`, which rounds half to even (`:283`). JS `Math.round` rounds half up. At 24 kHz they disagree whenever the frame count is 12 mod 24.
+- `segment[a:b]` pads with up to 2 ms of zero frames when the rounded length overshoots the data (`:319-328`).
+- RMS runs over the interleaved samples of all channels; slicing is per frame.
+- Sample width: 24-bit wavs become 32-bit, with `max_possible_amplitude` 2^31 (`:235-246`). Float wavs are refused by the fast path (`:118`) and go through ffmpeg as `pcm_s32le` (`:720-735`).
+
+### Mel (`model/modules.py`, `get_vocos_mel_spectrogram`)
+
+- `torchaudio.transforms.MelSpectrogram(sample_rate=24000, n_fft=1024, win_length=1024, hop_length=256, n_mels=100, power=1, center=True, normalized=False, norm=None)`. The rest are torchaudio defaults:
+  - Periodic Hann window (`torch.hann_window`).
+  - Reflect padding of n_fft/2 on both sides.
+  - HTK mel scale, f_min 0, f_max 12000.
+  - The filterbank is not normalised.
+- Output: `log(clamp(mel, 1e-5))`, shape (1, 100, samples // 256 + 1).
+
+### Vocoder (`vocos`, `charactr/vocos-mel-24khz`)
+
+- `VocosBackbone`:
+  - Conv1d 100 to 512 (kernel 7), then LayerNorm.
+  - 8 ConvNeXt blocks of 512: depthwise kernel 7, LayerNorm, 512 to 1536, exact (erf) GELU, 1536 to 512, layer scale. The DiT uses the tanh GELU; this one does not.
+  - A final LayerNorm.
+  - Output (1, T, 512).
+- `ISTFTHead`, with `padding: center` from the model's HF `config.yaml`. The library default is `same` (`heads.py:38`), which would give T * 256 samples.
+  - Linear 512 to 1026.
+  - The first 513 values are a log magnitude: `exp`, then clipped at 100. The rest are a phase.
+  - `S = mag * (cos p + i sin p)`. The phase of bins 0 and 512 is generally nonzero, and `irfft` ignores the imaginary part of those two bins.
+  - `torch.istft(S, n_fft=1024, hop=256, win=1024, hann, center=True)`.
+  - Output length (T - 1) * 256.
+- Golden taps: `c*.mel_out` (the input), `c*.vocoder.backbone`, `c*.vocoder.head_out` (the linear output) and `c*.vocoder.wav` (after the RMS rescale).
+- The tiny Vocos is dim 64, intermediate 192, 2 layers (`tools/webgpu/tiny_model.py:41-49`).
+
+## Decisions
+
+### D1. Where the mel runs (proposal: TypeScript on the CPU)
+
+- The reference mel is computed once per generation, for at most about 12 s of audio. That is about 1,130 frames of a 1024-point real FFT, a few milliseconds in JS.
+- On the GPU it would need an STFT op (ORT Web's WebGPU EP support is unknown) or WGSL. Neither is worth it for a one-off.
+- The filterbank is computed in TS with torchaudio's formula and checked against torchaudio's matrix, which is exported once as a test fixture.
+- The FFT runs in float64. The golden mel is float32 PyTorch, and float64 is at least as close to the exact result.
+
+### D2. Where the inverse STFT runs (proposal: TypeScript on the CPU first, GPU only if profiling says so)
+
+- **Option A.** ONNX outputs `head_out`. JS reads it back and does `exp`, clip, `cos`/`sin`, an inverse real FFT per frame, the window, overlap-add and the window-envelope division.
+  - For a 2000-frame chunk the readback is 2000 x 1026 floats (8 MB), and the CPU work is about 2000 FFTs of 1024 points.
+  - Simple, and exact in float64.
+- **Option B.** The iSTFT inside the ONNX graph as a convolution with a fixed inverse-DFT kernel, as `runtime/triton_trtllm/scripts/conv_stft.py` does for TensorRT. That keeps everything on the GPU, but the edge handling has to be checked against `torch.istft(center=True)`.
+- Proposal: A first, timed. B only if A costs more than 5 percent of a chunk's time on the integrated GPU.
+
+### D3. Vocoder graph boundary (proposal: backbone plus `head.out`, outputs `head_out`)
+
+- The graph's output is exactly the golden `c*.vocoder.head_out` tap, so the parity runner checks it directly (`vocoder.stft_complex`).
+- The `exp`/clip and the trigonometry happen in JS with D2's option A. If D2 moves to option B they join the graph.
+
+### D4. Resampler (proposal: port torchaudio's `sinc_interp_hann` resampler to TS)
+
+- Web Audio can resample (`OfflineAudioContext`), but its algorithm is browser-specific and would not match the golden `audio.ref`.
+- torchaudio's resampler is a fixed windowed-sinc kernel: about 60 lines with the kernel construction.
+  - The TS kernel is built in float64 and each tap rounded with `Math.fround`, to match torchaudio's float32 cache.
+- Tolerance: plan 00's rule on the measured CPU-against-CUDA floor (1.8e-7 max abs) gives 1e-6. The port must meet that; the tolerance is not re-derived from the port.
+- The input is decoded PCM at its own sample rate. Plan 06 must decode without the browser resampling it. For example, use `decodeAudioData` on an `AudioContext` created at the file's rate, or parse wav directly.
+
+### D5. Silence trim and clip (proposal: port pydub's algorithm, exact for 16-bit PCM wav)
+
+- R3 in plan 00 said the browser "cannot match exactly". On reading pydub, it can, for 16-bit PCM wav at 11025 Hz or above, provided the port reproduces every detail in "pydub details that exact parity depends on" above. That list is the exactness contract.
+- Scope of exact parity:
+  - 16-bit PCM wav, any channel count, 11025 Hz or above.
+  - Everything else (24-bit and float wav, compressed formats, rates below 11025 Hz) is approximate. The port converts it to int16 and proceeds, and the UI does not promise identical output. With 32-bit samples the sum of squares is also no longer exact in float64.
+- Input: interleaved int16 samples plus `channels` and `sampleRate`.
+- The appended silence reproduces `ratecv`'s output length for 551 zero frames at 11025 Hz converted to the input rate. The values are all zeros, so only the length matters.
+- Performance: `detect_silence` rescans a 1000 ms window every 10 ms, which is billions of operations for a multi-minute upload. The port uses a prefix sum of squared samples. For int16 the sums stay below 2^53, so float64 is exact and the result is identical, in linear time.
+- Check: the port's output against `prep.audio`, exact length and values. New check `prep.audio`, exact, in `tolerances.json` and both runners' `checksFor`.
+
+## Steps
+
+### Step 1. Mel
+
+- `web/src/audio/mel.ts`:
+  - Reflect pad, periodic Hann, real FFT (a small radix-2 implementation; no dependency needed).
+  - Magnitude, the HTK mel filterbank, `log(max(x, 1e-5))`.
+  - Output layout (100, frames), the same as the golden (1, 100, n) without the batch axis.
+- Test fixture: torchaudio's filterbank (513 x 100) exported by a small `tools/webgpu/export_audio_fixtures.py` and committed (200 KB).
+- Tests: Vitest against `mel.ref` of the tiny case (committed) and, locally, of every real case, with `mel.log_masked` and `mel.linear`.
+- Done when: all cases pass both mel checks.
+
+### Step 2. Reference preparation
+
+- `web/src/audio/prepare.ts`:
+  - `trimAndClip(samples: Int16Array, channels, sampleRate)`: D5.
+  - `downmixRmsResample(channels, sampleRate)`: mean, RMS raise, D4.
+  - Returns the 24 kHz mono reference and the `rms`/`raised` values plan 04 needs for the output rescale.
+- Golden inputs: there are 4 distinct `input.wav` files, not 7. `en-short`, `en-multi`, `en-multi-fixdur` and `en-epss16` share one. None of them reaches the 12 s hard cut, and the committed `tiny` case (24 kHz mono, rms 0.147) triggers neither the resample, the downmix nor the RMS raise.
+- Synthetic fixtures, generated with pydub and torchaudio by `export_audio_fixtures.py` and committed (each under 1 s unless the case needs more):
+  - A quiet 44.1 kHz stereo clip: resample, downmix and RMS raise.
+  - Silence only.
+  - No silence and longer than 12 s: the hard cut.
+  - A long silence in the middle.
+  - One fixture for each item of D5's exactness contract that the above miss. These are mainly frame counts at 12 mod 24, where Python's `round` and JS's `Math.round` disagree, and a slice that overshoots and gets padded.
+- Tests:
+  - `prep.audio` exactly, from `input.wav` for every golden case and every fixture.
+  - `audio.ref` from `prep.audio`, with `audio.resample` at 1e-6 (D4).
+- Done when: every golden case and fixture passes both, and the fixtures run in CI.
+
+### Step 3. Vocoder export and CPU parity
+
+- `tools/webgpu/export_vocos.py`:
+  - Wraps `vocos.backbone` and `vocos.head.out`.
+  - Dynamic T, dynamo, a single file (about 54 MB, no external data needed).
+  - Also exports the tiny Vocos for CI (committed). It is built from `build_tiny_vocos()` and the committed `vocos.safetensors`, not from `from_pretrained`.
+  - Logs which op the exact GELU became (opset-20 `Gelu`, or an `Erf` decomposition), for step 5's placement check.
+- Python check in onnxruntime CPU: feed `c*.mel_out`, compare with `c*.vocoder.backbone` (a debug output) and `c*.vocoder.head_out` through `parity.py`.
+- Done when: every chunk of every case passes `vocoder.backbone` and `vocoder.stft_complex`.
+
+### Step 4. Inverse STFT and output rescale
+
+- `web/src/audio/istft.ts`: D2 option A, with the `torch.istft(center=True)` semantics:
+  - Inverse real FFT per frame, ignoring the imaginary part of bins 0 and 512 as `irfft` does.
+  - Periodic Hann window.
+  - Overlap-add at hop 256.
+  - Divide by the sum of squared windows.
+  - Trim n_fft/2 at both ends.
+- `web/src/audio/output.ts`: the RMS rescale (`wave * rms / 0.1` when `raised`).
+- New check `vocoder.istft`, rel_l2 1e-5: from the golden `head_out` to `vocoder.wav`. The existing `vocoder.wav` tolerance (rel_l2 1e-2, max_abs 0.1) was sized for the whole vocoder on CPU against CUDA, and is too loose to catch a wrong window or envelope here. `vocoder.istft` is used only by this test.
+- Tests:
+  - Every chunk of every case, from `c*.vocoder.head_out`.
+  - A synthetic frame with nonzero phase in bins 0 and 512, compared with `torch.fft.irfft`.
+- Done when: every chunk passes `vocoder.istft`, and the synthetic frame matches.
+
+### Step 5. Browser
+
+- Run the vocoder graph on WebGPU (both GPUs, Chrome) from the golden `mel_out`, then the TS iSTFT, then compare with `vocoder.wav`.
+- The tiny case runs in CI (SwiftShader); the real cases run locally.
+- Time the graph and the iSTFT per chunk on both GPUs, for D2.
+- Placement: no float compute node on the CPU and no inserted copy of an activation tensor. The GELU's op from step 3 is checked by name.
+- Done when: the real cases pass on both GPUs, and D2 is decided with numbers.
+
+### Step 6. Close out
+
+- `docs/research/webgpu-audio.md` (add it to `docs/index.md`): the mel and filterbank spec as implemented, the pydub exactness contract, the iSTFT timing and D2's outcome, and the vocoder graph's per-chunk time.
+- Hand off to plan 04: the function signatures and the `rms`/`raised` contract.
+- Hand off to plan 05: the vocoder's size and fp32 timing.
+- Hand off to plan 06: the input formats that get exact parity, and the decoding requirement in D4.
+- `docs/debugging.md` entries; `docs/shape-ledger.md` entries for layout slips. The mel is (b, d, n) and the backbone output is (b, n, d), so this boundary is where they happen.
+
+## Risks
+
+- **R1. The torchaudio filterbank details** (HTK scale, f_max, normalisation, the triangle edges at bin boundaries) are easy to get subtly wrong. Mitigation: the exported matrix is the reference, and it is compared before the mel is.
+- **R2. pydub edge cases** beyond the exactness contract. One example: `split_on_silence` with `keep_silence` overlaps neighbouring chunks, and its handling is order-dependent. The exact `prep.audio` check catches any difference, but only on the inputs it is given, which is why step 2 adds the synthetic fixtures.
+- **R3. Float64 in TS against float32 in PyTorch.** Expected to help, not hurt. If a check fails by a hair, compare with a float32 path before suspecting a bug.
+- **R4. The iSTFT readback** (8 MB per long chunk) may be slow on some browsers. D2 option B exists for that.
+- **R5. Browser decoding resamples silently** if the `AudioContext` rate differs from the file's. That is plan 06's to handle, but this plan's API takes the sample rate explicitly, so a mismatch is visible.
+- **R6. The exact GELU's ONNX form** may not run on the WebGPU EP. If `Erf` lands on the CPU, the fallback is an export-time substitution with the same numerics. A tanh approximation would not match.
+
+## Pressure test, 2026-11-18
+
+A fresh agent given only this file reviewed the first draft against the code, pydub, torchaudio, vocos and the golden data. Findings and what changed:
+- **The appended "50 ms" is 1198 samples at 24 kHz and 2201 at 44.1 kHz.** pydub makes it at 11025 Hz and converts it with `ratecv`. Confirmed against every golden `prep.audio`. Now stated, with the low-rate upsampling it implies.
+- **"pydub only slices, so nothing can drift" was wrong.** These details all matter for exactness:
+  - Integer RMS and the linear threshold comparison.
+  - Truncated double-precision ms-to-frame conversion.
+  - Python's round-half-even.
+  - Zero padding on overshooting slices.
+  
+  They are now listed as the exactness contract, each with a test.
+- **Format handling was wrong.** pydub keeps 24-bit audio as 32-bit and sends float wav through ffmpeg, so it does not convert to int16. Exact parity is now limited to 16-bit PCM wav at 11025 Hz or above. The port's API takes interleaved samples and a channel count, because `en-prep` is stereo.
+- **The iSTFT check was too loose to catch a wrong window or envelope.** A new `vocoder.istft` check at rel_l2 1e-5 is used for the head-to-wav test.
+- **The resample tolerance was circular.** It is now the floor-derived 1e-6, and the port must meet it. The kernel is rounded to float32 as torchaudio's is.
+- **CI exercised none of resample, downmix, RMS raise or clipping,** and the golden set has only 4 distinct inputs. Synthetic fixtures are added, including one that reaches the 12 s hard cut.
+- **`detect_silence` is quadratic in practice.** The port uses a prefix sum instead, which gives identical results for int16.
+- **Smaller fixes:**
+  - DC and Nyquist bins in the iSTFT.
+  - The tiny Vocos is built from the committed weights.
+  - Exact GELU and its ONNX placement (new risk R6).
+  - The `center` padding is cited from the model's config.
+  - The downmix happens after pydub.
