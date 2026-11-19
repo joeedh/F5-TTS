@@ -1,0 +1,54 @@
+name: web
+
+# WebGPU port checks (plan 00, step 7). GitHub's Ubuntu runners have no GPU: the browser tests run on
+# Playwright's Chromium with SwiftShader (software WebGPU), as in the cloud container.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run format:check
+      # Node tests: the tiny golden case and the parity runner's self-tests (the CUDA smoke test skips itself)
+      - run: npm test
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Browser tests (SwiftShader)
+        run: npm run test:browser
+
+  golden-tiny:
+    # Regenerates the tiny golden case on CPU and compares it with the committed one through the
+    # parity runner. Tolerances, not hashes: the committed case comes from Windows and Python 3.15.
+    # A failure here means the model code changed behaviour, or the tolerances are too tight for
+    # cross-platform CPU differences (see docs/plans/webgpu-00-scope-and-parity.md, step 7).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install CPU torch
+        run: pip install "torch==2.15.0" torchaudio --index-url https://download.pytorch.org/whl/cpu
+      - name: Install the project with the webgpu extra
+        run: pip install -e ".[webgpu]"
+      - name: Regenerate the tiny case
+        run: python tools/webgpu/make_golden.py --case tiny --out-root "$RUNNER_TEMP/golden"
+      - name: Compare with the committed tiny case
+        run: python tools/webgpu/parity.py --case tiny --actual "$RUNNER_TEMP/golden/tiny"
+      - name: Parity runner self-tests
+        run: python tools/webgpu/parity_selftest.py

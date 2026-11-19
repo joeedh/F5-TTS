@@ -20,8 +20,9 @@ jobs:
           python-version: "3.12"
       - name: Install CPU torch
         run: pip install "torch==2.15.0" torchaudio --index-url https://download.pytorch.org/whl/cpu
+      # webgpu: pyright also checks tools/webgpu, which imports onnx, onnxscript and onnxruntime
       - name: Install the project and pyright
-        run: pip install -e ".[typecheck]"
+        run: pip install -e ".[typecheck,webgpu]"
       # The `eval` extra cannot be installed as is: faster_whisper==0.10.1 pins av==10.*, which has no
       # wheel for Python 3.12 and needs FFmpeg headers to build. pyright only needs the sources.
       - name: Install eval packages for type resolution

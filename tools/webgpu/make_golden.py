@@ -460,6 +460,9 @@ def main() -> None:
     p.add_argument("--threads", type=int, default=8)
     p.add_argument("--init-tiny", action="store_true", help="make new tiny weights (overwrites the committed ones)")
     p.add_argument("--no-recheck", action="store_true", help="skip the second, determinism-check run")
+    p.add_argument(
+        "--out-root", type=Path, default=OUT_ROOT, help="write cases here (tiny weights are still read from testdata)"
+    )
     args = p.parse_args()
     names: list[str] = sorted(CASES) if args.all else args.case
     if not names:
@@ -472,7 +475,7 @@ def main() -> None:
         if case.model not in models:
             models[case.model] = load_models(case, args.init_tiny)
         model, vocoder = models[case.model]
-        out = OUT_ROOT / name
+        out = args.out_root / name
         out.mkdir(parents=True, exist_ok=True)
         t0 = time.time()
         rec = run_case(case, model, vocoder, out, args.threads)
