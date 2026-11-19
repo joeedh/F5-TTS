@@ -76,5 +76,5 @@ Homepage = "https://github.com/SWivid/F5-TTS"
 [tool.pyright]
 pythonVersion = "3.10"
 typeCheckingMode = "basic"
-include = ["src/f5_tts", "tools/typing_guard"]
+include = ["src/f5_tts", "tools/typing_guard", "tools/webgpu"]
 exclude = ["**/__pycache__", "src/f5_tts/runtime/triton_trtllm", "src/third_party"]

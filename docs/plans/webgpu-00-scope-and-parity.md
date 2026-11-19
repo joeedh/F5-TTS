@@ -1,6 +1,6 @@
 # Plan 00: scope, runtime decision and parity harness
 
-Status: `plan pressure-tested` (drafted and reviewed 2026-11-02; findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; steps 1 and 2 done 2026-11-02; step 3 done 2026-11-18 (D3: ORT Web). Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
+Status: `plan pressure-tested` (drafted and reviewed 2026-11-02; findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; steps 1 and 2 done 2026-11-02; step 3 done 2026-11-18 (D3: ORT Web); step 4 done 2026-11-18. Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
 
 Task list: [webgpu-port-tasks.md](webgpu-port-tasks.md). Model details: [../architecture.md](../architecture.md).
 
@@ -99,7 +99,7 @@ testdata/webgpu/<case>/  golden data; only the tiny case is committed
 - Every tensor is stored in the layout PyTorch has at that point; the manifest gives the shape and the axis names (for example `b d n` for a mel, which is (1, 100, frames)), so nobody has to guess.
 - `manifest.json` holds: case name, git commit, Python version, torch version, OS, device, dtype, `torch.get_num_threads()`, all inference settings, the input strings, the scalar values listed below, and one entry per tensor (name, file, stage, shape, axis names, dtype, sha256). Strings and string lists (chunks, pinyin tokens) go in the manifest directly.
 - Inputs that do not change between DiT calls (text ids, `step_cond`) are stored once per chunk, not once per call.
-- The tiny case is committed. Real-checkpoint cases are about 40 MB per 1000-frame chunk (about 80 MB at 2048 frames) plus the DiT internals, and are gitignored; they are rebuilt with one command. `--dump-steps` limits which steps are stored if size becomes a problem.
+- The tiny case is committed. Real-checkpoint cases are about 40 MB per 1000-frame chunk (about 80 MB at 2048 frames) plus the DiT internals (measured in step 4: about 720 MiB per case, 4.5 GB for all cases), and are gitignored; they are rebuilt with one command. `--dump-steps` limits which steps are stored if size becomes a problem.
 
 ## Golden data
 
@@ -241,6 +241,27 @@ Starting table. Every float row is a placeholder until step 5 replaces it with m
 - `tools/webgpu/make_golden.py` as described under Golden data, plus `tools/webgpu/tiny_model.py` for the tiny case's models.
 - Generate all cases. Check determinism (two runs, same hashes). Listen to each `final` wav.
 - Done when: pyright and ruff pass on the new Python, all cases are generated, and the tiny case is committed.
+- **Done 2026-11-18.** The user was sent 16-bit copies of the six real-case `final` wavs to listen to, and approved the commit afterwards. Results:
+  - All 7 cases were generated in `.venv` (Python 3.15, torch 2.15.0+cpu, 8 threads). Each was run twice, and every tensor hash matched between the runs.
+    - Run times per pass: `en-short` 262 s, `zh-short` 139 s, `en-multi` 399 s, `en-multi-fixdur` 335 s, `en-prep` 159 s, `en-epss16` 81 s, `tiny` under 1 s.
+  - Each case shows the behaviour it was made for:
+    - `en-multi` splits into chunks of 162, 172 and 6 bytes, and the 6-byte chunk gets speed 0.3.
+    - `en-multi-fixdur` divides the fixed duration across its chunks (1820, 1903 and 515 frames).
+    - `en-prep` is a 44.1 kHz stereo input. It is clipped to 6.9 s, and the RMS raise fires (0.033 to 0.1).
+    - `zh-short` gets the polyphones right (银行 yin2 hang2, 行长 hang2 zhang3, 重新 chong2, 长期 chang2).
+  - **Size: 4.5 GB in total** (gitignored), much more than the estimate above. The `dit_internal` block outputs dominate, at about 720 MiB per case. To keep that down, internals are dumped for chunk 0 only, at steps 0 and nfe/2; `settings.dit_internal_chunks` in the manifest records this. `tiny` is about 9 MB with its weights.
+  - **Departure from "How the generator gets these":** there is no recording wrapper around the DiT. Instead:
+    - A forward pre-hook and a forward hook (`with_kwargs=True`) on the DiT record `x_k`, `t_k`, `step_cond`, the text ids and the CFG output. This avoids forwarding `dim` and `clear_cache`.
+    - `f5_tts.model.cfm.odeint` is patched during the run to record `y0` and the full time grid, and to mark chunk boundaries. It also asserts nfe DiT calls per chunk.
+    - `utils_infer.convert_char_to_pinyin` is patched to record the joined text and its tokens.
+    - The synchronous stand-in for `ThreadPoolExecutor` records each chunk's wav after the output RMS rescale.
+  - An upstream quirk the data shows: `preprocess_ref_audio_text` appends `". "` and `infer_batch_process` then appends another space, so the joined text has two spaces between the reference and generated text. Plan 03 must reproduce this.
+  - The `final` wavs of the real cases peak at about 1.25. They are saved as float32, so nothing is clipped; a 16-bit export would clip.
+  - `tiny`'s output is near silent (peak below 0.01), as R5 expects from random weights.
+  - Web: `npm test` (Vitest 5.0.5; 5.1.1 came out the same day and was skipped) checks the committed tiny case against its manifest. `npm run test:browser` (Playwright, Chrome on Windows) requests a WebGPU device. It passes on Intel and, with `PW_GPU=nvidia`, on the RTX 5050.
+    - Also added: a placeholder `web/index.html`, because Playwright's web-server check fails on Vite's 404 for `/`.
+    - Also added: `web/.prettierignore`, because Prettier reads only `web/.gitignore`, not the root one.
+  - `spike_export.py` now has a pyright ignore on its `onnxruntime` import, because `.venv` (Python 3.15) has no onnxruntime.
 
 ### Step 5. Measure noise floors and fix tolerances
 - `tools/webgpu/measure_floor.py`, run in `.venv313`: rerun each stage on CUDA fp32 (TF32 off) with golden inputs, compare with the CPU golden data, take the maximum over all cases, chunks and steps.

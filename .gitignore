@@ -177,3 +177,9 @@ web/spikes/ort-block/public/data/
 # the result JSON is committed (the generic results/ rule above would hide it); the verbose logs are not
 !web/spikes/ort-block/results/
 web/spikes/ort-block/results/*.log
+
+# plan 00 golden data: only the tiny case is committed; the rest is rebuilt by tools/webgpu/make_golden.py
+testdata/webgpu/*
+!testdata/webgpu/tiny/
+web/test-results/
+web/playwright-report/

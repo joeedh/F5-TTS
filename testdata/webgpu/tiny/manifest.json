@@ -1,0 +1,838 @@
+{
+ "case": "tiny",
+ "git_commit": "a207d4484451268f4d91860e6b1be7930c346554 (dirty)",
+ "python": "3.15.1",
+ "torch": "2.15.0+cpu",
+ "os": "Windows-11-10.0.26300-SP0",
+ "device": "cpu",
+ "dtype": "float32",
+ "num_threads": 8,
+ "elapsed_s": 0.1,
+ "settings": {
+  "model": "tiny",
+  "nfe_step": 8,
+  "cfg_strength": 2.0,
+  "sway_sampling_coef": -1.0,
+  "speed": 1.0,
+  "fix_duration": null,
+  "seed": 0,
+  "target_rms": 0.1,
+  "cross_fade_duration": 0.15,
+  "dit_internal_steps": [
+   0,
+   4
+  ],
+  "dit_internal_chunks": [
+   0
+  ]
+ },
+ "input": {
+  "sample_rate": 24000,
+  "ref_text": "Some call me",
+  "gen_text": "Hello there, world."
+ },
+ "prep": {
+  "sample_rate": 24000,
+  "ref_text": "Some call me. "
+ },
+ "text": {
+  "max_chars": 320,
+  "chunks": [
+   "Hello there, world."
+  ],
+  "ref_text_spaced": "Some call me.  "
+ },
+ "audio": {
+  "rms": 0.14725904166698456,
+  "raised": false
+ },
+ "mel": {
+  "n_ref": 87
+ },
+ "chunks": [
+  {
+   "joined_text": "Some call me.  Hello there, world.",
+   "tokens": [
+    "S",
+    "o",
+    "m",
+    "e",
+    " ",
+    "c",
+    "a",
+    "l",
+    "l",
+    " ",
+    "m",
+    "e",
+    ".",
+    " ",
+    " ",
+    "H",
+    "e",
+    "l",
+    "l",
+    "o",
+    " ",
+    "t",
+    "h",
+    "e",
+    "r",
+    "e",
+    ",",
+    " ",
+    "w",
+    "o",
+    "r",
+    "l",
+    "d",
+    "."
+   ],
+   "duration": 194,
+   "text": "Hello there, world.",
+   "local_speed": 1.0,
+   "ref_audio_len": 86
+  }
+ ],
+ "tensors": [
+  {
+   "name": "input.wav",
+   "file": "input.wav.npy",
+   "stage": "input",
+   "shape": [
+    1,
+    24000
+   ],
+   "axes": "c nw",
+   "dtype": "float32",
+   "sha256": "5ee5380187948a9542e56fe7a86777fba25697e338a0c01f35e06fc86b4e4072"
+  },
+  {
+   "name": "prep.audio",
+   "file": "prep.audio.npy",
+   "stage": "prep",
+   "shape": [
+    1,
+    22078
+   ],
+   "axes": "c nw",
+   "dtype": "float32",
+   "sha256": "8237232dc27cbde3c2be393ff2b083615e9147bdb8f4c7d5ef1c02186aace1cc"
+  },
+  {
+   "name": "audio.ref",
+   "file": "audio.ref.npy",
+   "stage": "audio",
+   "shape": [
+    1,
+    22078
+   ],
+   "axes": "b nw",
+   "dtype": "float32",
+   "sha256": "8237232dc27cbde3c2be393ff2b083615e9147bdb8f4c7d5ef1c02186aace1cc"
+  },
+  {
+   "name": "mel.ref",
+   "file": "mel.ref.npy",
+   "stage": "mel",
+   "shape": [
+    1,
+    100,
+    87
+   ],
+   "axes": "b d n",
+   "dtype": "float32",
+   "sha256": "9d4706dee2021047e1310bb19b33acac15f28a0f1c3426201fbccd9e6208190e"
+  },
+  {
+   "name": "c0.noise.y0",
+   "file": "c0.noise.y0.npy",
+   "stage": "noise",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "de8102ba23980781e945f3eec9bc1956a822ac42057fb7504db2b0a2840450b2"
+  },
+  {
+   "name": "c0.plan.t",
+   "file": "c0.plan.t.npy",
+   "stage": "plan",
+   "shape": [
+    9
+   ],
+   "axes": "t",
+   "dtype": "float32",
+   "sha256": "bacfdd585261d3a310253a14c7c903f2cc5bcf5643eeb441237b24390080021b"
+  },
+  {
+   "name": "c0.dit.step_cond",
+   "file": "c0.dit.step_cond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "3fdc63c91cc1a37b14adb86e5b992a204302a3408372ba96a1f400ae5297ad2c"
+  },
+  {
+   "name": "c0.dit.text_ids",
+   "file": "c0.dit.text_ids.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    34
+   ],
+   "axes": "b nt",
+   "dtype": "int32",
+   "sha256": "2bc3463aa429eebebef7125862fe67294af0a3efb21f8488a75e7a0989a5d3bc"
+  },
+  {
+   "name": "c0.dit.s00.x",
+   "file": "c0.dit.s00.x.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "de8102ba23980781e945f3eec9bc1956a822ac42057fb7504db2b0a2840450b2"
+  },
+  {
+   "name": "c0.dit.s00.t",
+   "file": "c0.dit.s00.t.npy",
+   "stage": "dit",
+   "shape": [
+    1
+   ],
+   "axes": "b",
+   "dtype": "float32",
+   "sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119"
+  },
+  {
+   "name": "c0.dit_internal.s00.time_embed",
+   "file": "c0.dit_internal.s00.time_embed.npy",
+   "stage": "dit_internal",
+   "shape": [
+    1,
+    128
+   ],
+   "axes": "b d",
+   "dtype": "float32",
+   "sha256": "d5d59ecebdf28ae1893a08d9e0f17f587797380f53e7e6b1675f9c47d2b4106d"
+  },
+  {
+   "name": "c0.dit_internal.text_embed",
+   "file": "c0.dit_internal.text_embed.npy",
+   "stage": "dit_internal",
+   "shape": [
+    1,
+    194,
+    64
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "6abbb9b24ddfb7e251c379d5bff97dd644887df7bcccccfc3866895318988fac"
+  },
+  {
+   "name": "c0.dit_internal.s00.input_embed",
+   "file": "c0.dit_internal.s00.input_embed.npy",
+   "stage": "dit_internal",
+   "shape": [
+    1,
+    194,
+    128
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "4b54df20d19239d651b4307dc7dede2f977b45b47de2cfceff9a324c14c1a6de"
+  },
+  {
+   "name": "c0.dit_internal.text_embed_uncond",
+   "file": "c0.dit_internal.text_embed_uncond.npy",
+   "stage": "dit_internal",
+   "shape": [
+    1,
+    194,
+    64
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "1f9f9b530de5b6c176612038ddd5276aef3b327137eb1752d65624b09f0a7525"
+  },
+  {
+   "name": "c0.dit_internal.s00.input_embed_uncond",
+   "file": "c0.dit_internal.s00.input_embed_uncond.npy",
+   "stage": "dit_internal",
+   "shape": [
+    1,
+    194,
+    128
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "bebce7acf9da6d4329f694b8e878bb47b1bd2a4d9096a974c3fb91a1da4c3ac6"
+  },
+  {
+   "name": "c0.dit_internal.s00.block00",
+   "file": "c0.dit_internal.s00.block00.npy",
+   "stage": "dit_internal",
+   "shape": [
+    2,
+    194,
+    128
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "ce97600a01adc455192ed241a639704b4450bfdaa812bd1a15acf4d900d2c108"
+  },
+  {
+   "name": "c0.dit_internal.s00.block01",
+   "file": "c0.dit_internal.s00.block01.npy",
+   "stage": "dit_internal",
+   "shape": [
+    2,
+    194,
+    128
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "8b760969c16170bac5e329f2d8a0d70586b384d936d1e8f84c2889ff699cc6ea"
+  },
+  {
+   "name": "c0.dit_internal.s00.norm_out",
+   "file": "c0.dit_internal.s00.norm_out.npy",
+   "stage": "dit_internal",
+   "shape": [
+    2,
+    194,
+    128
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "81da2bb7f0803e3faeda2fc917852c7639ca3a92f21e906f3774c168a5449b3d"
+  },
+  {
+   "name": "c0.dit.s00.out_cond",
+   "file": "c0.dit.s00.out_cond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "e8fe8422bdde52bd01d636922f03bb8d745aa025ecabbe6deaeb04899c430d4f"
+  },
+  {
+   "name": "c0.dit.s00.out_uncond",
+   "file": "c0.dit.s00.out_uncond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "e6ad406a5788b89cad3f8f219872ee97142d08d2bcf0588ea8537b7330b02af2"
+  },
+  {
+   "name": "c0.dit.s01.x",
+   "file": "c0.dit.s01.x.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "acfc906e6b2a695aa39242ba39f8f3b2c37cf0501be8829ec6607ca7cff6a92e"
+  },
+  {
+   "name": "c0.dit.s01.t",
+   "file": "c0.dit.s01.t.npy",
+   "stage": "dit",
+   "shape": [
+    1
+   ],
+   "axes": "b",
+   "dtype": "float32",
+   "sha256": "bc4660be4bcd8b000762c35e7908f767ed0bce4b5c69aee00ac6605ed34ef8ce"
+  },
+  {
+   "name": "c0.dit.s01.out_cond",
+   "file": "c0.dit.s01.out_cond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "a3d82cf0bb7cd71da121400d51708524d95997567e5acadce5226a69619c0a09"
+  },
+  {
+   "name": "c0.dit.s01.out_uncond",
+   "file": "c0.dit.s01.out_uncond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "8fcd5a0305bc23750cb3417e6824ff80bcf1d34b3e0fd6dcee9e3d676df4a2c1"
+  },
+  {
+   "name": "c0.dit.s02.x",
+   "file": "c0.dit.s02.x.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "b2104d00c11998106dc5a76dc6c21a201695b6c7d23c225d0e7f11c5bfadc255"
+  },
+  {
+   "name": "c0.dit.s02.t",
+   "file": "c0.dit.s02.t.npy",
+   "stage": "dit",
+   "shape": [
+    1
+   ],
+   "axes": "b",
+   "dtype": "float32",
+   "sha256": "0b0823d29d40bd7e58011e2841b19bc243f9d21a10be8e575e2ded69f98d6ff5"
+  },
+  {
+   "name": "c0.dit.s02.out_cond",
+   "file": "c0.dit.s02.out_cond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "6a19acd17d71c147ef1243d6f3e7861654657330112977ff14421ac36a22360e"
+  },
+  {
+   "name": "c0.dit.s02.out_uncond",
+   "file": "c0.dit.s02.out_uncond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "1f4cee6aff653d472c3cadc0593a13a74df7d091d61e7ba45981937a356083a1"
+  },
+  {
+   "name": "c0.dit.s03.x",
+   "file": "c0.dit.s03.x.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "cf69a5754abd041e91cfb1328bd09748a82b749d952f0291e4116f4d58d536ed"
+  },
+  {
+   "name": "c0.dit.s03.t",
+   "file": "c0.dit.s03.t.npy",
+   "stage": "dit",
+   "shape": [
+    1
+   ],
+   "axes": "b",
+   "dtype": "float32",
+   "sha256": "9967b86e25ad7dfbbb73ce953e43ce5bc5908c0ea602ebbef9049de52ac1e03f"
+  },
+  {
+   "name": "c0.dit.s03.out_cond",
+   "file": "c0.dit.s03.out_cond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "29522b0686f219a826d250ad2428b1f723fe7ae85ff30cd34ab545ef0af39ed9"
+  },
+  {
+   "name": "c0.dit.s03.out_uncond",
+   "file": "c0.dit.s03.out_uncond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "6619c5db5efcc029542ef0ed529c15ae67001f9c58af5a0ac3d4f4b0575e4303"
+  },
+  {
+   "name": "c0.dit.s04.x",
+   "file": "c0.dit.s04.x.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "ba1200efbfdc8f19636e714aeaac12af34fe465b4061246595613a78243e95d3"
+  },
+  {
+   "name": "c0.dit.s04.t",
+   "file": "c0.dit.s04.t.npy",
+   "stage": "dit",
+   "shape": [
+    1
+   ],
+   "axes": "b",
+   "dtype": "float32",
+   "sha256": "e3fd31ecc9bf75130630cfc26414a939743cdf57fe1b20d76070c6d2f7ccc21a"
+  },
+  {
+   "name": "c0.dit_internal.s04.time_embed",
+   "file": "c0.dit_internal.s04.time_embed.npy",
+   "stage": "dit_internal",
+   "shape": [
+    1,
+    128
+   ],
+   "axes": "b d",
+   "dtype": "float32",
+   "sha256": "24b1498449433e1ff5bee21e3727af3efd6035abe5dec0027f9da821a36ed80f"
+  },
+  {
+   "name": "c0.dit_internal.s04.input_embed",
+   "file": "c0.dit_internal.s04.input_embed.npy",
+   "stage": "dit_internal",
+   "shape": [
+    1,
+    194,
+    128
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "ca9e0f56a213d46490a2c62530b25dcbb2a6d9e99ba1c290f28d71b6763db9da"
+  },
+  {
+   "name": "c0.dit_internal.s04.input_embed_uncond",
+   "file": "c0.dit_internal.s04.input_embed_uncond.npy",
+   "stage": "dit_internal",
+   "shape": [
+    1,
+    194,
+    128
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "29ed7dec8916c263d1c9bca1cfc2ba40e884084d643e7642351ea34c576699d2"
+  },
+  {
+   "name": "c0.dit_internal.s04.block00",
+   "file": "c0.dit_internal.s04.block00.npy",
+   "stage": "dit_internal",
+   "shape": [
+    2,
+    194,
+    128
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "d4182552437b67406caa6387cc7a5a9f201fe6df1d4b9c4bc7d003d474d72d0a"
+  },
+  {
+   "name": "c0.dit_internal.s04.block01",
+   "file": "c0.dit_internal.s04.block01.npy",
+   "stage": "dit_internal",
+   "shape": [
+    2,
+    194,
+    128
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "d8eb74e5dd323c6b18df206e2d02b5e60dd38da5114a38934f33eddbb2b310a7"
+  },
+  {
+   "name": "c0.dit_internal.s04.norm_out",
+   "file": "c0.dit_internal.s04.norm_out.npy",
+   "stage": "dit_internal",
+   "shape": [
+    2,
+    194,
+    128
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "c516017a44d68067f9504684b045a2c58e8851de5682cff902eccc9279adf275"
+  },
+  {
+   "name": "c0.dit.s04.out_cond",
+   "file": "c0.dit.s04.out_cond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "9d53efb5e3e29c4c6e685ebd71e086b4b598e0b64e5681e81e16776fcebfe45d"
+  },
+  {
+   "name": "c0.dit.s04.out_uncond",
+   "file": "c0.dit.s04.out_uncond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "2ef1ed95739e25fc2d8bc77880cd110b83677946252b0f858e37a2159c2a0171"
+  },
+  {
+   "name": "c0.dit.s05.x",
+   "file": "c0.dit.s05.x.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "19363d0b6b6e4dc87a51cb0ca7de287d0d27a1b10f44b5b7c3d38ec1419b1ab3"
+  },
+  {
+   "name": "c0.dit.s05.t",
+   "file": "c0.dit.s05.t.npy",
+   "stage": "dit",
+   "shape": [
+    1
+   ],
+   "axes": "b",
+   "dtype": "float32",
+   "sha256": "5015e26d7ae971db1f5a162168600a5b3dc319fb42c15a7966be9b349d873d8e"
+  },
+  {
+   "name": "c0.dit.s05.out_cond",
+   "file": "c0.dit.s05.out_cond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "6266c58b73399f61b747a01a124a282d5d1c390a099d242c0d46f52f01b84924"
+  },
+  {
+   "name": "c0.dit.s05.out_uncond",
+   "file": "c0.dit.s05.out_uncond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "fe935ecfa77bc8eaa3ab5be5600d4ae068bcd44d5bbe216886928c7966ef74cf"
+  },
+  {
+   "name": "c0.dit.s06.x",
+   "file": "c0.dit.s06.x.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "b334950468f9f126dcf20a831d69e0d3ab1cce9f1ed61c51c441520ac57b8f1b"
+  },
+  {
+   "name": "c0.dit.s06.t",
+   "file": "c0.dit.s06.t.npy",
+   "stage": "dit",
+   "shape": [
+    1
+   ],
+   "axes": "b",
+   "dtype": "float32",
+   "sha256": "39161d006fc7e4827b605c7e3f8e03d4eba3650353b32a3d44fe72a3ad73b6c2"
+  },
+  {
+   "name": "c0.dit.s06.out_cond",
+   "file": "c0.dit.s06.out_cond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "4f6acbade9f8c6d781aff733b72d0c8989fdaff66f1a786ab468b39cd5de6ce4"
+  },
+  {
+   "name": "c0.dit.s06.out_uncond",
+   "file": "c0.dit.s06.out_uncond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "19ea848843d1373732efceaebd16fa9b19d24a65ae9ab1670c753bf092fff399"
+  },
+  {
+   "name": "c0.dit.s07.x",
+   "file": "c0.dit.s07.x.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "bf834ff20c30960f7c71cee40c5ee0806230878fb6166a01a8e1b2b7468b7083"
+  },
+  {
+   "name": "c0.dit.s07.t",
+   "file": "c0.dit.s07.t.npy",
+   "stage": "dit",
+   "shape": [
+    1
+   ],
+   "axes": "b",
+   "dtype": "float32",
+   "sha256": "4fb7329bc93168d54f67ddecd6c45453e50ee2acca49114dee78aa68602a8038"
+  },
+  {
+   "name": "c0.dit.s07.out_cond",
+   "file": "c0.dit.s07.out_cond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "0432682375ce3771d02115741ef93f2a61db0ecca76f4b9ae385d2cd22c07a7f"
+  },
+  {
+   "name": "c0.dit.s07.out_uncond",
+   "file": "c0.dit.s07.out_uncond.npy",
+   "stage": "dit",
+   "shape": [
+    1,
+    194,
+    100
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "96b1a8d0caab54178b6128010312c3fc9b874b9a271a0d91d38f7821a38a345e"
+  },
+  {
+   "name": "c0.mel_out",
+   "file": "c0.mel_out.npy",
+   "stage": "mel_out",
+   "shape": [
+    1,
+    100,
+    108
+   ],
+   "axes": "b d n",
+   "dtype": "float32",
+   "sha256": "507c9646ddf26baa46a7d03caefa38e6bb768706430af5d57a5ce3fffc7dac6f"
+  },
+  {
+   "name": "c0.vocoder.backbone",
+   "file": "c0.vocoder.backbone.npy",
+   "stage": "vocoder",
+   "shape": [
+    1,
+    108,
+    64
+   ],
+   "axes": "b n d",
+   "dtype": "float32",
+   "sha256": "bda6b6c1da69756c4998864f3b655e2f56d63bad0e4906c8174e79ec299feeb0"
+  },
+  {
+   "name": "c0.vocoder.head_out",
+   "file": "c0.vocoder.head_out.npy",
+   "stage": "vocoder",
+   "shape": [
+    1,
+    108,
+    1026
+   ],
+   "axes": "b n f",
+   "dtype": "float32",
+   "sha256": "a8c37361fa0a5e2e6dd55790995583d94415fdc12e5c1f3e7f791a83c37e4e93"
+  },
+  {
+   "name": "c0.vocoder.wav",
+   "file": "c0.vocoder.wav.npy",
+   "stage": "vocoder",
+   "shape": [
+    27392
+   ],
+   "axes": "nw",
+   "dtype": "float32",
+   "sha256": "40f17612a2d3ac7d3c6e5f8f341f132f9550f3c2a19219a410c1a176398324a6"
+  },
+  {
+   "name": "final.wav",
+   "file": "final.wav.npy",
+   "stage": "final",
+   "shape": [
+    27392
+   ],
+   "axes": "nw",
+   "dtype": "float32",
+   "sha256": "40f17612a2d3ac7d3c6e5f8f341f132f9550f3c2a19219a410c1a176398324a6"
+  }
+ ]
+}

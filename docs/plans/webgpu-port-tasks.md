@@ -68,7 +68,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 
 | # | Plan (file to be written) | Depends on | Status |
 |---|---|---|---|
-| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | in progress; steps 1 to 3 done (D3: ORT Web, 2026-11-18), step 4 (golden generator) next |
+| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | in progress; steps 1 to 4 done (D3: ORT Web; golden data generated, 2026-11-18), step 5 (noise floors) next |
 | 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | plan not written |
 | 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | plan not written |
 | 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | plan not written |
@@ -93,7 +93,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [x] Confirm the starting assumptions above, or change them. (Confirmed 2026-11-02, plan 00 D1: as written, plus v1 targets Chrome and Edge on desktop, tested on one discrete and one integrated GPU.)
 - [x] Choose ORT Web versus custom WGSL, with a small spike: run one DiT block and a depthwise conv on WebGPU. (Done 2026-11-18: ORT Web; see [../research/webgpu-runtime-spike.md](../research/webgpu-runtime-spike.md).)
 - [ ] Pick the repo layout for web code (where it lives, build tool, language).
-- [ ] Build the golden-data generator: fixed seed, fixed noise tensor, fixed inputs; dump text ids, reference mel, per-step DiT output, final mel, final wav from PyTorch.
+- [x] Build the golden-data generator: fixed seed, fixed noise tensor, fixed inputs; dump text ids, reference mel, per-step DiT output, final mel, final wav from PyTorch. (Done 2026-11-18: `tools/webgpu/make_golden.py`, 7 cases.)
 - [ ] Define tolerances per stage (mel, DiT output, wav).
 - [ ] Write the test runner that compares any port stage to the golden data.
 

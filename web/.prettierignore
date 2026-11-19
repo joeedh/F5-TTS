@@ -1,0 +1,4 @@
+# Prettier reads only web/.gitignore (there is none), not the repo root's, so generated output is listed here.
+test-results/
+playwright-report/
+spikes/ort-block/public/data/

@@ -2,6 +2,15 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-18: recording intermediates without changing model code (plan 00, step 4)
+
+- `tools/webgpu/make_golden.py` shows how to take every intermediate out of the real inference path. The same approach works for a one-off debugging dump:
+  - Forward hooks on submodules; `register_forward_pre_hook(..., with_kwargs=True)` for the DiT, which `CFM.sample` calls with keyword arguments only.
+  - Temporary patches of module globals: `f5_tts.model.cfm.odeint`, `utils_infer.convert_char_to_pinyin`, `utils_infer.ThreadPoolExecutor`. These work because the callers look the names up in their own module's globals at call time.
+  - A synchronous stand-in for `ThreadPoolExecutor`, so that multi-chunk runs are reproducible (risk R1 in plan 00).
+- With that stand-in, a fixed seed and 8 threads, a CPU fp32 run is bit-identical between two runs in one process, for all 7 golden cases.
+- **PowerShell 5.1 `Get-Content` / `Set-Content` corrupt UTF-8 source files.** `Get-Content` without `-Encoding UTF8` reads UTF-8 as the ANSI code page. `Set-Content -Encoding ascii` then writes every non-ASCII character as `?`. This wiped the Chinese test strings in `make_golden.py` once; they were caught and restored before use. Edit such files with an editor tool, not a PowerShell round trip. `Set-Content -Encoding utf8` adds a BOM, which also shows up as a diff on line 1.
+
 ## 2026-11-18: onnxruntime-web on WebGPU (plan 00, step 3)
 
 - **ORT ignores a `GPUDevice` you give it.** In onnxruntime-web 1.31.1, setting `ort.env.webgpu.device = myDevice` before the first session has no effect. ORT creates its own device and writes it back to `env.webgpu.device`.

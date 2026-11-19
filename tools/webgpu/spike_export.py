@@ -26,7 +26,7 @@ from typing import Any
 
 import numpy as np
 import onnx
-import onnxruntime as ort
+import onnxruntime as ort  # pyright: ignore[reportMissingImports]  # no Python 3.15 wheel; run in .venv313
 import soundfile as sf
 import torch
 import torchaudio.functional as AF
