@@ -68,7 +68,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 
 | # | Plan (file to be written) | Depends on | Status |
 |---|---|---|---|
-| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | in progress; steps 1 to 7 done (D3: ORT Web; golden data; tolerances; parity runner; CI green; 2026-11-18), step 8 (close out) next |
+| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | done 2026-11-18 (D3: ORT Web; golden data, tolerances, parity runner and CI in place) |
 | 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | plan not written |
 | 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | plan not written |
 | 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | plan not written |
@@ -92,9 +92,9 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 ### 00 Scope, runtime decision and parity harness
 - [x] Confirm the starting assumptions above, or change them. (Confirmed 2026-11-02, plan 00 D1: as written, plus v1 targets Chrome and Edge on desktop, tested on one discrete and one integrated GPU.)
 - [x] Choose ORT Web versus custom WGSL, with a small spike: run one DiT block and a depthwise conv on WebGPU. (Done 2026-11-18: ORT Web; see [../research/webgpu-runtime-spike.md](../research/webgpu-runtime-spike.md).)
-- [ ] Pick the repo layout for web code (where it lives, build tool, language).
+- [x] Pick the repo layout for web code (where it lives, build tool, language). (Done 2026-11-02, plan 00 D4: `web/` in this repo, TypeScript, Vite, Vitest, Playwright; Python tools in `tools/webgpu/`.)
 - [x] Build the golden-data generator: fixed seed, fixed noise tensor, fixed inputs; dump text ids, reference mel, per-step DiT output, final mel, final wav from PyTorch. (Done 2026-11-18: `tools/webgpu/make_golden.py`, 7 cases.)
-- [ ] Define tolerances per stage (mel, DiT output, wav).
+- [x] Define tolerances per stage (mel, DiT output, wav). (Done 2026-11-18: measured CPU vs CUDA floors, `testdata/webgpu/tolerances.json`.)
 - [x] Write the test runner that compares any port stage to the golden data. (Done 2026-11-18: `web/test/parity/` and `tools/webgpu/parity.py`.)
 
 ### 01 DiT export to ONNX
@@ -104,6 +104,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Settle dynamic versus bucketed sequence lengths; check the attention mask path.
 - [ ] Export with external weight data; verify parity against golden data in onnxruntime (CPU).
 - [ ] Verify the graph loads and matches on ORT Web WebGPU; list any unsupported or slow ops.
+- [ ] Attention: the dynamo export is unfused (MatMul, Softmax, MatMul) and dominates block time at 2048 frames, especially on the Intel GPU. Try a fused attention op that the WebGPU EP supports (plan 00 spike, `../research/webgpu-runtime-spike.md`).
 
 ### 02 Mel spectrogram and vocoder
 - [ ] Specify the exact Vocos mel (STFT params, filterbank, log/clamp) from `model/modules.py`.
@@ -117,7 +118,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Choose a JS pinyin and word-segmentation library; measure mismatches against Python on a test corpus.
 - [ ] Port vocab loading (`infer/examples/vocab.txt`; index 0 is space and unknown).
 - [ ] Port `chunk_text` (UTF-8 byte budget, ASCII and CJK sentence punctuation).
-- [ ] Port reference-text punctuation fix-up.
+- [ ] Port reference-text punctuation fix-up. Note the double space: `preprocess_ref_audio_text` appends `". "` and `infer_batch_process` adds another space, so the token sequence has two spaces before the generated text (seen in the plan 00 golden data).
 - [ ] Build a corpus test: token ids from JS equal token ids from Python.
 
 ### 04 Sampler and generation pipeline
@@ -135,7 +136,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Script that converts the original safetensors to the published ONNX files and uploads them, so the repo can be rebuilt.
 - [ ] Download plan for roughly 0.7 to 1.3 GB: CORS check on the chosen URLs, progress UI, resume, file sharding.
 - [ ] Cache in OPFS or IndexedDB; versioning and eviction.
-- [ ] fp16 path with `shader-f16` detection; fp32 fallback.
+- [ ] fp16 path with `shader-f16` detection; fp32 fallback. The WebGPU EP's fp16 MatMul is about 30 times less accurate than ORT CPU fp16 (rel L2 4e-3 at K = 1024), which looks like fp16 accumulation; measure the effect on audio, and try fp32 accumulation or mixed precision (plan 00 spike).
 - [ ] Buffer and binding size limits across target devices.
 - [ ] Try int8 and 4-bit quantization; judge quality with listening tests and the eval metrics already in `src/f5_tts/eval/`.
 
@@ -149,7 +150,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 
 ### 07 Performance and browser validation
 - [ ] Benchmark script: real-time factor, time to first audio, peak GPU memory.
-- [ ] Profile per-step cost; find the slowest ops (attention, convs).
+- [ ] Profile per-step cost; find the slowest ops (attention, convs). Known from the plan 00 spike: `conv_pos_embed` (grouped conv, 140 to 560 GFLOPS) is about 7 percent of a step, and Edge was up to 2 times slower than Chrome on the same GPU.
 - [ ] Optimisations: step count (EPSS 16 steps), batching the CFG pair, sequence bucketing.
 - [ ] Browser and device matrix: Chrome, Edge, Safari, Firefox; desktop GPU, integrated GPU, mobile. On Windows laptops the integrated GPU is what a page gets by default, so it is the main case, not the fallback.
 - [ ] Record limits and known failures in [../debugging.md](../debugging.md).
@@ -160,4 +161,4 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - Exact attribution wording for the model card. Gate for plan 05: nothing is published until this is settled.
 - App licence at publish time. MIT code with separately licensed CC-BY-NC weights is how upstream does it, so the code may not need to change as long as the weights are downloaded separately and not bundled in the app repo. If the app is hosted as a product and non-commercial use is intended, decide whether the app should say so. Revisit when plan 05 publishes.
 - ~~Which browsers are in scope.~~ Answered 2026-11-02 (plan 00 D1): Chrome and Edge on desktop for v1; Safari and Firefox tested in plan 07 but not blocking.
-- Whether the Python package should gain a `webgpu/` export script entry point or this stays a separate project.
+- ~~Whether the Python package should gain a `webgpu/` export script entry point or this stays a separate project.~~ Answered 2026-11-02 (plan 00 D4): no entry point for now; export tools stay in `tools/webgpu/`, outside the `f5_tts` package.

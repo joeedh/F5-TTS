@@ -1,6 +1,6 @@
 # Plan 00: scope, runtime decision and parity harness
 
-Status: `plan pressure-tested` (drafted and reviewed 2026-11-02; findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; steps 1 and 2 done 2026-11-02; step 3 done 2026-11-18 (D3: ORT Web); steps 4 to 7 done 2026-11-18 (golden data; measured tolerances; parity runner; CI, which also covered the SwiftShader check). Step 8 (close out) remains. Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
+Status: `done` (2026-11-18). Drafted and pressure-tested 2026-11-02 (findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; D3 decided by the step 3 spike: ORT Web. Steps 1 and 2 done 2026-11-02, steps 3 to 8 on 2026-11-18. Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
 
 Task list: [webgpu-port-tasks.md](webgpu-port-tasks.md). Model details: [../architecture.md](../architecture.md).
 
@@ -339,6 +339,14 @@ Measured table (step 5, 2026-11-18). The source of truth is `testdata/webgpu/tol
 - Update the task list: plan 00 status, the ticked tasks, the answered open questions (parity, browsers, export entry point).
 - `docs/debugging.md` entries for anything found on the way (R1 at least).
 - If D1 to D3 change the plan materially, pressure-test this file again.
+- **Done 2026-11-18.**
+  - Task list updated:
+    - Plan 00 is marked done, and its six tasks are ticked.
+    - The export entry-point question is answered (no entry point, D4). The parity and browser questions were answered in step 1.
+    - Spike findings went into plans 01 (attention), 03 (double space), 05 (fp16 accuracy) and 07 (conv cost, Edge versus Chrome).
+  - `docs/debugging.md` has these entries: R1 (reproduced, with a control; see below), ORT Web device handling, recording with hooks, Fortran-order `.npy`, and PowerShell UTF-8 corruption.
+  - No second pressure test. D1 and D2 were accepted as proposed, and D3 came out as the default, ORT Web, so the step's condition is not met. What did differ from the plan is recorded in the step notes above. This covers the data size, hooks instead of a recording wrapper, internals for chunk 0 only, and the tiny-specific tolerance.
+  - R1 reproduced on CUDA: 6 runs of the threaded `en-multi` path with one seed gave 4 different outputs. The single-chunk `en-short` was identical in 4 of 4 runs.
 
 ## Risks and known issues
 

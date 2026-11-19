@@ -2,6 +2,14 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-18: multi-chunk inference is not reproducible with a fixed seed (plan 00, risk R1)
+
+- **Symptom:** `infer_batch_process` with several text chunks gives different audio from run to run, even after `seed_everything(0)`. Measured on CUDA fp32 with the `en-multi` golden inputs (3 chunks): 6 runs gave 4 different output hashes. The length was the same every time, because durations do not depend on the noise.
+- **Control:** the single-chunk `en-short` gave the same hash in all 4 runs on the same GPU, so the variation does not come from the CUDA kernels.
+- **Cause:** `infer_batch_process` submits every chunk to a `ThreadPoolExecutor` at once. Each chunk draws its noise `y0` with `torch.randn` from the global generator inside `CFM.sample`, so which chunk gets which noise depends on thread timing. `CFM.sample`'s `seed` argument would not help: it calls `torch.manual_seed`, which seeds the same global generator, so parallel chunks would still race. A per-chunk `torch.Generator` would fix it.
+- **Workaround used:** `tools/webgpu/make_golden.py` swaps in a synchronous executor during the run, so chunks run in order on one thread. It also records each chunk's `y0`, which the port takes as an input. Upstream is not changed.
+- **Diagnose:** hash the output of a few repeated runs. If only multi-chunk inputs vary, this is the cause.
+
 ## 2026-11-18: .npy files saved from permuted tensors (plan 00, step 6)
 
 - **Symptom:** the TypeScript parity reader throws `fortran-order .npy is not supported` on some files written by `measure_floor.py --dump`.
