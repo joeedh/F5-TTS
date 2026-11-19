@@ -1,6 +1,6 @@
 # Plan 00: scope, runtime decision and parity harness
 
-Status: `plan pressure-tested` (drafted and reviewed 2026-11-02; findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; steps 1 and 2 done 2026-11-02; step 3 done 2026-11-18 (D3: ORT Web); steps 4 to 6 done 2026-11-18 (golden data; measured tolerances; parity runner, except the cloud SwiftShader check). Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
+Status: `plan pressure-tested` (drafted and reviewed 2026-11-02; findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; steps 1 and 2 done 2026-11-02; step 3 done 2026-11-18 (D3: ORT Web); steps 4 to 7 done 2026-11-18 (golden data; measured tolerances; parity runner; CI, which also covered the SwiftShader check). Step 8 (close out) remains. Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
 
 Task list: [webgpu-port-tasks.md](webgpu-port-tasks.md). Model details: [../architecture.md](../architecture.md).
 
@@ -333,6 +333,7 @@ Measured table (step 5, 2026-11-18). The source of truth is `testdata/webgpu/tol
     - The fix is the tiny-specific tolerance described under "Tolerances".
     - All other comparisons passed with wide margins. The DiT output was at 1.4e-6 against 1e-4, for example.
     - Locally, regenerating with `.venv313`'s torch build and with 1 or 2 threads had given bit-identical `time_embed`. So the gap is a Linux-versus-Windows CPU kernel difference, not thread scheduling.
+- **Done 2026-11-18.** On commit 66ff4d6, `web` (both jobs), `typecheck` and `pre-commit` all pass on GitHub.
 
 ### Step 8. Close out
 - Update the task list: plan 00 status, the ticked tasks, the answered open questions (parity, browsers, export entry point).
