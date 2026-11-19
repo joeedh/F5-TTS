@@ -183,3 +183,5 @@ testdata/webgpu/*
 !testdata/webgpu/tiny/
 web/test-results/
 web/playwright-report/
+!testdata/webgpu/tolerances.json
+!testdata/webgpu/floors.json

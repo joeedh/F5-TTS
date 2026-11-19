@@ -68,7 +68,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 
 | # | Plan (file to be written) | Depends on | Status |
 |---|---|---|---|
-| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | in progress; steps 1 to 4 done (D3: ORT Web; golden data generated, 2026-11-18), step 5 (noise floors) next |
+| 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | in progress; steps 1 to 5 done (D3: ORT Web; golden data; measured tolerances; 2026-11-18), step 6 (parity runner) next |
 | 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | plan not written |
 | 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | plan not written |
 | 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | plan not written |

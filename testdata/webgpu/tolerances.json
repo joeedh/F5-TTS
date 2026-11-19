@@ -1,0 +1,142 @@
+{
+  "method": "10x the worst CPU fp32 vs CUDA fp32 (TF32 off) difference over all real cases, rounded up to a power of ten; see docs/plans/webgpu-00-scope-and-parity.md, Tolerances",
+  "measured_with": {
+    "torch": "2.15.0+cu132",
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "cases": [
+      "en-epss16",
+      "en-multi",
+      "en-multi-fixdur",
+      "en-prep",
+      "en-short",
+      "zh-short"
+    ]
+  },
+  "exact": [
+    "text.max_chars",
+    "text.chunks",
+    "text.tokens",
+    "dit.text_ids",
+    "plan.duration",
+    "plan.ref_audio_len",
+    "plan.local_speed"
+  ],
+  "near_zero_rule": "relative L2 is not used where ||golden|| < 1e-6 * size; max_abs decides",
+  "checks": {
+    "plan.t": {
+      "note": "time grid after sway",
+      "max_abs": 1e-06,
+      "floor_max_abs": 5.960464477539063e-08,
+      "floor_max_abs_at": "en-epss16/c0.plan.t"
+    },
+    "audio.resample": {
+      "note": "informational; plan 02 decides (a different resampler may be accepted)",
+      "max_abs": 1e-05,
+      "floor_max_abs": 1.7881393432617188e-07,
+      "floor_max_abs_at": "en-prep/audio.ref"
+    },
+    "mel.log_masked": {
+      "note": "log mel, bins with golden linear magnitude above 1e-4",
+      "max_abs": 0.1,
+      "floor_max_abs": 0.009473800659179688,
+      "floor_max_abs_at": "zh-short/mel.ref"
+    },
+    "mel.linear": {
+      "note": "linear mel magnitude, exp of the log mel",
+      "rel_l2": 1e-05,
+      "floor_rel_l2": 1.9230017349611984e-07,
+      "floor_rel_l2_at": "en-epss16/mel.ref"
+    },
+    "dit.out": {
+      "note": "one DiT call (cond or uncond half), golden inputs",
+      "rel_l2": 0.0001,
+      "floor_rel_l2": 3.329237051696385e-06,
+      "floor_rel_l2_at": "en-multi/c0.dit.s30.out_cond",
+      "max_abs": 0.1,
+      "floor_max_abs": 0.0016783475875854492,
+      "floor_max_abs_at": "en-multi/c0.dit.s30.out_cond"
+    },
+    "dit_internal.text_embed": {
+      "note": "TextEmbedding output",
+      "rel_l2": 0.0001,
+      "floor_rel_l2": 8.036729492452484e-06,
+      "floor_rel_l2_at": "en-epss16/c0.dit_internal.text_embed_uncond",
+      "max_abs": 0.001,
+      "floor_max_abs": 2.2709369659423828e-05,
+      "floor_max_abs_at": "zh-short/c0.dit_internal.text_embed"
+    },
+    "dit_internal.time_embed": {
+      "note": "TimestepEmbedding output",
+      "rel_l2": 1e-06,
+      "floor_rel_l2": 7.237210077347413e-08,
+      "floor_rel_l2_at": "en-multi/c0.dit_internal.s16.time_embed",
+      "tiny_rel_l2": 2.7156256750561472e-06,
+      "max_abs": 1e-05,
+      "floor_max_abs": 9.5367431640625e-07,
+      "floor_max_abs_at": "en-epss16/c0.dit_internal.s08.time_embed"
+    },
+    "dit_internal.input_embed": {
+      "note": "InputEmbedding output",
+      "rel_l2": 0.0001,
+      "floor_rel_l2": 2.1772181408089527e-06,
+      "floor_rel_l2_at": "en-prep/c0.dit_internal.s00.input_embed",
+      "max_abs": 0.01,
+      "floor_max_abs": 0.00029528141021728516,
+      "floor_max_abs_at": "en-prep/c0.dit_internal.s16.input_embed"
+    },
+    "dit_internal.block": {
+      "note": "output of any of the 22 blocks, full model run up to it",
+      "rel_l2": 0.0001,
+      "floor_rel_l2": 5.820564802349593e-06,
+      "floor_rel_l2_at": "en-multi-fixdur/c0.dit_internal.s00.block15",
+      "max_abs": 0.1,
+      "floor_max_abs": 0.007645130157470703,
+      "floor_max_abs_at": "en-multi-fixdur/c0.dit_internal.s00.block14"
+    },
+    "dit_internal.norm_out": {
+      "note": "AdaLayerNorm_Final output",
+      "rel_l2": 0.0001,
+      "floor_rel_l2": 3.124441914681715e-06,
+      "floor_rel_l2_at": "en-multi-fixdur/c0.dit_internal.s00.norm_out",
+      "max_abs": 0.01,
+      "floor_max_abs": 0.0005180835723876953,
+      "floor_max_abs_at": "en-multi-fixdur/c0.dit_internal.s00.norm_out"
+    },
+    "vocoder.backbone": {
+      "note": "Vocos backbone output from golden mel",
+      "rel_l2": 0.001,
+      "floor_rel_l2": 4.255640641475459e-05,
+      "floor_rel_l2_at": "en-multi-fixdur/c0.vocoder.backbone",
+      "max_abs": 1.0,
+      "floor_max_abs": 0.011951446533203125,
+      "floor_max_abs_at": "en-multi-fixdur/c0.vocoder.backbone"
+    },
+    "vocoder.head_out": {
+      "note": "informational; raw head output, phase half is unstable where magnitude is tiny",
+      "max_abs": 1.0,
+      "floor_max_abs": 0.049472808837890625,
+      "floor_max_abs_at": "en-multi-fixdur/c0.vocoder.head_out"
+    },
+    "vocoder.stft_complex": {
+      "note": "complex STFT from the head output",
+      "rel_l2": 0.01,
+      "floor_rel_l2": 0.000794372764379269,
+      "floor_rel_l2_at": "en-multi-fixdur/c0.vocoder.head_out"
+    },
+    "vocoder.wav": {
+      "note": "chunk wav after output RMS rescale, golden mel",
+      "rel_l2": 0.01,
+      "floor_rel_l2": 0.0007150589600415003,
+      "floor_rel_l2_at": "en-multi-fixdur/c0.vocoder.wav",
+      "max_abs": 0.1,
+      "floor_max_abs": 0.008330047130584717,
+      "floor_max_abs_at": "en-multi-fixdur/c0.vocoder.wav"
+    },
+    "mel_out.free_running": {
+      "note": "free-running ODE with golden noise, cropped mel",
+      "rel_l2": 0.001,
+      "floor_rel_l2": 2.7566380865480426e-05,
+      "floor_rel_l2_at": "zh-short/c0.mel_out"
+    }
+  }
+}

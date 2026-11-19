@@ -1,6 +1,6 @@
 # Plan 00: scope, runtime decision and parity harness
 
-Status: `plan pressure-tested` (drafted and reviewed 2026-11-02; findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; steps 1 and 2 done 2026-11-02; step 3 done 2026-11-18 (D3: ORT Web); step 4 done 2026-11-18. Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
+Status: `plan pressure-tested` (drafted and reviewed 2026-11-02; findings folded in, see the end of this file). D1 and D2 accepted by the user on 2026-11-02; steps 1 and 2 done 2026-11-02; step 3 done 2026-11-18 (D3: ORT Web); steps 4 and 5 done 2026-11-18 (golden data; measured tolerances). Depends on: nothing. Blocks: plans 01, 02, 03 (and through them everything else).
 
 Task list: [webgpu-port-tasks.md](webgpu-port-tasks.md). Model details: [../architecture.md](../architecture.md).
 
@@ -170,22 +170,36 @@ Special cases:
 - **Log mel.** Bins just above the 1e-5 clamp turn tiny absolute differences into large log differences. Compare only bins where the golden linear magnitude is above 1e-4, plus a separate check on the linear magnitude.
 - **Vocoder head output.** The second half of `head.out` is phase. Phase error where the magnitude is tiny does not matter, so phase is compared as the complex STFT value (magnitude times cos/sin) by relative L2, not as raw phase.
 
-Starting table. Every float row is a placeholder until step 5 replaces it with measured values.
+Measured table (step 5, 2026-11-18). The source of truth is `testdata/webgpu/tolerances.json`, which both runners read; this table copies it. Every measurement is in `testdata/webgpu/floors.json`.
+- Floors: CPU fp32 golden against CUDA fp32 with TF32 off, on the RTX 5050 (`tools/webgpu/measure_floor.py`).
+- Each floor is the worst difference over the 6 real cases (1,005 comparisons). `tiny` is measured but does not count (R5).
+- Both sides are deterministic: a second measurement run gave bit-identical floors.
 
-| Stage | Check | Starting tolerance |
-|---|---|---|
-| `text` | `max_chars`, chunk strings, tokens, ids | exact |
-| `plan` | `local_speed`, duration, `ref_audio_len` | exact |
-| `plan` | time grid | max abs 1e-6 |
-| `audio` | reference audio after downmix, RMS and resample | plan 02 decides; a different resampler may be accepted and judged at `mel` |
-| `mel` | log mel from golden audio, masked as above | max abs 1e-3 |
-| `dit` | one DiT call, golden inputs | relative L2 1e-4 |
-| `vocoder` | complex STFT from golden mel | relative L2 1e-4 |
-| `vocoder` | wav from golden mel | max abs 1e-3 |
-| `mel_out` | free-running ODE with golden noise | relative L2 1e-2 |
-| `final` | end-to-end | listening check against the golden wav; metric comparison deferred to plans 04 and 07 (see D2) |
+| Check (`tolerances.json` key) | What | Floor | Tolerance | Starting placeholder |
+|---|---|---|---|---|
+| text, plan integers | `max_chars`, chunk strings, tokens, ids, duration, `ref_audio_len`, `local_speed` | - | exact | exact |
+| `plan.t` | time grid after sway | max abs 6.0e-8 | max abs 1e-6 | max abs 1e-6 |
+| `audio.resample` | downmix, RMS, resample (`en-prep` only) | max abs 1.8e-7 | max abs 1e-5 (informational; plan 02 decides) | plan 02 |
+| `mel.log_masked` | log mel from golden audio, bins with linear magnitude above 1e-4 | max abs 9.5e-3 (zh-short; others 5.6e-4 or less) | max abs 0.1 | max abs 1e-3 |
+| `mel.linear` | linear mel magnitude | rel L2 1.9e-7 | rel L2 1e-5 | - |
+| `dit.out` | one DiT call, either CFG half, golden inputs | rel L2 3.3e-6; max abs 1.7e-3 | rel L2 1e-4; max abs 0.1 | rel L2 1e-4 |
+| `dit_internal.text_embed` | | rel L2 8.0e-6; max abs 2.3e-5 | rel L2 1e-4; max abs 1e-3 | - |
+| `dit_internal.time_embed` | | rel L2 7.2e-8; max abs 9.5e-7 | rel L2 1e-6; max abs 1e-5 | - |
+| `dit_internal.input_embed` | | rel L2 2.2e-6; max abs 3.0e-4 | rel L2 1e-4; max abs 1e-2 | - |
+| `dit_internal.block` | any of the 22 block outputs | rel L2 5.8e-6; max abs 7.6e-3 | rel L2 1e-4; max abs 0.1 | - |
+| `dit_internal.norm_out` | | rel L2 3.1e-6; max abs 5.2e-4 | rel L2 1e-4; max abs 1e-2 | - |
+| `vocoder.backbone` | Vocos backbone from golden mel | rel L2 4.3e-5; max abs 1.2e-2 | rel L2 1e-3; max abs 1 | - |
+| `vocoder.stft_complex` | complex STFT from the head output | rel L2 7.9e-4 | rel L2 1e-2 | rel L2 1e-4 |
+| `vocoder.wav` | chunk wav from golden mel | rel L2 7.2e-4; max abs 8.3e-3 | rel L2 1e-2; max abs 0.1 | max abs 1e-3 |
+| `mel_out.free_running` | free-running ODE with golden noise | rel L2 2.8e-5 | rel L2 1e-3 | rel L2 1e-2 |
+| `final` | end to end | - | listening check; metrics deferred to plans 04 and 07 (D2) | same |
 
-- The free-running `mel_out` bound is the one most likely to move. If the measured floor is large, D2 already says end-to-end is judged by quality.
+- **For step 7:** `tiny`'s `time_embed` floor (rel L2 2.7e-6) is above the tolerance taken from the real cases (1e-6). The CI comparison of a regenerated `tiny` against the committed one may need a tiny-specific allowance for that check (`tiny_rel_l2` in `tolerances.json`).
+- `vocoder.head_out` (raw head output, max abs floor 4.9e-2) is in the file as informational only. Its phase half is not meaningful where the magnitude is tiny.
+- The free-running ODE drifts far less than feared: 2.8e-5, so its bound is 10 times tighter than the placeholder.
+- Two floors are much larger than their placeholders, and both come from amplification of ordinary fp32 differences, not from bugs:
+  - **Log mel:** in `zh-short`, a few bins sit just above the 1e-4 mask, where a 1e-6 absolute difference becomes 1 percent in log scale. The linear-magnitude check (rel L2 1e-5) is the strict one. Plan 02 may raise the mask threshold if 0.1 proves too loose.
+  - **Vocoder:** a backbone difference of 4e-5 relative goes through the linear head and `exp()`, with magnitudes up to Vocos's clip at 100. That makes 8e-4 relative in the STFT and the wav, mostly in the multi-chunk cases. Max abs 0.1 on a wav peaking at 1.25 is loose, so `vocoder.wav` also has a relative L2 check.
 
 ## Steps
 
@@ -268,6 +282,10 @@ Starting table. Every float row is a placeholder until step 5 replaces it with m
 - Replace the placeholder rows in the tolerance table with the measured values. Store the table as `testdata/webgpu/tolerances.json`, which both runners read; this file is the single source.
 - If CUDA stops working in `.venv313`, use two CPU runs with different thread counts as a weaker floor and say so.
 - Done when: `tolerances.json` is committed and the table above matches it.
+- **Done 2026-11-18.** CUDA worked in `.venv313`, so the weaker fallback with two CPU thread counts was not needed. Results are in the "Tolerances" table.
+  - `measure_floor.py --from-floors` rebuilds `tolerances.json` from `floors.json` without a GPU.
+  - Additions to the plan: a separate `mel.linear` check, a relative L2 check on `vocoder.wav`, and tolerances for the `dit_internal` modules that plan 01 bisects with.
+  - The free-running run uses the real `CFM.sample` on CUDA, with the golden `y0` injected through the same `odeint` patch the generator uses. That run also gives the CUDA time grid.
 
 ### Step 6. Parity runner
 - `web/test/parity/`: `.npy` reader, `loadCase(dir)` (manifest plus lazily loaded tensors; reads from the filesystem in Node and over HTTP in the browser), `compare(stage, name, actual, golden)` against `tolerances.json` with the special cases above, and a report: one line per comparison, pass or fail, and the first failing stage printed last so it is easy to find.
