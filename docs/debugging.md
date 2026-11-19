@@ -2,6 +2,14 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-19: ORT Web graph capture fails with a `createBindGroup` error (plan 01, step 4)
+
+- **Symptom:** with `enableGraphCapture: true`, the first `session.run()` throws `Failed to execute 'createBindGroup' on 'GPUDevice': ... Failed to read the 'buffer' property from 'GPUBufferBinding': Required member is undefined.` Seen in ORT Web 1.31.1, Chrome and Edge, NVIDIA and Intel.
+- **Where:** every `mha` step graph (tiny and base), and the base unfused step graph with static n, even at n = 64. Only the tiny unfused graph works.
+- **Not:** the rotary-table `Gather`. Changing its layout did not help, and the change was reverted.
+- **Related:** passing preallocated `fetches` with capture on fails first, with `BufferManager::MemCpy ... copy_size <= src_size && copy_size <= dst_size was false`. Leave the outputs to ORT when capture is on.
+- **Status:** unresolved; capture is not used (`docs/research/webgpu-dit-export.md`). To retry with a newer ORT: `node bench/dit-step/run.mjs --gpu nvidia --only unfused-static-1024-capture` from `web/`, or `--graph <file> --n 64 --capture` for one graph.
+
 ## 2026-11-19: rotary cos and sin lose precision on the NVIDIA GPU (plan 01, step 3)
 
 - **Symptom:** the DiT step graph on WebGPU failed `dit.v` and `dit.out` narrowly (relative L2 1.1e-4 to 1.4e-4 against 1e-4) on the RTX 5050, at steps 0 to 4 of a chunk only. The Intel GPU passed. The median error was 2 to 10 percent of the tolerance.

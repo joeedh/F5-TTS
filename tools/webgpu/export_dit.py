@@ -255,7 +255,7 @@ def export(
     args: tuple[Tensor, ...],
     input_names: list[str],
     output_names: list[str],
-    dynamic: dict[str, dict[int, Any]],  # Any: torch.export Dim
+    dynamic: dict[str, dict[int, Any]] | None,  # Any: torch.export Dim; None exports static shapes
     path: Path,
     opset: int,
     table: dict[Any, Callable[..., Any]] | None,  # Any: aten overloads and onnxscript functions
@@ -277,7 +277,7 @@ def export(
         old.unlink(missing_ok=True)
     prog.save(str(path), external_data=True)
     model = onnx.load(str(path), load_external_data=False)
-    for inp in model.graph.input:  # n must stay symbolic (plan 01 step 1)
+    for inp in model.graph.input if dynamic is not None else []:  # n must stay symbolic (plan 01 step 1)
         dims = inp.type.tensor_type.shape.dim
         if len(dims) == 3 or inp.name == "text":
             assert dims[1].dim_param, f"{path.name}: input {inp.name} has a fixed n ({dims[1].dim_value})"
@@ -304,6 +304,7 @@ def main() -> None:
     p.add_argument("--attention", choices=["unfused", "mha", "onnx23"], default="unfused")
     p.add_argument("--debug", action="store_true", help="also export step_debug.onnx with internal outputs")
     p.add_argument("--out", type=Path, help="default: testdata/webgpu/tiny/onnx or build/webgpu/dit/base")
+    p.add_argument("--static-n", type=int, help="export only step<suffix>_n<N>.onnx, with n fixed (D2 timing)")
     args = p.parse_args()
     out: Path = args.out or (
         REPO / "testdata/webgpu/tiny/onnx" if args.model == "tiny" else REPO / "build/webgpu/dit/base"
@@ -327,7 +328,7 @@ def main() -> None:
     with torch.inference_mode():
         tc, tu = TextGraph(dit.text_embed)(text)
 
-    if args.attention == "unfused":  # the text graph has no attention; one export serves every variant
+    if args.attention == "unfused" and not args.static_n:  # no attention in the text graph; one export serves all
         t0 = time.perf_counter()
         m = export(
             TextGraph(dit.text_embed),
@@ -342,9 +343,13 @@ def main() -> None:
         summary["text"] = {**describe(m), "export_s": round(time.perf_counter() - t0, 1)}
         print("text.onnx", json.dumps(summary["text"]["ops"]))
 
+    step_n = args.static_n or EXPORT_N
+    if args.static_n:
+        with torch.inference_mode():
+            tc, tu = TextGraph(dit.text_embed)(torch.nn.functional.pad(text, (0, step_n - EXPORT_N), value=-1))
     step_args = (
-        torch.randn(1, EXPORT_N, 100, generator=gen),
-        torch.randn(1, EXPORT_N, 100, generator=gen),
+        torch.randn(1, step_n, 100, generator=gen),
+        torch.randn(1, step_n, 100, generator=gen),
         tc.clone(),
         tu.clone(),
         torch.tensor([0.5]),
@@ -354,7 +359,9 @@ def main() -> None:
     names = ["x", "step_cond", "text_cond", "text_uncond", "time", "cfg_strength", "dt"]
     dynamic: dict[str, dict[int, Any]] = {k: {1: n_step} for k in names[:4]}  # Any: Dim
     dynamic.update({k: {} for k in names[4:]})
-    variants = [("step", False)] + ([("step_debug", True)] if args.debug else [])
+    if args.static_n:
+        suffix += f"_n{args.static_n}"
+    variants = [("step", False)] + ([("step_debug", True)] if args.debug and not args.static_n else [])
     for stem, debug in variants:
         t0 = time.perf_counter()
         with precomputed_rope():
@@ -363,7 +370,7 @@ def main() -> None:
                 step_args,
                 names,
                 step_output_names(dit.depth, debug),
-                dynamic,
+                None if args.static_n else dynamic,
                 out / f"{stem}{suffix}.onnx",
                 opset,
                 table,

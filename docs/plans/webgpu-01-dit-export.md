@@ -77,6 +77,7 @@ Out of scope:
   - The first-call latency at a new n after warming up at another n. Every chunk has a new n, so shader and pipeline creation counts.
   - ORT's `enableGraphCapture`, which only static shapes allow. It is measured, but kept separate from the 10 percent rule.
 - If dynamic is less than 10 percent slower in steady state, and its new-n latency is under 1 s, keep it. Otherwise record the gap and let plan 07 decide (for example, a few static sizes plus the mask path).
+- Decided 2026-11-19: dynamic n. It passes both rules on both GPUs (step 4). Graph capture fails in ORT Web 1.31.1, so it does not count against dynamic n.
 
 ### D3. Attention form (proposal: measure three, pick the fastest that passes)
 
@@ -88,6 +89,7 @@ The spike's export was unfused (MatMul, Softmax, MatMul). It writes out a (2, 16
 3. ONNX `Attention` (opset 23), if the exporter emits it for `scaled_dot_product_attention` at opset 23 and ORT Web's WebGPU EP runs it.
 
 - Each candidate must pass `dit.out` in onnxruntime CPU (step 1) before it is timed. Then it must pass in the browser (step 4) and place no float compute on the CPU.
+- Decided 2026-11-19: `mha`. `onnx23` is excluded. It was correct but took about 25 s a step in Chrome, likely because its `Attention` runs on the CPU. The unfused graph stays as the parity baseline only: at n = 1913 it needs 6.5 to 7.3 GB of GPU memory against 1.7 GB for `mha`, and it is slower (step 2). Step 4 therefore times `mha` only; `export_dit.py` keeps the `onnx23` option for later ORT versions.
 - Timing uses the spike's method: a chained run on GPU buffers, median of 5. It covers n = 1024 and 2048 on both GPUs.
 
 ### D4. Rotary embedding (proposal: a constant table in the step graph, sliced to n)
@@ -213,6 +215,12 @@ The spike's export was unfused (MatMul, Softmax, MatMul). It writes out a (2, 16
   - Chrome on both GPUs, and Edge on NVIDIA.
 - Record the results in `docs/research/webgpu-dit-export.md` (add it to `docs/index.md`).
 - Done when: D2 and D3 are decided with numbers, and the chosen graphs pass step 3's runner.
+- Result, 2026-11-19 (details in `docs/research/webgpu-dit-export.md`):
+  - D3: `mha`, as recorded under D3. It passes step 3's runner on both GPUs (1,228 of 1,228, worst at 10 percent of tolerance).
+  - D2: dynamic n. Steady state is 2 percent slower than static on NVIDIA and no slower on Intel. The first call at a new n costs nothing measurable on NVIDIA and at most about 0.25 s on Intel.
+  - Graph capture fails in ORT Web 1.31.1 on every base graph (a `createBindGroup` error), so it is not used. Its possible gain is under 10 percent of a step at n = 1024. Left to plan 07 and a later ORT release.
+  - Per step, `mha`, dynamic n: Chrome NVIDIA 406 ms at n = 1024 and 961 ms at 2048; Edge NVIDIA 402 and 960 ms; Chrome Intel 1.16 and 2.78 s. That is an RTF of 1.9 to 2.3 on NVIDIA and 5.3 to 6.5 on Intel for 32 steps.
+  - `export_dit.py --static-n N` exports a static-n step graph, used only for this comparison.
 
 ### Step 5. Close out
 
