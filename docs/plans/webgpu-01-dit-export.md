@@ -158,6 +158,25 @@ The spike's export was unfused (MatMul, Softmax, MatMul). It writes out a (2, 16
   - Whether the text graph's session can be created alongside.
 - If loading fails, follow D5's fallback order and record why.
 - Done when: the step graph loads and runs one step on both GPUs, or a fallback is decided and done.
+- Result, 2026-11-19 (`web/bench/dit-load/`, results in `results/*.json`; Chrome, ORT Web 1.31.1, `en-short` chunk 0, n = 1913):
+  - The fp32 graphs load unsharded on both GPUs, with the text graph alongside. Step 0 passes `dit.out` and `text_embed` on both. No D5 fallback is needed.
+  - Memory is set by attention, not by the weights. Loading peaks at 2 to 3.5 GB of browser RAM and puts little on the GPU; ORT uploads the weights at the first run. Peaks while running one step:
+
+    | GPU | Attention | GPU memory | Browser RAM | Step time |
+    |---|---|---|---|---|
+    | NVIDIA | unfused | 6.5 to 7.3 GB dedicated (of 8) | 4 to 10.6 GB | 1.1 to 1.5 s |
+    | NVIDIA | `mha` | 1.7 GB dedicated | 2.5 GB | 0.9 s |
+    | NVIDIA | `onnx23` | 1.6 GB dedicated | 3 GB | 25 s (likely on the CPU) |
+    | Intel | unfused | 4.3 GB shared | 4.4 GB | 9 s |
+    | Intel | `mha` | 1.7 GB shared | 2.3 to 3.5 GB | 2.5 to 3.7 s |
+
+  - The unfused graph's (2, 16, n, n) scores cost about 0.47 GB per block at this n, and ORT does not keep their buffers small. This is a strong argument for `mha` in D3; step 4 still has to confirm placement and timing.
+  - Load time (step graph create plus fetch): 3 to 10 s from the local server. Chrome's HTTP cache does not keep the 1.33 GB file (the second fetch transferred all of it), so the browser cache in the sense of this step means Cache Storage:
+    - Filling it took 25 to 51 s (the `cache.put` of a 1.33 GB response).
+    - Loading from it took 2.8 to 3.8 s, of which about 1.5 s is reading the response into an ArrayBuffer.
+  - Handed to plan 05: HTTP caching does not work at this size, and Cache Storage fills slowly.
+  - Times are from single runs, and the step time includes reading `pred` back. Step 4 does the real timing.
+  - Memory is sampled from outside Chrome about once a second (`sample-memory.ps1`), so short peaks may be missed.
 
 ### Step 3. Browser parity runner for the DiT
 

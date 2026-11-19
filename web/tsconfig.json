@@ -14,5 +14,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "test", "spikes", "vitest.config.ts", "playwright.config.ts"]
+  "include": ["src", "test", "spikes", "bench", "vitest.config.ts", "playwright.config.ts"]
 }
