@@ -1,0 +1,115 @@
+{
+  "channel": "chrome",
+  "gpuFlag": "intel",
+  "browserVersion": "157.0.8103.79",
+  "attention": "unfused",
+  "caseName": "en-short",
+  "runs": [
+    {
+      "caseName": "en-short",
+      "attention": "unfused",
+      "source": "url",
+      "text.createMs": 886,
+      "text.transfer": {
+        "transferSize": 38908204,
+        "encodedBodySize": 38907904
+      },
+      "step.createMs": 8620,
+      "step.transfer": {
+        "transferSize": 1328358588,
+        "encodedBodySize": 1328358288
+      },
+      "loadTotalMs": 10026,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "runMs": [10770, 9299, 8488],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003584833248682217,
+          "maxAbs": 0.000016957521438598633,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007834945422108581,
+          "maxAbs": 0.000016435980796813965,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 9.638509526782188e-7,
+          "maxAbs": 0.00009083747863769531,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.332664742138673e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795109958832,
+        "textCreated": 1795109959721,
+        "stepCreated": 1795109968857,
+        "ran": 1795109997674,
+        "released": 1795109997685
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 25,
+        "baseline": {
+          "privateGB": 0.22,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 4.4,
+        "maxProcessPrivateGB": 4.06,
+        "rendererGB": 1.73,
+        "gpuProcessGB": 4.06,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 4.29
+      },
+      "memoryLoad": {
+        "samples": 7,
+        "baseline": {
+          "privateGB": 0.22,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 2.2,
+        "maxProcessPrivateGB": 1.67,
+        "rendererGB": 1.73,
+        "gpuProcessGB": 0.41,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 0.56
+      },
+      "memoryRun": {
+        "samples": 17,
+        "baseline": {
+          "privateGB": 2.14,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 4.4,
+        "maxProcessPrivateGB": 4.06,
+        "rendererGB": 0.32,
+        "gpuProcessGB": 4.06,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 4.29
+      },
+      "pageErrors": [],
+      "scenario": "0:url"
+    }
+  ]
+}

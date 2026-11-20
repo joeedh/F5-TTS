@@ -1,0 +1,224 @@
+{
+  "channel": "chrome",
+  "gpuFlag": "intel",
+  "browserVersion": "158.0.8127.37",
+  "results": [
+    {
+      "graph": "step_mha.onnx",
+      "graphCapture": false,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.0.0 Safari/537.36",
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "createMs": 40671,
+      "perN": [
+        {
+          "n": 1024,
+          "firstMs": 3260,
+          "singleMs": {
+            "median": 1160.5,
+            "min": 1145.7,
+            "max": 1206.6
+          },
+          "chainMs": {
+            "median": 37191.4,
+            "min": 37138.8,
+            "max": 38671
+          },
+          "perStepInChainMs": 1162.2,
+          "chainFinite": true
+        },
+        {
+          "n": 2048,
+          "firstMs": 3051,
+          "singleMs": {
+            "median": 2811.4,
+            "min": 2704.6,
+            "max": 3018.7
+          },
+          "chainMs": {
+            "median": 88828.3,
+            "min": 87742.9,
+            "max": 90882
+          },
+          "perStepInChainMs": 2775.9,
+          "chainFinite": true
+        },
+        {
+          "n": 1913,
+          "firstMs": 2531,
+          "singleMs": {
+            "median": 2567.9,
+            "min": 2481.3,
+            "max": 3086.8
+          },
+          "chainMs": {
+            "median": 85116.5,
+            "min": 83963.7,
+            "max": 89117.2
+          },
+          "perStepInChainMs": 2659.9,
+          "chainFinite": true
+        }
+      ],
+      "gpuErrors": [],
+      "name": "mha-dynamic",
+      "pageErrors": []
+    },
+    {
+      "graph": "step_mha_n1024.onnx",
+      "graphCapture": false,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.0.0 Safari/537.36",
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "createMs": 10463,
+      "perN": [
+        {
+          "n": 1024,
+          "firstMs": 2577,
+          "singleMs": {
+            "median": 1150.3,
+            "min": 1135.5,
+            "max": 1278.2
+          },
+          "chainMs": {
+            "median": 40400.6,
+            "min": 37428.3,
+            "max": 41569.6
+          },
+          "perStepInChainMs": 1262.5,
+          "chainFinite": true
+        }
+      ],
+      "gpuErrors": [],
+      "name": "mha-static-1024",
+      "pageErrors": []
+    },
+    {
+      "graph": "step_mha_n2048.onnx",
+      "graphCapture": false,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.0.0 Safari/537.36",
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "createMs": 10142,
+      "perN": [
+        {
+          "n": 2048,
+          "firstMs": 3496,
+          "singleMs": {
+            "median": 2653.2,
+            "min": 2614.8,
+            "max": 2701.4
+          },
+          "chainMs": {
+            "median": 95985.5,
+            "min": 90392.1,
+            "max": 97766.8
+          },
+          "perStepInChainMs": 2999.5,
+          "chainFinite": true
+        }
+      ],
+      "gpuErrors": [],
+      "name": "mha-static-2048",
+      "pageErrors": []
+    },
+    {
+      "graph": "step_n1024.onnx",
+      "graphCapture": false,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.0.0 Safari/537.36",
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "createMs": 15888,
+      "perN": [
+        {
+          "n": 1024,
+          "firstMs": 3721,
+          "singleMs": {
+            "median": 1214,
+            "min": 1201.7,
+            "max": 1287.9
+          },
+          "chainMs": {
+            "median": 41449,
+            "min": 38732.1,
+            "max": 43853.9
+          },
+          "perStepInChainMs": 1295.3,
+          "chainFinite": true
+        }
+      ],
+      "gpuErrors": [],
+      "name": "unfused-static-1024",
+      "pageErrors": []
+    },
+    {
+      "error": "Error: page.evaluate: TypeError: Failed to execute 'createBindGroup' on 'GPUDevice': Failed to read the 'entries' property from 'GPUBindGroupDescriptor': Failed to read the 'resource' property from 'GPUBindGroupEntry': Failed to read the 'buffer' property from 'GPUBufferBinding': Required member is undefined.\n    at Of (http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort.webgpu.bundle.min.mjs?v=103dda3e:10:14903)\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[275]:0x39732\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[4421]:0x6ba4e9\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[11265]:0x11fbb82\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[10767]:0x1098482\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[11538]:0x124723f\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[2351]:0x34ae1f\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[5525]:0x8da70c\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[5526]:0x8dbe69\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[1851]:0x2591da",
+      "name": "unfused-static-1024-capture",
+      "pageErrors": []
+    },
+    {
+      "graph": "step_n2048.onnx",
+      "graphCapture": false,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.0.0 Safari/537.36",
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "createMs": 10545,
+      "perN": [
+        {
+          "n": 2048,
+          "firstMs": 4858,
+          "singleMs": {
+            "median": 3682.2,
+            "min": 3228.8,
+            "max": 4486.5
+          },
+          "chainMs": {
+            "median": 98905.8,
+            "min": 95911.8,
+            "max": 105397.6
+          },
+          "perStepInChainMs": 3090.8,
+          "chainFinite": true
+        }
+      ],
+      "gpuErrors": [],
+      "name": "unfused-static-2048",
+      "pageErrors": []
+    },
+    {
+      "error": "Error: page.evaluate: TypeError: Failed to execute 'createBindGroup' on 'GPUDevice': Failed to read the 'entries' property from 'GPUBindGroupDescriptor': Failed to read the 'resource' property from 'GPUBindGroupEntry': Failed to read the 'buffer' property from 'GPUBufferBinding': Required member is undefined.\n    at Of (http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort.webgpu.bundle.min.mjs?v=103dda3e:10:14903)\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[275]:0x39732\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[4421]:0x6ba4e9\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[11265]:0x11fbb82\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[10767]:0x1098482\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[11538]:0x124723f\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[2351]:0x34ae1f\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[5525]:0x8da70c\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[5526]:0x8dbe69\n    at http://127.0.0.1:53460/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm:wasm-function[1851]:0x2591da",
+      "name": "unfused-static-2048-capture",
+      "pageErrors": []
+    }
+  ]
+}
