@@ -11,6 +11,10 @@ Writes testdata/webgpu/audio-fixtures/ (committed):
   prep/<name>.ref.npy  the 24 kHz reference after infer_batch_process's downmix, RMS raise and resample,
                        (1, samples) float32; only for the fixtures that resample
   prep/manifest.json   per fixture: rates, lengths, rms and raised
+  istft/head_out.npy   (6, 1026) float32 head output: log magnitudes (some clipped at 100) and phases,
+                       nonzero at bins 0 and 512 too (plan 02, step 4)
+  istft/irfft.npy      (6, 1024) torch.fft.irfft of each frame's complex spectrum, in float64
+  istft/wav.npy        (1280,) torch.istft of the whole spectrum as the Vocos head runs it, in float64
 """
 
 from __future__ import annotations
@@ -215,6 +219,26 @@ def prep_fixtures(out: Path) -> None:
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 
 
+def istft_fixture(out: Path) -> None:
+    out.mkdir(parents=True, exist_ok=True)
+    rng = np.random.default_rng(7)
+    frames = 6
+    log_mag = rng.normal(0.0, 1.5, (frames, 513))
+    log_mag[:, 100] = 5.0  # exp(5) = 148, clipped to 100 as ISTFTHead does
+    phase = rng.uniform(-np.pi, np.pi, (frames, 513))  # bins 0 and 512 included: irfft ignores their imaginary part
+    head_out = np.concatenate([log_mag, phase], axis=1).astype(np.float32)
+    h = torch.from_numpy(head_out).double()
+    mag = torch.clip(torch.exp(h[:, :513]), max=1e2)
+    spec = mag * (torch.cos(h[:, 513:]) + 1j * torch.sin(h[:, 513:]))  # (frames, 513), ISTFTHead's formula
+    irfft = torch.fft.irfft(spec, n=1024, dim=1)
+    window = torch.hann_window(1024, dtype=torch.float64)
+    wav = torch.istft(spec.T, n_fft=1024, hop_length=256, win_length=1024, window=window, center=True)
+    assert wav.shape == ((frames - 1) * 256,), wav.shape
+    np.save(out / "head_out.npy", head_out)
+    np.save(out / "irfft.npy", irfft.numpy().astype(np.float32))
+    np.save(out / "wav.npy", wav.numpy().astype(np.float32))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--out", type=Path, default=OUT)
@@ -224,6 +248,7 @@ def main() -> None:
     np.save(out / "mel_fbank.npy", mel_fbank())
     print(f"wrote {out / 'mel_fbank.npy'}")
     prep_fixtures(out / "prep")
+    istft_fixture(out / "istft")
 
 
 if __name__ == "__main__":

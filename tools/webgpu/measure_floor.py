@@ -257,6 +257,16 @@ CHECKS: dict[str, tuple[list[str], str]] = {
 }
 
 
+# checks with a set tolerance instead of a measured floor; write_tolerances copies them as they are
+FIXED: dict[str, dict[str, float | str]] = {
+    "vocoder.istft": {
+        "note": "inverse STFT and output rescale from the golden head_out, against vocoder.wav; set to catch a wrong"
+        " window or envelope, which vocoder.wav's tolerance would miss (plan 02, step 4)",
+        "rel_l2": 1e-5,
+    },
+}
+
+
 def pow10_up(x: float) -> float:
     return float(10.0 ** math.ceil(math.log10(max(x, MIN_FLOOR) * 10.0) - 1e-9))
 
@@ -318,6 +328,7 @@ def write_tolerances(fl: Floors, names: list[str], gpu: str) -> None:
                 entry[f"tiny_{key}"] = wt[key]
                 entry.setdefault("tiny", {})[key] = pow10_up(wt[key])
         table[check] = entry
+    table.update(FIXED)
     tolerances = {
         "method": "10x the worst CPU fp32 vs CUDA fp32 (TF32 off) difference over all real cases, rounded up to a"
         " power of ten; see docs/plans/webgpu-00-scope-and-parity.md, Tolerances",

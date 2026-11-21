@@ -210,6 +210,14 @@ Out of scope:
   - Every chunk of every case, from `c*.vocoder.head_out`.
   - A synthetic frame with nonzero phase in bins 0 and 512, compared with `torch.fft.irfft`.
 - Done when: every chunk passes `vocoder.istft`, and the synthetic frame matches.
+- Result, 2026-11-21:
+  - Code: `web/src/audio/istft.ts` (`istft`, `irfftFrame`) and `web/src/audio/output.ts` (`rescaleOutput`, float32 like upstream). Tests in `web/test/audio/istft.test.ts`.
+  - `vocoder.istft` (rel L2 1e-5) is a fixed entry in `measure_floor.py` (`FIXED`), so regenerating `tolerances.json` keeps it. `--from-floors` reproduces the committed file exactly, step 2's changes included.
+  - Every chunk of all 7 cases passes, at rel L2 1.1e-7 to 1.2e-7 and max abs 3e-7 at worst: the float32 rounding of the output.
+  - The synthetic fixture (`testdata/webgpu/audio-fixtures/istft/`, from `export_audio_fixtures.py`) has 6 frames, nonzero DC and Nyquist phases, and one bin clipped at 100. It matches torch's float64 `irfft` and `istft` to rel L2 below 1e-6.
+  - Mutations caught: a symmetric Hann window fails 8 of the 9 tests, and a constant envelope 7. A 0.2 percent ripple gives rel L2 1.4e-3, which `vocoder.wav`'s tolerance (1e-2) would pass and `vocoder.istft` fails.
+  - Keeping the imaginary part of bin 0 changes nothing here: the port builds the full Hermitian spectrum and keeps only the real part of the inverse FFT, so that term cannot leak. The fixture guards a future packed real FFT, where it would.
+  - Speed in Node: about 75 microseconds per frame, so 110 ms for a 1,450-frame chunk and about 150 ms for 2,000 frames. Against a chunk's 30 to 90 s of DiT steps (plan 01), that is well under D2's 5 percent. Step 5 adds the readback in the browser and decides D2.
 
 ### Step 5. Browser
 
