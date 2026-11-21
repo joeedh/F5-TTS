@@ -184,6 +184,17 @@ Out of scope:
   - Logs which op the exact GELU became (opset-20 `Gelu`, or an `Erf` decomposition), for step 5's placement check.
 - Python check in onnxruntime CPU: feed `c*.mel_out`, compare with `c*.vocoder.backbone` (a debug output) and `c*.vocoder.head_out` through `parity.py`.
 - Done when: every chunk of every case passes `vocoder.backbone` and `vocoder.stft_complex`.
+- Result, 2026-11-21:
+  - `tools/webgpu/export_vocos.py` writes `vocos.onnx` (`mel` (1, 100, T) to `head_out` (1, T, 1026)) and `vocos_debug.onnx` (also `backbone` (1, T, 512)). T is dynamic, from 8 to 16384.
+    - Tiny: `testdata/webgpu/tiny/onnx/`, 0.7 MB each, committed.
+    - Real: `build/webgpu/vocos/`, 54.3 MB each, one file with no external data.
+  - The exact GELU exports as opset 20 `Gelu` with `approximate="none"`, one per ConvNeXt block (8), not an `Erf` decomposition. Step 5 checks it is placed on the GPU (R6).
+  - The real graph is 96 nodes: `Conv` 9, `Transpose` 19, `LayerNormalization` 10, `MatMul` 17, `Add` 25, `Gelu` 8, `Mul` 8.
+  - `tools/webgpu/check_vocos_ort.py` (onnxruntime CPU, golden `c*.mel_out` in): every chunk of all 7 cases passes. Worst over the real cases, all in en-multi-fixdur chunk 0:
+    - `vocoder.backbone`: rel L2 1.3e-5 (tolerance 1e-3).
+    - `vocoder.stft_complex`: rel L2 2.6e-4 (tolerance 1e-2).
+    - Both are below the CPU-against-CUDA floors (4.3e-5 and 7.9e-4).
+  - The export is deterministic. Node metadata records source line numbers, though, so editing the exporter changes the files' bytes.
 
 ### Step 4. Inverse STFT and output rescale
 

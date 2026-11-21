@@ -2,6 +2,12 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-21: `torch.onnx.export` fails with `UnicodeEncodeError` on Windows (plan 02, step 3)
+
+- **Symptom:** the export fails at the end with `UnicodeEncodeError: 'charmap' codec can't encode character '✅'`, raised from a `print("[torch.onnx]", ...)`.
+- **Cause:** the dynamo exporter prints a check-mark emoji. When stdout is a pipe on Windows (as in the Bash tool, or `| tee`), Python encodes it as cp1252, which has no such character.
+- **Fix:** set `PYTHONIOENCODING=utf-8`, or reconfigure stdout and stderr to UTF-8 at start-up, as `tools/webgpu/export_vocos.py` does.
+
 ## 2026-11-21: a silent reference gives upstream an all-NaN reference (plan 02, step 2)
 
 - **Symptom:** `export_audio_fixtures.py`'s `silence-only` fixture (1.5 s of zeros) prepares fine, to pydub's 50 ms of silence at 11025 Hz. But its reference after `infer_batch_process` is all NaN.
