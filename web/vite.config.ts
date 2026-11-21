@@ -9,6 +9,7 @@ export default defineConfig({
     serveData({
       "/testdata/webgpu/": join(repo, "testdata/webgpu"), // golden data and the tiny model's graphs
       "/model/dit/": join(repo, "build/webgpu/dit"), // the real DiT exports (tools/webgpu/export_dit.py)
+      "/model/vocos/": join(repo, "build/webgpu/vocos"), // the real Vocos export (tools/webgpu/export_vocos.py)
     }),
   ],
   // as in the plan 00 spike: ORT Web finds its .wasm files relative to its own module, so it is not pre-bundled

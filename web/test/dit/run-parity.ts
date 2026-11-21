@@ -4,6 +4,7 @@
 // Loaded into the page by the Playwright tests in test/browser/ and test/browser-local/.
 import * as ort from "onnxruntime-web/webgpu";
 import { DiT } from "../../src/dit";
+import { errorSpread, withPlacement } from "../ort/diagnostics";
 import {
   compare,
   httpReader,
@@ -27,49 +28,6 @@ export interface DitParityOptions {
   debug?: boolean;
   /** Only the first steps of each chunk. */
   maxSteps?: number;
-}
-
-/** Node placement per session, read from ORT's verbose log while the sessions are created. */
-export interface Placement {
-  /** Per session in creation order (text, then step): execution provider to node count. */
-  sessions: Record<string, number>[];
-  /** "OpType (name)" of every node placed on the CPU, per session. */
-  cpuNodes: string[][];
-  /** CPU nodes whose op type is not shape arithmetic; the criterion allows none. */
-  offenders: string[];
-  /** MemcpyTransformer's "modified" flags; 1 means copy nodes were inserted. */
-  memcpyModified: number[];
-}
-
-// Ops that may sit on the CPU when they compute shapes (placement criterion, plan 01). The log gives op
-// types and names, not whether the inputs are shape tensors, so the names of any CPU nodes are reported too.
-const SHAPE_OPS = new Set(["Shape", "Gather", "Concat", "Range", "Slice", "Unsqueeze", "Squeeze", "Cast", "Reshape"]);
-
-export function parsePlacement(lines: string[]): Placement {
-  const sessions: Record<string, number>[] = [];
-  const cpuNodes: string[][] = [];
-  const memcpyModified: number[] = [];
-  let ep = "";
-  for (const line of lines) {
-    const memcpy = /GraphTransformer MemcpyTransformer modified: (\d)/.exec(line);
-    if (memcpy) memcpyModified.push(Number(memcpy[1]));
-    if (line.includes("VerifyEachNodeIsAssignedToAnEp] Node placements")) {
-      sessions.push({});
-      cpuNodes.push([]);
-      continue;
-    }
-    const placed = /(?:All nodes|Node\(s\)) placed on \[(\w+)\]\. Number of nodes: (\d+)/.exec(line);
-    const current = sessions.at(-1);
-    if (placed && current) {
-      ep = placed[1] ?? "";
-      current[ep] = Number(placed[2]);
-      continue;
-    }
-    const node = /VerifyEachNodeIsAssignedToAnEp\]\s{2,}(\S+ \(.*\))\s*$/.exec(line);
-    if (node && ep === "CPUExecutionProvider") cpuNodes.at(-1)?.push(node[1] ?? "");
-  }
-  const offenders = cpuNodes.flat().filter((n) => !SHAPE_OPS.has(n.split(" ")[0] ?? ""));
-  return { sessions, cpuNodes, offenders, memcpyModified };
 }
 
 function cpuTensor(t: Tensor): ort.Tensor {
@@ -97,31 +55,13 @@ export async function runDitParity(options: DitParityOptions) {
   const suffix = (options.attention ?? "unfused") === "unfused" ? "" : `_${options.attention}`;
   const stepFile = `${options.debug ? "step_debug" : "step"}${suffix}.onnx`;
 
-  // ORT prints node placement to the console at verbose level while it creates a session
-  const logLines: string[] = [];
-  const saved = {
-    log: console.log,
-    info: console.info,
-    warn: console.warn,
-    error: console.error,
-    debug: console.debug,
-  };
-  for (const level of Object.keys(saved) as (keyof typeof saved)[]) {
-    console[level] = (...args: unknown[]) => void logLines.push(args.map(String).join(" "));
-  }
-  ort.env.logLevel = "verbose";
-  let dit: DiT;
-  try {
-    dit = await DiT.create({
+  const { value: dit, placement } = await withPlacement(() =>
+    DiT.create({
       textUrl: `${options.modelBase}text.onnx`,
       stepUrl: `${options.modelBase}${stepFile}`,
       logSeverityLevel: 0,
-    });
-  } finally {
-    ort.env.logLevel = "warning";
-    Object.assign(console, saved);
-  }
-  const placement = parsePlacement(logLines);
+    }),
+  );
   const loadMs = performance.now() - t0;
 
   const device = await ort.env.webgpu.device;
@@ -195,22 +135,6 @@ export async function runDitParity(options: DitParityOptions) {
   }
   const r = report(results);
   const lines = r.text.split("\n");
-  // per check: the error as a fraction of its tolerance, so near misses show as well as failures
-  const ratios: Record<string, { name: string; relL2: number; maxAbs: number }[]> = {};
-  for (const x of results) {
-    if (!x.metrics || !x.tolerance) continue;
-    const rel = x.tolerance.relL2 && x.metrics.relL2 !== null ? x.metrics.relL2 / x.tolerance.relL2 : 0;
-    const abs = x.tolerance.maxAbs ? x.metrics.maxAbs / x.tolerance.maxAbs : 0;
-    (ratios[x.check] ??= []).push({ name: x.name, relL2: rel, maxAbs: abs });
-  }
-  const errorSpread = Object.fromEntries(
-    Object.entries(ratios).map(([check, xs]) => {
-      const rel = xs.map((x) => x.relL2).sort((a, b) => a - b);
-      const q = (p: number) => Number((rel[Math.min(rel.length - 1, Math.floor(p * rel.length))] ?? 0).toFixed(3));
-      const worst = [...xs].sort((a, b) => b.relL2 - a.relL2).slice(0, 3);
-      return [check, { count: xs.length, relL2Median: q(0.5), relL2P90: q(0.9), relL2Max: q(1), worst }];
-    }),
-  );
   return {
     caseName: options.caseName,
     attention: options.attention ?? "unfused",
@@ -221,7 +145,7 @@ export async function runDitParity(options: DitParityOptions) {
     failures: lines.filter((l) => l.startsWith("FAIL")),
     /** Every internal comparison, in order, when `debug` is set. */
     internals: options.debug ? lines.filter((l) => l.includes(" dit_internal ")) : [],
-    errorSpread,
+    errorSpread: errorSpread(results),
     placement,
     gpuErrors,
     loadMs: Math.round(loadMs),

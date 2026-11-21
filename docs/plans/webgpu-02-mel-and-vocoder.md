@@ -90,6 +90,7 @@ Out of scope:
   - Simple, and exact in float64.
 - **Option B.** The iSTFT inside the ONNX graph as a convolution with a fixed inverse-DFT kernel, as `runtime/triton_trtllm/scripts/conv_stft.py` does for TensorRT. That keeps everything on the GPU, but the edge handling has to be checked against `torch.istft(center=True)`.
 - Proposal: A first, timed. B only if A costs more than 5 percent of a chunk's time on the integrated GPU.
+- Decided 2026-11-21: option A. Readback plus istft is about 75 ms per 1,448-frame chunk on both GPUs, 0.1 to 0.25 percent of the chunk's time (step 5).
 
 ### D3. Vocoder graph boundary (proposal: backbone plus `head.out`, outputs `head_out`)
 
@@ -226,6 +227,28 @@ Out of scope:
 - Time the graph and the iSTFT per chunk on both GPUs, for D2.
 - Placement: no float compute node on the CPU and no inserted copy of an activation tensor. The GELU's op from step 3 is checked by name.
 - Done when: the real cases pass on both GPUs, and D2 is decided with numbers.
+- Result, 2026-11-21 (Chrome, ORT Web 1.31.1):
+  - Code:
+    - `web/src/vocoder/` (`Vocoder`: `create`, `run`, `decode`, `release`). `decode` returns the audio before the RMS rescale, and its timing.
+    - `web/test/vocoder/run-parity.ts`, the browser twin of `check_vocos_ort.py` plus the istft and rescale.
+    - `test/browser/vocoder-tiny.spec.ts` (CI) and `test/browser-local/vocoder.spec.ts` (`VOCODER_CASES`).
+    - `vite.config.ts` serves `build/webgpu/vocos/` at `/model/vocos/`.
+    - The DiT runner's placement parsing and error spread moved to `web/test/ort/diagnostics.ts` (`withPlacement`, `parsePlacement`, `errorSpread`), shared by both runners.
+  - Parity: every chunk of all 6 real cases passes `vocoder.backbone`, `vocoder.stft_complex` and `vocoder.wav` on both GPUs. The tiny case passes in the CI test.
+    - Worst, as a fraction of the tolerance: `vocoder.stft_complex` 5.0 percent on NVIDIA and 4.6 percent on Intel, and `vocoder.wav` 4.3 and 3.9 percent, all at en-short chunk 0 (the same mel as en-multi's).
+  - Placement: all 69 nodes on the WebGPU EP, none on the CPU, on both GPUs. The 8 exact `Gelu` nodes run on the GPU, so R6's fallback is not needed.
+  - Time per chunk, median of 5 (ms):
+
+    | GPU | frames | graph | readback | istft |
+    |---|---|---|---|---|
+    | NVIDIA | 1448 | 15 | 6 | 70 |
+    | NVIDIA | 470 | 7.5 | 4.7 | 21 |
+    | Intel | 1448 | 47 | 5 | 67 to 73 |
+    | Intel | 470 | 18.5 | 4.4 | 20 |
+
+    The graph time is `session.run` until the GPU finishes. The readback copies 1448 x 1026 floats (5.9 MB).
+  - **D2 decided: option A.** The readback and the istft together cost about 75 ms for a 1,448-frame chunk on either GPU. A chunk's DiT steps take about 30 s on NVIDIA and 85 s on Intel (plan 01), so that is 0.1 to 0.25 percent, far below the 5 percent that would call for option B.
+  - The istft is still the largest part of the vocoder's time, 4 to 5 times the graph on NVIDIA. If plan 07 wants it gone from the critical path, there are two ways. It can run in a worker while the next chunk's DiT steps run. Or a packed real FFT would halve it.
 
 ### Step 6. Close out
 
