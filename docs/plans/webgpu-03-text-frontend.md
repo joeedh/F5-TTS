@@ -145,6 +145,20 @@ Needed: enough real text to make "zero mismatches" mean something. Proposal:
 - Output as JSON next to the corpus. The edge-case output is committed; the large corpus's is not.
 - Where the golden fields are: `max_chars`, `chunks` and `ref_text_spaced` are in the `text` stage; `joined_text` and `tokens` are in `manifest.chunks[i]`.
 - Done when: the dump runs on the edge cases and on the golden cases, and reproduces their `max_chars`, `chunks`, `ref_text_spaced`, `joined_text` and `tokens` exactly.
+- Result, 2026-11-21:
+  - `tools/webgpu/text_reference.py` (in `.venv313`) runs upstream's own `convert_char_to_pinyin` and `chunk_text`. It wraps the `rjieba.cut` and `lazy_pinyin` they call, to record each call.
+    - The reference fix-up, the trailing-space rule and the `max_chars` line sit inside larger functions, so they are copied and asserted against upstream's source, as `make_golden.py` does.
+    - The `len(seg_) == len(seg)` assertion never fired.
+  - Golden cases: all 7 reproduce exactly: `prep.ref_text`, `max_chars`, `chunks`, `ref_text_spaced`, every chunk's `joined_text` and `tokens`, and the ids in `c*.dit.text_ids`.
+  - Edge cases: `testdata/webgpu/text/edge_cases.txt`, 219 inputs in the categories D4 lists. The dump, `edge_cases.json` (241 KB), is committed and deterministic. `\u{XXXX}` in the text file stands for a code point, so invisible characters and trailing spaces survive editors.
+  - Versions recorded: rjieba 0.2.2, jieba-rs 0.11.0 (read from rjieba's SBOM), pypinyin 0.55.0.
+  - The dump confirms the plan's predictions:
+    - `hello-world` and `U.S.A` stay single segments; `don't` splits into `don`, `'`, `t`; `C++` and `C#` stay whole.
+    - `〇` gives `ling2` with no space; `ㄅ` gets a space and then itself.
+    - `版本` gives `ban3 ben3`; `一次` gives `yi1 ci4`; `两点论` stays `liang3 dian3 lun4`.
+    - U+F900 passes through. Its look-alike U+8C48 is an ordinary ideograph (`qi3`). Both are in the edge cases, and jieba segments them differently next to `㐀`.
+    - 66 tokens across the edge cases are not in the vocab and map to 0. Examples: the neutral-tone `ge` and `bu`, tab, CR and `}`.
+  - The Seed-TTS corpus: the `BytedanceSpeech/seed-tts-eval` repo has no licence file, and its README states no terms for the test set (a Google Drive download). Per D4, this went back to the user. Decided 2026-11-21: use the Seed-TTS lists anyway, locally and uncommitted, as upstream's own eval code does. The texts go in `testdata/webgpu/text/corpus/`, which git ignores.
 
 ### Step 2. String functions
 

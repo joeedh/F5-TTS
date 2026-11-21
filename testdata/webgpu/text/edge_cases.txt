@@ -1,0 +1,242 @@
+# Plan 03 edge cases for the text front end. One input per line; lines starting with # and empty lines are
+# skipped. \u{XXXX} stands for that code point (for invisible characters); everything else is literal.
+# tools/webgpu/text_reference.py dumps what upstream makes of each line; web/test/text/ compares with it.
+
+# --- polyphones in context ---
+我们银行的行长重新安排了长期计划。
+他长得很高，头发也长了。
+这个音乐很好听，我很快乐。
+重庆的重量级选手重新上场。
+银行里的人行色匆匆。
+他背着包，背诵课文。
+我们都觉得这个觉睡得好。
+还是把书还给他吧。
+这道题的答案很难，他遭了难。
+朝阳区的人朝着太阳走。
+数一数这些数字。
+他得了第一名，你得努力。
+差不多了，出差的差旅费。
+种子种在地里。
+调查之后调整了音调。
+大夫说这个大小正好。
+着急的时候他着凉了，睡着了。
+为了你，我为此努力。
+曾经的曾先生。
+单于和单先生。
+# --- 一 and 不 sandhi, within and across mmseg words ---
+一次
+一个
+一天
+一样
+一年
+一起
+一下
+不是
+不要
+不对
+不好
+不去
+看一看
+想一想
+一模一样
+一心一意
+不三不四
+不知不觉
+他一次也没来过。
+第一次的一千一百一十一个。
+# --- third-tone chains, including those that stay 3-3-x ---
+版本
+两点论
+九尾狐
+五斗柜
+展览馆
+我很好
+你也想买点儿水果吗？
+老鼠跑了。
+所以我也想走了。
+请你给我讲讲。
+小老虎
+冷水澡
+# --- mixed Chinese and Latin, digits ---
+明天用AI和GPU再试一次，共3个版本。
+iPhone 15 Pro的价格是7999元。
+我用Python写了一个CNN模型。
+第3章讲的是HTTP/2协议。
+温度是-5.5度，湿度80%。
+2024年11月18日星期一
+他的电话是138-0013-8000。
+Wi-Fi密码是abc123。
+这是v1.2.3版本。
+会议在3:30开始。
+# --- English that jieba splits or keeps ---
+Hello world.
+hello-world
+The well-known author wrote a state-of-the-art book.
+Version v1.2.3 is out.
+It grew 3.5% this year.
+For example, e.g. this one.
+He moved to the U.S.A. last year.
+The variable foo_bar is unused.
+a-b-c-
+C++ and C# are languages, and so is c++.
+AT&T is a company.
+I don't think so, she's right.
+It's 5 o'clock.
+Rock 'n' roll.
+The quick brown fox jumps over the lazy dog.
+Email me at someone@example.com please.
+Visit https://example.com/path?x=1&y=2 now.
+Numbers like 1,000,000 and 3.14159.
+Mr. Smith, Dr. Jones and Ms. Lee met at 10 a.m.
+"Quoted text," he said.
+Wait... what?!
+(parenthesised) [bracketed] {braced}
+CamelCaseWord and snake_case_word and kebab-case-word.
+x86_64 and arm64-v8a builds.
+a.b.c and a_b_c and a-b-c.
+2.0.1-beta.3
+#hashtag @mention
+tab\u{9}separated\u{9}words
+Line one.\u{d}\u{a}Line two.
+Line one.\u{a}Line two.
+# --- full-width and half-width punctuation, curly quotes, semicolons ---
+你好，世界！
+你好,世界!
+他说：“你好。”
+他说:"你好."
+‘单引号’和“双引号”
+“Curly quotes” and ‘single ones’.
+第一；第二；第三。
+first; second; third.
+问号？感叹号！
+句号。逗号，顿号、分号；冒号：
+（括号）【方括号】《书名号》
+省略号……破折号——
+全角ＡＢＣ１２３
+半角ABC123
+# --- the range gaps between is_chinese and pypinyin's Han range ---
+〇
+二〇二四年
+ㄅㄆㄇㄈ
+㈠㈡㈢
+䷀䷁
+\u{f900}\u{3400}
+\u{f900}
+豈㐀
+豈
+㐀
+𠮶
+𠀀
+中文𠮶字
+# --- emoji and characters outside the BMP ---
+今天天气很好😀
+Good morning 🌅!
+👨‍👩‍👧 family
+🇨🇳🇺🇸
+😀
+a😀b
+中😀文
+# --- whitespace that Python and JS classify differently ---
+a\u{1c}b
+a\u{1d}b
+a\u{1e}b
+a\u{1f}b
+a\u{85}b
+a\u{feff}b
+\u{feff}leading BOM.
+trailing space. \u{85}
+中文\u{3000}全角空格
+non\u{a0}breaking space
+en\u{2002}space and em\u{2003}space
+zero\u{200b}width
+# --- reference-text fix-up endings ---
+Ends with a full stop.
+Ends with a full stop and space.\u{20}
+Ends with no punctuation
+Ends with a question mark?
+以句号结尾。
+没有标点结尾
+以问号结尾？
+Ends with an ellipsis...
+Ends with a quote."
+# --- chunk boundaries (the dump chunks every line at several max_chars) ---
+One. Two. Three. Four. Five. Six. Seven. Eight. Nine. Ten.
+一。二。三。四。五。六。七。八。九。十。
+This sentence is exactly long enough. And this one follows it closely.
+短句。A short one. 又一句。Another one.
+No punctuation at all in this rather long line of plain words that goes on and on
+Semicolons; colons: commas, and full stops. All of them!
+中文逗号，中文分号；中文冒号：中文句号。中文问号？中文叹号！
+Mixed,no space after comma.And none after this one.
+Spaces   between   words   and   after.   Punctuation.
+A sentence ending in a CJK word 中文. Then English.
+# --- longer realistic passages ---
+床前明月光，疑是地上霜。举头望明月，低头思故乡。
+人工智能正在改变我们的生活方式，从智能手机到自动驾驶汽车，无处不在。
+北京是中华人民共和国的首都，也是全国的政治、文化中心。
+他在银行工作了十年，后来成为了行长。
+我们一起去公园散步吧，那里的风景很美。
+这件事情我们需要从长计议，不能操之过急。
+小明的爸爸是一名医生，妈妈是一名老师。
+虽然下着大雨，但是他还是坚持去上学。
+The rain in Spain stays mainly in the plain.
+To be, or not to be, that is the question.
+She sells seashells by the seashore.
+In 1969, Neil Armstrong walked on the Moon.
+Some call me nature, others call me mother nature.
+对，这就是我，万人敬仰的太乙真人。
+# --- characters and symbols near byte-length boundaries ---
+é
+café
+naïve résumé
+Ångström
+ß and ÿ
+ĀāĒē
+Ω and π and ∞
+→ arrows ←
+€100 and £50 and ¥1000
+© 2024 ™ ®
+°C and µs
+½ ¼ ¾
+# --- single characters and tiny inputs ---
+a
+A
+1
+.
+。
+，
+中
+\u{20}
+# --- digits and pinyin-adjacent cases ---
+123
+一二三
+壹贰叁
+第1名
+3个人
+100%
+1/2
+3.14
+# --- names and rare characters ---
+诸葛亮
+欧阳修
+司马迁
+尉迟恭
+单雄信
+仇先生
+解先生
+曾国藩
+乐毅
+朴先生
+# --- repeated characters and reduplication ---
+妈妈
+爸爸
+哈哈哈哈
+谢谢谢谢你
+高高兴兴
+干干净净
+研究研究
+# --- semicolon translation and quotes in context ---
+他说;我们走吧
+“好的”，她说；“我们走”。
+'single' and "double" quotes.
+It’s a dog’s life.

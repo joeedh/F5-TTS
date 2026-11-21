@@ -183,6 +183,9 @@ testdata/webgpu/*
 !testdata/webgpu/tiny/
 # plan 02: audio fixtures from tools/webgpu/export_audio_fixtures.py
 !testdata/webgpu/audio-fixtures/
+# plan 03: the edge cases and their dump are committed; a downloaded corpus goes in corpus/ and is not
+!testdata/webgpu/text/
+testdata/webgpu/text/corpus/
 web/test-results/
 web/playwright-report/
 !testdata/webgpu/tolerances.json
