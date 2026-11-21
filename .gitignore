@@ -181,6 +181,8 @@ web/spikes/ort-block/results/*.log
 # plan 00 golden data: only the tiny case is committed; the rest is rebuilt by tools/webgpu/make_golden.py
 testdata/webgpu/*
 !testdata/webgpu/tiny/
+# plan 02: audio fixtures from tools/webgpu/export_audio_fixtures.py
+!testdata/webgpu/audio-fixtures/
 web/test-results/
 web/playwright-report/
 !testdata/webgpu/tolerances.json

@@ -126,6 +126,13 @@ Out of scope:
 - Test fixture: torchaudio's filterbank (513 x 100) exported by a small `tools/webgpu/export_audio_fixtures.py` and committed (200 KB).
 - Tests: Vitest against `mel.ref` of the tiny case (committed) and, locally, of every real case, with `mel.log_masked` and `mel.linear`.
 - Done when: all cases pass both mel checks.
+- Result, 2026-11-21:
+  - Code: `web/src/audio/fft.ts` (radix-2 complex FFT in float64, reused by step 4) and `web/src/audio/mel.ts` (`logMel`, `melFilterbank`, `hannWindow`). Tests in `web/test/audio/mel.test.ts`.
+  - Fixture: `testdata/webgpu/audio-fixtures/mel_fbank.npy`, the `mel_scale.fb` of the same `MelSpectrogram` upstream builds, written by `tools/webgpu/export_audio_fixtures.py` (205 KB).
+  - The filterbank reproduces torchaudio's float32 arithmetic (`Math.fround` at each step, and `torch.linspace`'s two-ended fill), not D1's plain float64. With float64, `mel.linear` was 1.9e-6, 10 times the CPU-against-CUDA floor (1.9e-7); with torchaudio's own matrix it was 1.4e-7. The float64 matrix is 9.0e-6 away from torchaudio's, and that is the whole gap (`docs/debugging.md`).
+  - The emulation matches the fixture to 3.8e-6 at worst, with the same zero pattern. The rest is torch's vectorised float32 `pow`, which rounds 5 of the 102 centre frequencies differently from a correctly rounded one. Pinning those 5 values would close it; not done, since the mel is already far inside its tolerance.
+  - All 7 cases pass, the tiny one in CI. Worst over the real cases: `mel.linear` rel L2 4.2e-7 (tolerance 1e-5), `mel.log_masked` max abs 1.6e-3 (tolerance 0.1; zh-short).
+  - Speed in Node: about 5 ms per second of audio, so about 70 ms for a 12 s reference. Most of it is the dense filterbank product; skipping its zeros would cut it if it ever matters.
 
 ### Step 2. Reference preparation
 

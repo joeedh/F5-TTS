@@ -2,6 +2,13 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-21: a float64 mel filterbank is 10 times further from the golden mel than torchaudio's (plan 02, step 1)
+
+- **Symptom:** the TypeScript mel passed, but `mel.linear` sat at rel L2 1.9e-6, 10 times the CPU-against-CUDA floor of 1.9e-7. The FFT and window are float64, so they were expected to land at the floor.
+- **Cause:** torchaudio builds the mel filterbank in float32 (`torch.linspace`, then `10 ** x`, then the triangle slopes). The same formula in float64 is up to 9.0e-6 away from torchaudio's matrix, and the mel follows the matrix, not the exact maths.
+- **Fix:** `melFilterbank` in `web/src/audio/mel.ts` rounds every step with `Math.fround`, and fills `linspace` from both ends as torch's CPU kernel does. That brings `mel.linear` to 4.2e-7. The remaining gap is torch's vectorised float32 `pow`, which differs from a correctly rounded one at 5 of 102 points; torch's own scalar `pow` gives the same 5 differences.
+- **Diagnose:** run the port with the reference's own constant (here torchaudio's matrix, exported as `testdata/webgpu/audio-fixtures/mel_fbank.npy`). If the error drops to the floor, the constant is the problem, not the algorithm. Then compare each intermediate in numpy float32 to find the step that rounds differently.
+
 ## 2026-11-19: ORT Web graph capture fails with a `createBindGroup` error (plan 01, step 4)
 
 - **Symptom:** with `enableGraphCapture: true`, the first `session.run()` throws `Failed to execute 'createBindGroup' on 'GPUDevice': ... Failed to read the 'buffer' property from 'GPUBufferBinding': Required member is undefined.` Seen in ORT Web 1.31.1, Chrome and Edge, NVIDIA and Intel.
