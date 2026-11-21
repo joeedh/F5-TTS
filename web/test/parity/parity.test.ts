@@ -43,6 +43,7 @@ describe("checksFor", () => {
     ["mel.ref", ["mel.log_masked", "mel.linear"]],
     ["c1.vocoder.head_out", ["vocoder.head_out", "vocoder.stft_complex"]],
     ["c0.dit.text_ids", ["exact"]],
+    ["prep.audio", ["exact"]],
     ["c0.noise.y0", []],
     ["c0.dit.s00.x", []],
     ["c0.dit.step_cond", []],

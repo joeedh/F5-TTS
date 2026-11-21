@@ -2,6 +2,12 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-21: a silent reference gives upstream an all-NaN reference (plan 02, step 2)
+
+- **Symptom:** `export_audio_fixtures.py`'s `silence-only` fixture (1.5 s of zeros) prepares fine, to pydub's 50 ms of silence at 11025 Hz. But its reference after `infer_batch_process` is all NaN.
+- **Cause:** the rms is 0, which is below 0.1, so upstream scales by `target_rms / rms` (`utils_infer.py:479`), a division by zero.
+- **Not fixed here:** the port reproduces upstream, NaN included. Plan 06 should refuse a reference with no sound before it gets this far.
+
 ## 2026-11-21: a float64 mel filterbank is 10 times further from the golden mel than torchaudio's (plan 02, step 1)
 
 - **Symptom:** the TypeScript mel passed, but `mel.linear` sat at rel L2 1.9e-6, 10 times the CPU-against-CUDA floor of 1.9e-7. The FFT and window are float64, so they were expected to land at the floor.

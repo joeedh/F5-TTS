@@ -41,7 +41,7 @@ STAGE_ORDER = [
     "vocoder",
     "final",
 ]
-INFORMATIONAL = {"audio.resample", "vocoder.head_out"}
+INFORMATIONAL = {"vocoder.head_out"}
 LOG_MEL_MIN = math.log(1e-4)
 
 
@@ -54,7 +54,7 @@ def checks_for(name: str) -> list[str]:
         return ["audio.resample"]
     if name == "mel.ref":
         return ["mel.log_masked", "mel.linear"]
-    if n == "dit.text_ids":
+    if n == "dit.text_ids" or name == "prep.audio":
         return ["exact"]
     if re.fullmatch(r"dit\.s\d+\.out_(cond|uncond)", n):
         return ["dit.out"]

@@ -1,0 +1,164 @@
+{
+  "quiet-44k-stereo": {
+    "note": "44.1 kHz stereo at rms about 0.02: downmix, RMS raise, resample, and keep_silence overlap",
+    "input": {
+      "sample_rate": 44100,
+      "channels": 2,
+      "frames": 72765
+    },
+    "prep": {
+      "sample_rate": 44100,
+      "channels": 2,
+      "frames": 68792
+    },
+    "audio": {
+      "rms": 0.005281281657516956,
+      "raised": true,
+      "ref": true
+    }
+  },
+  "silence-only": {
+    "note": "1.5 s of silence: split_on_silence returns nothing, so the output is pydub's 50 ms at 11025 Hz. Upstream then divides by an rms of 0, so there is no reference to compare",
+    "input": {
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 36000
+    },
+    "prep": {
+      "sample_rate": 11025,
+      "channels": 1,
+      "frames": 551
+    },
+    "audio": {
+      "rms": 0.0,
+      "raised": true,
+      "ref": false
+    }
+  },
+  "hard-cut": {
+    "note": "12.4 s with no silence at all: both splits fail and the audio is cut at 12 s",
+    "input": {
+      "sample_rate": 11025,
+      "channels": 1,
+      "frames": 136710
+    },
+    "prep": {
+      "sample_rate": 11025,
+      "channels": 1,
+      "frames": 132851
+    },
+    "audio": {
+      "rms": 0.032007426023483276,
+      "raised": true,
+      "ref": false
+    }
+  },
+  "join-6-12": {
+    "note": "three 4 s bursts: the join stops once the result is over 6 s and the next part takes it over 12 s",
+    "input": {
+      "sample_rate": 11025,
+      "channels": 1,
+      "frames": 158760
+    },
+    "prep": {
+      "sample_rate": 11025,
+      "channels": 1,
+      "frames": 101981
+    },
+    "audio": {
+      "rms": 0.059645336121320724,
+      "raised": true,
+      "ref": false
+    }
+  },
+  "mid-silence": {
+    "note": "a 2.5 s silence in the middle, cut down to the kept 1 s on each side",
+    "input": {
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 79200
+    },
+    "prep": {
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 68398
+    },
+    "audio": {
+      "rms": 0.03561176359653473,
+      "raised": true,
+      "ref": false
+    }
+  },
+  "thresholds": {
+    "note": "rms exactly at the thresholds: 103 is silent at -50 dBFS and 104 is not; 260 is trimmed at -42 dBFS and 261 is not",
+    "input": {
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 103200
+    },
+    "prep": {
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 99598
+    },
+    "audio": {
+      "rms": 0.030888011679053307,
+      "raised": true,
+      "ref": false
+    }
+  },
+  "round-half-down": {
+    "note": "18012 frames is 750.5 ms, which Python rounds to 750: the last 12 frames are dropped",
+    "input": {
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 18012
+    },
+    "prep": {
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 19198
+    },
+    "audio": {
+      "rms": 0.0648098811507225,
+      "raised": true,
+      "ref": false
+    }
+  },
+  "round-half-up": {
+    "note": "18036 frames is 751.5 ms, rounded to 752: the slice overshoots and pydub pads 12 zero frames",
+    "input": {
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 18036
+    },
+    "prep": {
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 19246
+    },
+    "audio": {
+      "rms": 0.0643395259976387,
+      "raised": true,
+      "ref": false
+    }
+  },
+  "low-rate-8k": {
+    "note": "8 kHz: pydub's join upsamples it to 11025 Hz with audioop.ratecv",
+    "input": {
+      "sample_rate": 8000,
+      "channels": 1,
+      "frames": 4800
+    },
+    "prep": {
+      "sample_rate": 11025,
+      "channels": 1,
+      "frames": 7166
+    },
+    "audio": {
+      "rms": 0.062408220022916794,
+      "raised": true,
+      "ref": true
+    }
+  }
+}

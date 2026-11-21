@@ -20,7 +20,7 @@ export const STAGE_ORDER = [
 ];
 
 /** Checks that are reported but never fail (see the notes in tolerances.json). */
-export const INFORMATIONAL = new Set(["audio.resample", "vocoder.head_out"]);
+export const INFORMATIONAL = new Set(["vocoder.head_out"]);
 
 const LOG_MEL_MIN = Math.log(1e-4);
 
@@ -34,7 +34,7 @@ export function checksFor(name: string): string[] {
   if (n === "plan.t") return ["plan.t"];
   if (name === "audio.ref") return ["audio.resample"];
   if (name === "mel.ref") return ["mel.log_masked", "mel.linear"];
-  if (n === "dit.text_ids") return ["exact"];
+  if (n === "dit.text_ids" || name === "prep.audio") return ["exact"];
   if (/^dit\.s\d+\.out_(cond|uncond)$/.test(n)) return ["dit.out"];
   const internal = /^dit_internal\.(?:s\d+\.)?([a-z_]+?)(\d+)?(?:_uncond)?$/.exec(n);
   if (internal) return [internal[1] === "block" ? "dit_internal.block" : `dit_internal.${internal[1]}`];

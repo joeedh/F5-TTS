@@ -101,7 +101,7 @@ Out of scope:
 - Web Audio can resample (`OfflineAudioContext`), but its algorithm is browser-specific and would not match the golden `audio.ref`.
 - torchaudio's resampler is a fixed windowed-sinc kernel: about 60 lines with the kernel construction.
   - The TS kernel is built in float64 and each tap rounded with `Math.fround`, to match torchaudio's float32 cache.
-- Tolerance: plan 00's rule on the measured CPU-against-CUDA floor (1.8e-7 max abs) gives 1e-6. The port must meet that; the tolerance is not re-derived from the port.
+- Tolerance: plan 00's rule on the measured CPU-against-CUDA floor (1.8e-7 max abs) gives 1e-5, the value already in `tolerances.json`. (This line said 1e-6 until 2026-11-21; ten times the floor rounds up to 1e-5.) The port must meet that; the tolerance is not re-derived from the port.
 - The input is decoded PCM at its own sample rate. Plan 06 must decode without the browser resampling it. For example, use `decodeAudioData` on an `AudioContext` created at the file's rate, or parse wav directly.
 
 ### D5. Silence trim and clip (proposal: port pydub's algorithm, exact for 16-bit PCM wav)
@@ -109,7 +109,7 @@ Out of scope:
 - R3 in plan 00 said the browser "cannot match exactly". On reading pydub, it can, for 16-bit PCM wav at 11025 Hz or above, provided the port reproduces every detail in "pydub details that exact parity depends on" above. That list is the exactness contract.
 - Scope of exact parity:
   - 16-bit PCM wav, any channel count, 11025 Hz or above.
-  - Everything else (24-bit and float wav, compressed formats, rates below 11025 Hz) is approximate. The port converts it to int16 and proceeds, and the UI does not promise identical output. With 32-bit samples the sum of squares is also no longer exact in float64.
+  - Everything else (24-bit and float wav, compressed formats, rates below 11025 Hz) is approximate. (Step 2 made rates below 11025 Hz exact too, by porting `ratecv` in full.) The port converts it to int16 and proceeds, and the UI does not promise identical output. With 32-bit samples the sum of squares is also no longer exact in float64.
 - Input: interleaved int16 samples plus `channels` and `sampleRate`.
 - The appended silence reproduces `ratecv`'s output length for 551 zero frames at 11025 Hz converted to the input rate. The values are all zeros, so only the length matters.
 - Performance: `detect_silence` rescans a 1000 ms window every 10 ms, which is billions of operations for a multi-minute upload. The port uses a prefix sum of squared samples. For int16 the sums stay below 2^53, so float64 is exact and the result is identical, in linear time.
@@ -149,8 +149,31 @@ Out of scope:
   - One fixture for each item of D5's exactness contract that the above miss. These are mainly frame counts at 12 mod 24, where Python's `round` and JS's `Math.round` disagree, and a slice that overshoots and gets padded.
 - Tests:
   - `prep.audio` exactly, from `input.wav` for every golden case and every fixture.
-  - `audio.ref` from `prep.audio`, with `audio.resample` at 1e-6 (D4).
+  - `audio.ref` from `prep.audio`, with `audio.resample` at 1e-5 (D4).
 - Done when: every golden case and fixture passes both, and the fixtures run in CI.
+- Result, 2026-11-21:
+  - Code, all in `web/src/audio/`:
+    - `pydub.ts`: `Segment` (pydub's slicing, length, rms, dBFS, append) plus `audioop.ratecv`, `split_on_silence`, `detect_nonsilent`, `detect_silence` and `detect_leading_silence`.
+    - `prepare.ts`: `trimAndClip` and `downmixRmsResample`, in upstream's order.
+    - `resample.ts`: torchaudio's sinc resampler.
+    - `wav.ts`: a 16-bit PCM wav reader, used by the tests; plan 06 can reuse it.
+  - Golden cases: all 7 give `prep.audio` exactly. `audio.ref` passes on all of them. On en-prep, the only one that resamples, the worst error is 1.8e-7, equal to the CPU-against-CUDA floor. The other cases match exactly, since they need no resample. `rms` is within one float32 ulp, and `raised` matches.
+  - `audio.resample` is no longer informational, in both runners. `prep.audio` is an exact check in `tolerances.json`, `measure_floor.py` and both runners' `checksFor`.
+  - Fixtures: `tools/webgpu/export_audio_fixtures.py` writes 9 synthetic 16-bit wavs with upstream's output for each (`testdata/webgpu/audio-fixtures/prep/`, 2.8 MB, deterministic). All 9 match exactly in CI:
+    - `quiet-44k-stereo`: downmix, RMS raise, resample, and overlapping `keep_silence`.
+    - `silence-only`: nothing survives the split, so the output is pydub's 50 ms at 11025 Hz (551 frames).
+    - `hard-cut`: the 12 s cut.
+    - `join-6-12`: the join loop stops after 9.25 s.
+    - `mid-silence`: a long silence in the middle.
+    - `thresholds`: rms 103 against 104 at -50 dBFS, and 260 against 261 at -42 dBFS.
+    - `round-half-down` and `round-half-up`: 750.5 and 751.5 ms, where Python's `round` and JS's `Math.round` disagree. The second also overshoots and is padded.
+    - `low-rate-8k`: pydub upsamples it to 11025 Hz with `ratecv`.
+  - Two of them also check the resampled reference against torchaudio: `quiet-44k-stereo` and `low-rate-8k`. `silence-only` cannot, see below.
+  - Each contract rule was checked by breaking it in the port and seeing a fixture fail: `Math.round` for `round`, no slice padding, an integer threshold, and a dB offset.
+  - The fixtures are longer than the 1 s the plan aimed for: the 12 s rules need more than 12 s. They use 11025 Hz, the lowest exact rate, to stay small.
+  - Exact parity now also covers rates below 11025 Hz, since `ratecv` is ported in full.
+  - Found: a silent reference makes upstream divide by an rms of 0, so its `audio.ref` is all NaN. Plan 06 should refuse such input; the port reproduces the NaN.
+  - Speed in Node, en-prep: `trimAndClip` takes 7 ms on the 16 s 44.1 kHz stereo input, and `downmixRmsResample` 28 ms on the 7 s result.
 
 ### Step 3. Vocoder export and CPU parity
 
@@ -215,7 +238,7 @@ A fresh agent given only this file reviewed the first draft against the code, py
   They are now listed as the exactness contract, each with a test.
 - **Format handling was wrong.** pydub keeps 24-bit audio as 32-bit and sends float wav through ffmpeg, so it does not convert to int16. Exact parity is now limited to 16-bit PCM wav at 11025 Hz or above. The port's API takes interleaved samples and a channel count, because `en-prep` is stereo.
 - **The iSTFT check was too loose to catch a wrong window or envelope.** A new `vocoder.istft` check at rel_l2 1e-5 is used for the head-to-wav test.
-- **The resample tolerance was circular.** It is now the floor-derived 1e-6, and the port must meet it. The kernel is rounded to float32 as torchaudio's is.
+- **The resample tolerance was circular.** It is now the floor-derived 1e-5 (first written here as 1e-6, corrected 2026-11-21), and the port must meet it. The kernel is rounded to float32 as torchaudio's is.
 - **CI exercised none of resample, downmix, RMS raise or clipping,** and the golden set has only 4 distinct inputs. Synthetic fixtures are added, including one that reaches the 12 s hard cut.
 - **`detect_silence` is quadratic in practice.** The port uses a prefix sum instead, which gives identical results for int16.
 - **Smaller fixes:**

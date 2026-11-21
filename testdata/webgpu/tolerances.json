@@ -17,6 +17,7 @@
     "text.chunks",
     "text.tokens",
     "dit.text_ids",
+    "prep.audio",
     "plan.duration",
     "plan.ref_audio_len",
     "plan.local_speed"
@@ -30,7 +31,7 @@
       "floor_max_abs_at": "en-epss16/c0.plan.t"
     },
     "audio.resample": {
-      "note": "informational; plan 02 decides (a different resampler may be accepted)",
+      "note": "24 kHz reference after downmix, RMS raise and resample (plan 02 ports torchaudio's resampler)",
       "max_abs": 1e-05,
       "floor_max_abs": 1.7881393432617188e-07,
       "floor_max_abs_at": "en-prep/audio.ref"

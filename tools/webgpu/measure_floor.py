@@ -235,7 +235,10 @@ def measure_case(name: str, model: Any, vocoder: Any, dev: torch.device, fl: Flo
 # check -> (metrics the pass check uses, how to read it)
 CHECKS: dict[str, tuple[list[str], str]] = {
     "plan.t": (["max_abs"], "time grid after sway"),
-    "audio.resample": (["max_abs"], "informational; plan 02 decides (a different resampler may be accepted)"),
+    "audio.resample": (
+        ["max_abs"],
+        "24 kHz reference after downmix, RMS raise and resample (plan 02 ports torchaudio's resampler)",
+    ),
     "mel.log_masked": (["max_abs"], "log mel, bins with golden linear magnitude above 1e-4"),
     "mel.linear": (["rel_l2"], "linear mel magnitude, exp of the log mel"),
     "dit.out": (["rel_l2", "max_abs"], "one DiT call (cond or uncond half), golden inputs"),
@@ -328,6 +331,7 @@ def write_tolerances(fl: Floors, names: list[str], gpu: str) -> None:
             "text.chunks",
             "text.tokens",
             "dit.text_ids",
+            "prep.audio",
             "plan.duration",
             "plan.ref_audio_len",
             "plan.local_speed",
