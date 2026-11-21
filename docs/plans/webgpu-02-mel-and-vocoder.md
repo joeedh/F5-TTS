@@ -1,6 +1,6 @@
 # Plan 02: Mel spectrogram, reference audio and vocoder
 
-Status: `plan pressure-tested` (written 2026-11-18; review findings folded in, see the end of this file). Depends on: plan 00 (done). Blocks: plans 04 and 05.
+Status: `done` 2026-11-21 (written 2026-11-18; review findings folded in, see the end of this file). Depends on: plan 00 (done). Blocks: plans 04 and 05. Hand-offs to plans 04, 05 and 06 are under step 6.
 
 Task list: [webgpu-port-tasks.md](webgpu-port-tasks.md). Golden data and tolerances: [webgpu-00-scope-and-parity.md](webgpu-00-scope-and-parity.md).
 
@@ -257,6 +257,36 @@ Out of scope:
 - Hand off to plan 05: the vocoder's size and fp32 timing.
 - Hand off to plan 06: the input formats that get exact parity, and the decoding requirement in D4.
 - `docs/debugging.md` entries; `docs/shape-ledger.md` entries for layout slips. The mel is (b, d, n) and the backbone output is (b, n, d), so this boundary is where they happen.
+- Result, 2026-11-21: plan 02 is done. Findings are in `docs/research/webgpu-audio.md`; the hand-offs are below.
+  - No `docs/shape-ledger.md` entries. No layout slip happened at the mel/backbone boundary: the golden layouts are fixed in the manifest, and `compare` refuses a wrong shape before it compares values. The one layout hazard left is plan 04's, below.
+  - `docs/debugging.md` has three entries from this plan:
+    - The float32 filterbank.
+    - The all-NaN reference for silent input.
+    - The exporter's emoji on a Windows pipe.
+
+### Hand-off to plan 04 (sampler and pipeline)
+
+- Functions, all synchronous except the vocoder:
+  - `trimAndClip(pcm: Pcm): Pcm` and `downmixRmsResample(pcm: Pcm): Reference` in `web/src/audio/prepare.ts`. `Reference` is `{ audio: Float32Array (24 kHz mono), rms, raised }`.
+  - `logMel(audio): { data, frames }` in `mel.ts`. `data` is (100, frames) row-major, mel-major.
+  - `Vocoder.create({ url })`, then `decode(mel: ort.Tensor)` giving `{ wave, timing }` (`web/src/vocoder/`). The mel is (1, 100, T); `wave` is (T - 1) * 256 samples, before the rescale.
+  - `rescaleOutput(wave, reference)` in `output.ts`.
+- The `rms`/`raised` contract: `rms` is measured on the downmixed reference before any raise, in float32. When `raised`, the reference is scaled up to RMS 0.1, and every generated chunk must be scaled by `rms / 0.1` after the vocoder (`rescaleOutput`). Keep the `Reference` for the whole generation.
+- Layouts: `logMel` gives (100, frames), but the DiT's `step_cond` and `x` are (1, n, 100) (plan 01). The vocoder wants (1, 100, T) again, cropped to the generated frames. So the pipeline transposes twice. It also crops `ref_audio_len = samples / 256` frames, rounded down, which is one fewer than the reference mel has (plan 01's frame-0 note).
+- Cost per chunk: under 100 ms for the vocoder, readback and istft together on either GPU. `decode` reports the split.
+
+### Hand-off to plan 05 (weights and precision)
+
+- `vocos.onnx`: 54.3 MB fp32, one file, no external data. Rebuilt by `tools/webgpu/export_vocos.py --model base`.
+- fp32 time per 1,448-frame chunk: graph 15 ms on NVIDIA and 47 ms on Intel; readback 5 to 6 ms. fp16 would save little time here; its case is download size.
+- The exact GELU runs on WebGPU as `Gelu`; an fp16 export must keep it exact (`approximate="none"`).
+
+### Hand-off to plan 06 (web app)
+
+- Exact parity with upstream holds for 16-bit PCM wav at any rate and channel count, through `parseWav`.
+- Anything else (24-bit, 32-bit or float wav, mp3, m4a) must be decoded and converted to int16 by the app. The output may then differ from upstream's.
+- Decode at the file's own rate. The browser must not resample: either an `AudioContext` created at the file's rate, or `parseWav` for wav. The port's API takes the rate explicitly, so a mismatch shows (D4, R5).
+- Refuse a reference with no sound: upstream divides by an rms of 0 and produces NaN, and the port reproduces it.
 
 ## Risks
 

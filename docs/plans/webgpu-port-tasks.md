@@ -70,7 +70,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 |---|---|---|---|
 | 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | done 2026-11-18 (D3: ORT Web; golden data, tolerances, parity runner and CI in place) |
 | 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | done 2026-11-20 (fp32 text and step graphs; `mha` attention, dynamic n; parity on both GPUs; hand-offs to 04 and 05 in the plan) |
-| 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | plan pressure-tested 2026-11-18 |
+| 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | done 2026-11-21 (reference prep exact with pydub; mel, resampler and istft at the floor; Vocos graph on WebGPU; hand-offs to 04, 05 and 06 in the plan) |
 | 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | plan pressure-tested 2026-11-18 |
 | 04 | [Sampler and generation pipeline](webgpu-04-sampler-pipeline.md) | 01, 02, 03 | plan not written |
 | 05 | [Weight delivery, precision and quantization](webgpu-05-weights-precision.md) | 01, 02 | plan not written |
@@ -107,11 +107,11 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [x] Attention: the dynamo export is unfused (MatMul, Softmax, MatMul) and dominates block time at 2048 frames, especially on the Intel GPU. Try a fused attention op that the WebGPU EP supports (plan 00 spike, `../research/webgpu-runtime-spike.md`). (Done 2026-11-19: `com.microsoft.MultiHeadAttention`, about 4 times less GPU memory and a little faster.)
 
 ### 02 Mel spectrogram and vocoder
-- [ ] Specify the exact Vocos mel (STFT params, filterbank, log/clamp) from `model/modules.py`.
-- [ ] Implement mel extraction in JS or WGSL; match golden mel.
-- [ ] Export the Vocos backbone to ONNX (start from `runtime/triton_trtllm/scripts/export_vocoder_to_onnx.py`).
-- [ ] Implement inverse STFT outside ONNX; match golden wav.
-- [ ] Reference-audio prep: mono, resample to 24 kHz, RMS normalise, clip to about 12 s.
+- [x] Specify the exact Vocos mel (STFT params, filterbank, log/clamp) from `model/modules.py`. (Done 2026-11-21: `../research/webgpu-audio.md`.)
+- [x] Implement mel extraction in JS or WGSL; match golden mel. (Done 2026-11-21: TypeScript, `web/src/audio/mel.ts`; the filterbank reproduces torchaudio's float32.)
+- [x] Export the Vocos backbone to ONNX (start from `runtime/triton_trtllm/scripts/export_vocoder_to_onnx.py`). (Done 2026-11-21: `tools/webgpu/export_vocos.py`; every node on WebGPU.)
+- [x] Implement inverse STFT outside ONNX; match golden wav. (Done 2026-11-21: `web/src/audio/istft.ts`, on the CPU, about 70 ms per long chunk.)
+- [x] Reference-audio prep: mono, resample to 24 kHz, RMS normalise, clip to about 12 s. (Done 2026-11-21: exact with pydub for 16-bit PCM wav, `web/src/audio/prepare.ts`.)
 
 ### 03 Text front end
 - [ ] Specify `convert_char_to_pinyin` behaviour precisely, including polyphones and non-Chinese text.
@@ -130,6 +130,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Per-chunk loop and cross-fade assembly; optional streaming of chunks.
 - [ ] End-to-end test against golden wav with injected noise.
 - [ ] Start from plan 01's hand-off (`webgpu-01-dit-export.md`, step 5): graph IO, the `cond_mask` restore, the frame-0 off-by-one, `time` shaped (1,), cfg 0 cost, per-step time budget.
+- [ ] And from plan 02's (`webgpu-02-mel-and-vocoder.md`, step 6): the audio functions, the `rms`/`raised` rescale contract, and the mel layout transposes between `logMel`, the DiT and the vocoder.
 
 ### 05 Weight delivery, precision and quantization
 - [ ] Hugging Face hosting (decided). The browser needs converted ONNX files, so we publish them in our own repo (decided). Derivative of CC-BY-NC weights: repo owner, CC-BY-NC licence tag, model card crediting the F5-TTS authors and the Emilia dataset, link to the original `SWivid/F5-TTS` repo, and a statement that use is non-commercial.
@@ -141,6 +142,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Buffer and binding size limits across target devices.
 - [ ] Try int8 and 4-bit quantization; judge quality with listening tests and the eval metrics already in `src/f5_tts/eval/`.
 - [ ] Start from plan 01's hand-off (`webgpu-01-dit-export.md`, step 5): fp32 sizes (1.33 GB step, 39 MB text), no sharding needed, Chrome's HTTP cache does not keep the step file, Cache Storage fills in 25 to 51 s.
+- [ ] And plan 02's: `vocos.onnx` is 54.3 MB fp32, and an fp16 export must keep the exact GELU.
 
 ### 06 Web app and public API
 - [ ] Minimal demo page: reference upload or record, reference text, target text, play and download.
@@ -148,6 +150,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Run inference in a Worker so the UI stays responsive.
 - [ ] Decide on optional reference transcription (transformers.js Whisper) and its cost.
 - [ ] Error handling: no WebGPU, out of memory, download failure.
+- [ ] Start from plan 02's hand-off (`webgpu-02-mel-and-vocoder.md`, step 6): 16-bit PCM wav is exact, other formats are converted to int16, decode without resampling, refuse a silent reference.
 - [ ] Detect an integrated GPU (`adapter.info`) and tell the user how to switch the browser to the discrete GPU. On Windows the page cannot ask for it: Chrome ignores `powerPreference` there (found in plan 00 step 2, see `../research/webgpu-laptop.md`).
 
 ### 07 Performance and browser validation
@@ -157,6 +160,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Browser and device matrix: Chrome, Edge, Safari, Firefox; desktop GPU, integrated GPU, mobile. On Windows laptops the integrated GPU is what a page gets by default, so it is the main case, not the fallback.
 - [ ] Record limits and known failures in [../debugging.md](../debugging.md).
 - [ ] Retry ORT graph capture with a newer ORT Web (fails in 1.31.1; worth under 10 percent per step at n = 1024). Consider a batch-1 step graph for cfg 0. Extend `web/bench/dit-step/`.
+- [ ] The istft (about 70 ms per long chunk on the CPU) is the vocoder's largest cost: run it in a worker during the next chunk's DiT steps, or use a packed real FFT (plan 02, step 5).
 
 ## Open questions
 
