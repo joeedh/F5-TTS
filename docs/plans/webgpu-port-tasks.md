@@ -69,7 +69,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 | # | Plan (file to be written) | Depends on | Status |
 |---|---|---|---|
 | 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | done 2026-11-18 (D3: ORT Web; golden data, tolerances, parity runner and CI in place) |
-| 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | plan pressure-tested 2026-11-18 |
+| 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | done 2026-11-20 (fp32 text and step graphs; `mha` attention, dynamic n; parity on both GPUs; hand-offs to 04 and 05 in the plan) |
 | 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | plan pressure-tested 2026-11-18 |
 | 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | plan pressure-tested 2026-11-18 |
 | 04 | [Sampler and generation pipeline](webgpu-04-sampler-pipeline.md) | 01, 02, 03 | plan not written |
@@ -98,13 +98,13 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [x] Write the test runner that compares any port stage to the golden data. (Done 2026-11-18: `web/test/parity/` and `tools/webgpu/parity.py`.)
 
 ### 01 DiT export to ONNX
-- [ ] Wrap `DiT.forward` for export (fixed input signature, CFG batch handled outside or inside).
-- [ ] Replace or precompute rotary embeddings so they export cleanly.
-- [ ] Handle the text embedding cache (cond and uncond) in the exported graph.
-- [ ] Settle dynamic versus bucketed sequence lengths; check the attention mask path.
-- [ ] Export with external weight data; verify parity against golden data in onnxruntime (CPU).
-- [ ] Verify the graph loads and matches on ORT Web WebGPU; list any unsupported or slow ops.
-- [ ] Attention: the dynamo export is unfused (MatMul, Softmax, MatMul) and dominates block time at 2048 frames, especially on the Intel GPU. Try a fused attention op that the WebGPU EP supports (plan 00 spike, `../research/webgpu-runtime-spike.md`).
+- [x] Wrap `DiT.forward` for export (fixed input signature, CFG batch handled outside or inside). (Done 2026-11-19: `TextGraph` and `StepGraph` in `tools/webgpu/export_dit.py`; CFG batch inside the step graph, with `v` and `x_next` as outputs.)
+- [x] Replace or precompute rotary embeddings so they export cleanly. (Done 2026-11-19: cos and sin precomputed in float64; in-graph trig was inaccurate on the NVIDIA GPU.)
+- [x] Handle the text embedding cache (cond and uncond) in the exported graph. (Done: a separate text graph, run once per chunk.)
+- [x] Settle dynamic versus bucketed sequence lengths; check the attention mask path. (Done 2026-11-19: dynamic n, no mask path needed; see `../research/webgpu-dit-export.md`.)
+- [x] Export with external weight data; verify parity against golden data in onnxruntime (CPU). (Done 2026-11-19: all 7 cases pass.)
+- [x] Verify the graph loads and matches on ORT Web WebGPU; list any unsupported or slow ops. (Done 2026-11-19: all real cases pass on both GPUs; opset 23 `Attention` is slow, graph capture fails.)
+- [x] Attention: the dynamo export is unfused (MatMul, Softmax, MatMul) and dominates block time at 2048 frames, especially on the Intel GPU. Try a fused attention op that the WebGPU EP supports (plan 00 spike, `../research/webgpu-runtime-spike.md`). (Done 2026-11-19: `com.microsoft.MultiHeadAttention`, about 4 times less GPU memory and a little faster.)
 
 ### 02 Mel spectrogram and vocoder
 - [ ] Specify the exact Vocos mel (STFT params, filterbank, log/clamp) from `model/modules.py`.
@@ -129,6 +129,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Conditioning mel assembly, output crop of reference frames, mel to vocoder.
 - [ ] Per-chunk loop and cross-fade assembly; optional streaming of chunks.
 - [ ] End-to-end test against golden wav with injected noise.
+- [ ] Start from plan 01's hand-off (`webgpu-01-dit-export.md`, step 5): graph IO, the `cond_mask` restore, the frame-0 off-by-one, `time` shaped (1,), cfg 0 cost, per-step time budget.
 
 ### 05 Weight delivery, precision and quantization
 - [ ] Hugging Face hosting (decided). The browser needs converted ONNX files, so we publish them in our own repo (decided). Derivative of CC-BY-NC weights: repo owner, CC-BY-NC licence tag, model card crediting the F5-TTS authors and the Emilia dataset, link to the original `SWivid/F5-TTS` repo, and a statement that use is non-commercial.
@@ -139,6 +140,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] fp16 path with `shader-f16` detection; fp32 fallback. The WebGPU EP's fp16 MatMul is about 30 times less accurate than ORT CPU fp16 (rel L2 4e-3 at K = 1024), which looks like fp16 accumulation; measure the effect on audio, and try fp32 accumulation or mixed precision (plan 00 spike).
 - [ ] Buffer and binding size limits across target devices.
 - [ ] Try int8 and 4-bit quantization; judge quality with listening tests and the eval metrics already in `src/f5_tts/eval/`.
+- [ ] Start from plan 01's hand-off (`webgpu-01-dit-export.md`, step 5): fp32 sizes (1.33 GB step, 39 MB text), no sharding needed, Chrome's HTTP cache does not keep the step file, Cache Storage fills in 25 to 51 s.
 
 ### 06 Web app and public API
 - [ ] Minimal demo page: reference upload or record, reference text, target text, play and download.
@@ -154,6 +156,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Optimisations: step count (EPSS 16 steps), batching the CFG pair, sequence bucketing.
 - [ ] Browser and device matrix: Chrome, Edge, Safari, Firefox; desktop GPU, integrated GPU, mobile. On Windows laptops the integrated GPU is what a page gets by default, so it is the main case, not the fallback.
 - [ ] Record limits and known failures in [../debugging.md](../debugging.md).
+- [ ] Retry ORT graph capture with a newer ORT Web (fails in 1.31.1; worth under 10 percent per step at n = 1024). Consider a batch-1 step graph for cfg 0. Extend `web/bench/dit-step/`.
 
 ## Open questions
 

@@ -1,6 +1,6 @@
 # Plan 01: DiT export to ONNX
 
-Status: `plan pressure-tested` (written 2026-11-18; review findings folded in, see the end of this file). Depends on: plan 00 (done). Blocks: plans 04 and 05.
+Status: `done` 2026-11-20 (written 2026-11-18; review findings folded in, see the end of this file). Hand-offs to plans 04 and 05 are under step 5. Depends on: plan 00 (done). Blocks: plans 04 and 05.
 
 Task list: [webgpu-port-tasks.md](webgpu-port-tasks.md). Runtime decision and spike numbers: [../research/webgpu-runtime-spike.md](../research/webgpu-runtime-spike.md). Golden data and tolerances: [webgpu-00-scope-and-parity.md](webgpu-00-scope-and-parity.md).
 
@@ -233,6 +233,39 @@ The spike's export was unfused (MatMul, Softmax, MatMul). It writes out a (2, 16
 - Hand off to plan 05: sizes, load results, and whether sharding was needed.
 - `docs/debugging.md` entries for export problems found. `docs/shape-ledger.md` entries for any shape or layout bugs (for example, (b, n, d) versus (b, d, n) at the conv).
 - Update the task list.
+- Result, 2026-11-20: plan 01 is done. Plans 04 and 05 are not written yet, so their hand-offs are below; the task list points here.
+  - No `docs/shape-ledger.md` entries: no bug in this plan came from a wrong shape or layout. The one size problem (`int(seq_len)` fixing n at export) is a symbolic-shape issue a shape annotation would not catch; it is in `docs/debugging.md`.
+
+### Hand-off to plan 04 (sampler and pipeline)
+
+- Graphs: `text.onnx` and `step_mha.onnx`, built by `tools/webgpu/export_dit.py --model base --attention mha`. Load and run them through `web/src/dit/` (`DiT.create`, `embedText`, `step`, `release`).
+- Inputs and outputs are as in D1:
+  - Text graph: `text` int32 (1, n), padded with -1 (`embedText` does it). Outputs `text_cond` and `text_uncond`, (1, n, 512) each.
+  - Step graph: `x`, `step_cond` (1, n, 100); `text_cond`, `text_uncond`; `time`, `cfg_strength`, `dt`, each float32 shaped (1,). Outputs `pred` (2, n, 100), `v` and `x_next` (1, n, 100).
+  - All outputs stay on the GPU. The caller disposes them; feed `x_next` back as the next step's `x`.
+- n is dynamic, from 16 to 8192 (the `freqs_cis` table). Any chunk length works with no padding or mask, and a new n costs no extra time (step 4).
+- Run the text graph once per chunk, and again whenever the ids or n change (R4).
+- `time` is t_k and `dt` is t_{k+1} - t_k, both from the chunk's timestep plan (sway sampling or EPSS). The golden data stores `t` as shape (1,), where upstream passes a 0-d tensor; the graph takes (1,).
+- After the last step, restore the reference frames: `torch.where(cond_mask, cond, out)` (`cfm.py:235`). The graph does not do this.
+- Frame 0 off by one: `CFM.sample` restores `samples // 256 + 1` reference frames, but `infer_batch_process` crops only `samples // 256`. So frame 0 of each chunk's output is the reference's last frame. Reproduce it to match upstream (`docs/debugging.md`, 2026-11-18; `parity.x_next_golden` has the offset).
+- `cfg_strength` 0 still runs the batch-2 graph: same result as upstream, at twice the cost. Upstream switches to a batch-1 call there.
+- Time budget, per step at n = 1024 and 2048: about 0.4 and 0.96 s on the RTX 5050 (Chrome or Edge), 1.16 and 2.78 s on the Intel GPU. 32 steps are 1.9 to 2.3 times slower than real time on NVIDIA and 5.3 to 6.5 times on Intel, before the text graph and the vocoder.
+- The first run of a new session takes 1.4 to 3.3 s, because ORT uploads the weights to the GPU then. Count it as load time.
+- The step graph also outputs `pred` and `v`, which the pipeline does not need. They cost little; drop them from the export only if plan 07 finds otherwise.
+
+### Hand-off to plan 05 (weights and precision)
+
+- Sizes, fp32 external data:
+  - `step_mha.onnx`: 2.1 MB of graph, 1,330 MB of data. That is 331.6M parameters plus the 4 MB rotary table.
+  - `text.onnx`: 0.1 MB of graph, 38.9 MB of data.
+- Sharding was not needed: both graphs load unsharded on both GPUs, with the text graph alongside (step 2).
+- Memory at n = 1913 with `mha`: 1.7 GB of GPU memory and 2.3 to 3.5 GB of browser RAM. Loading peaks at 2 to 3.5 GB of browser RAM.
+- Session creation from a local server, including ORT's fetch of the data file: 8 to 9 s on NVIDIA, 10 to 16 s on Intel, with one cold-start outlier at 41 s.
+- Caching:
+  - Chrome's HTTP cache does not keep the 1.33 GB file; a second fetch transfers it again.
+  - Cache Storage works. Filling it (`cache.put`) took 25 to 51 s, and loading from it took 2.8 to 3.8 s.
+  - OPFS and IndexedDB were not tried.
+- fp16 is untouched by this plan. The plan 00 spike's warning about the WebGPU EP's fp16 MatMul accuracy still applies.
 
 ## Risks
 
