@@ -1,0 +1,3 @@
+# generated data that must stay byte-identical across checkouts
+web/src/text/pinyin_dict.txt -text
+*.wasm binary

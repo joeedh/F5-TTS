@@ -209,6 +209,21 @@ Needed: enough real text to make "zero mismatches" mean something. Proposal:
 - `tools/webgpu/export_pinyin_dict.py` and `web/src/text/pinyin.ts`.
 - Compare per segment with the dump's `lazy_pinyin` output. Also run `pinyin-pro` once as a comparison, and record its mismatch rate.
 - Done when: zero mismatches on the edge cases and the corpus, or the remaining ones are listed and judged.
+- Result, 2026-11-22: zero mismatches. D3 holds.
+  - The algorithm is written out in `docs/research/webgpu-text-frontend.md`: `simpleseg`, `mmseg` with `no_non_phrases`, the converter, the TONE3 and TONE2 conversions, and the sandhi quirks. For example, `"yi1".replace('4', '2')` leaves `一` before a fourth tone as `yi1`.
+  - `web/src/text/pinyin.ts` mirrors pypinyin function by function. `Pinyin.load()` fetches the dictionary lazily, and `Pinyin.parse()` takes its text.
+  - Data: `tools/webgpu/export_pinyin_dict.py` writes `web/src/text/pinyin_dict.txt`, committed: 41,923 characters and 47,111 phrases, first readings only, since `heteronym=False` reads nothing else. pypinyin's MIT licence is copied next to it.
+    - Size: 1.6 MB raw, 662 KB gzip -9, 541 KB brotli 11.
+    - In Node, parsing takes 55 to 75 ms, and 1,000 calls on a 20-character sentence take about 50 ms.
+    - `.gitattributes` marks the file `-text`, so a Windows checkout keeps it byte-identical. The parser accepts CRLF as well.
+  - Tests (`web/test/text/pinyin.test.ts`), all equal to pypinyin:
+    - every `lazy_pinyin` call in the edge cases and in both corpus dumps;
+    - `pinyin_cases.json` (`tools/webgpu/pinyin_reference.py`, local only, 119,034 cases): every dictionary character, every phrase, and 30,000 random mixes.
+  - Every word `mmseg` yields is a phrase or a single character, and all of those are in the cases. So the conversion and the sandhi are proven on every input they can receive, and the random mixes and corpus cover the segmenting.
+  - Mutation checks:
+    - Fixing the `yi1` quirk, dropping the third-tone rule, or dropping `no_non_phrases` each fails tests.
+    - Three mutants survive, and each is unreachable. The third-tone quirk before the final run occurs in no phrase. The `iou` mark rule is reached by no reading. `ü` handling inside TONE2 is undone by `tone2_to_tone`.
+  - `pinyin-pro` 3.29.5, once: on all-Han calls it differs from pypinyin on 4.36% of characters in the Chinese corpus (3,016 of 69,204) and 7.11% in the edge cases. Examples: `了` alone is `liao3`, `长` is `chang2`, and `可以` stays `ke3 yi3`.
 
 ### Step 5. Tokens and ids
 
