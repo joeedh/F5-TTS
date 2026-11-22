@@ -5,26 +5,9 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { addTrailingSpace, chunkText, fixRefText, maxChars, pyStrip, utf8Length } from "../../src/text/strings";
 import type { Manifest } from "../parity";
+import { corpora, edgeDump, loadCorpus } from "./dumps";
 
 const ROOT = join(import.meta.dirname, "../../../testdata/webgpu");
-
-export interface DumpLine {
-  text: string;
-  segments: string[];
-  pinyin_calls: [string, string[]][];
-  tokens: string[];
-  ids: number[];
-  fixed_ref: string;
-  spaced_ref: string;
-  utf8_len: number;
-  chunks: Record<string, string[]>;
-}
-export interface Dump {
-  versions: Record<string, string>;
-  chunk_max_chars: number[];
-  lines: DumpLine[];
-}
-export const edgeDump = JSON.parse(readFileSync(join(ROOT, "text/edge_cases.json"), "utf8")) as Dump;
 
 const golden = readdirSync(ROOT).filter((d) => existsSync(join(ROOT, d, "manifest.json")));
 const manifest = (name: string) => JSON.parse(readFileSync(join(ROOT, name, "manifest.json"), "utf8")) as Manifest;
@@ -71,11 +54,6 @@ describe("pyStrip", () => {
     expect(pyStrip(cp(0x200b) + "a")).toBe(cp(0x200b) + "a");
   });
 });
-
-// the Seed-TTS corpus (tools/webgpu/seedtts_corpus.py), local only
-const corpusDir = join(ROOT, "text/corpus");
-const corpora = ["seedtts_en", "seedtts_zh"].filter((c) => existsSync(join(corpusDir, `${c}.json`)));
-export const loadCorpus = (name: string) => JSON.parse(readFileSync(join(corpusDir, `${name}.json`), "utf8")) as Dump;
 
 describe.skipIf(corpora.length === 0)("corpus against Python", () => {
   it.each(corpora)("%s", (name) => {

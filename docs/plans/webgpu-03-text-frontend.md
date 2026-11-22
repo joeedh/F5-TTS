@@ -187,6 +187,21 @@ Needed: enough real text to make "zero mismatches" mean something. Proposal:
 - `web/src/text/segment_ascii.ts`: D2's pure-TS path for text with no CJK characters.
 - Compare both with rjieba's segments on the edge cases and the large corpus (Node, Vitest). Also run `jieba-wasm` 2.4.0 once as a comparison. Report mismatch counts with examples.
 - Done when: our wasm build has zero mismatches (or the TS fallback is done and has zero), and D2 is decided.
+- Result, 2026-11-22: D1 and D2 both hold. Zero mismatches.
+  - Built: `tools/webgpu/jieba_wasm/` holds the crate, `build.py`, and `build.json`, which records rustc, jieba-rs and the hashes. The built `web/src/text/jieba.wasm` sits next to its wrapper, so Vite can resolve it with `new URL(..., import.meta.url)`.
+  - Two changes from the proposal:
+    - A plain C ABI (`alloc`, `cut`, `result_ptr`, `dealloc`) instead of `wasm-bindgen`. There is no JS glue, and no `wasm-bindgen` CLI version to keep in step with the crate.
+    - `default-dict` is off. It unpacks the dictionary with zstd, whose C library needs a C compiler that targets wasm (none here). The same `dict.txt` is embedded uncompressed and loaded with `Jieba::with_dict`. That builds the same state as `Jieba::new()`: the file has no duplicate words (`with_dict` would overwrite a duplicate's frequency, and `new()` would not), no non-ASCII whitespace, and an integer frequency on every line.
+  - Pinning: `Cargo.lock` matches rjieba's SBOM for every shared crate (jieba-rs and jieba-macros 0.11.0, bytecount 0.6.9, rustc-hash 2.1.3). 0.11.0 no longer uses `regex`.
+  - Reproducible: a clean rebuild gives the same bytes. Without `--remap-path-prefix`, the panic locations embedded the build machine's cargo path, user name included. `build.py` remaps them and fails if a local path is left.
+  - Our wasm against rjieba: 0 of 219 edge cases, 0 of 1,711 English corpus texts and 0 of 2,857 Chinese corpus texts differ.
+    - The wrapper first stripped a leading U+FEFF from tokens. `TextDecoder` does that unless `ignoreBOM` is set, and the two BOM edge cases caught it.
+  - `jieba-wasm` 2.4.0 against rjieba, once: 18 of 219 edge cases and 14 of 1,711 English texts differ, and 0 of 2,857 Chinese. Every difference is a `.`, `_` or `-` join: rjieba keeps `x-ray`, `v1.2.3`, `Wi-Fi` and `138-0013-8000` whole, and 2.4.0 splits them. Through the space rule, `x-ray` becomes `x- ray`, which changes the tokens.
+  - D2, decided: text with no CJK ideograph (jieba-rs's `is_cjk`) uses `web/src/text/segment_ascii.ts` and never loads the wasm.
+    - jieba-rs reduces to this for such text. Only five dictionary words are pure ASCII (`AT&T`, `C#`, `C++`, `c#`, `c++`), none can overlap another, and each beats single characters on the route. The rest of each block goes through the HMM's skip splitter, which gives `skip_match_len` runs and one token per gap. Characters outside blocks are one token each, except `\r\n`.
+    - It matches rjieba on all 93 edge cases and all 1,711 English texts that have no CJK. It also matches the wasm on 20,000 random strings built from the characters that matter.
+    - Mutation checks: dropping `%`, the `-` connector, three of the five dictionary words, the `\r\n` grouping, or one-token gaps each fails tests.
+  - Size and init: 5.6 MB raw, 2.1 MB gzip -9, 1.7 MB brotli 11. In Node, the dictionary takes about 80 ms to build and the instance uses 46 MiB. Browser numbers come in step 6.
 
 ### Step 4. Pinyin (D3)
 

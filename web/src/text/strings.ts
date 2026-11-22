@@ -67,3 +67,10 @@ export function chunkText(text: string, maxChars = 135): string[] {
   if (current) chunks.push(pyStrip(current));
   return chunks;
 }
+
+const CUSTOM_TRANS: Record<string, string> = { ";": ",", "“": '"', "”": '"', "‘": "'", "’": "'" };
+
+/** convert_char_to_pinyin's first step, text.translate(custom_trans): curly quotes and ";" to ASCII. */
+export function customTranslate(text: string): string {
+  return text.replace(/[;“”‘’]/g, (c) => CUSTOM_TRANS[c] as string);
+}

@@ -1,0 +1,19 @@
+[package]
+name = "jieba-wasm-f5"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# no default-dict: its zstd runtime needs a C compiler for wasm; the same dict.txt is embedded instead
+jieba-rs = { version = "=0.11.0", default-features = false }
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

@@ -2,6 +2,25 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-22: a Rust wasm build embeds the build machine's paths (plan 03, step 3)
+
+- **Symptom:** `jieba.wasm` held `C:\Users\<name>\.cargo\...` 4 times, so committing it would publish the user name and make the build depend on where it ran.
+- **Cause:** panic locations (`file:line`) of the dependencies stay in the binary even with `panic = "abort"` and `strip = true`.
+- **Fix:** build with `RUSTFLAGS="--remap-path-prefix=<cargo home>=/cargo --remap-path-prefix=<crate dir>=/build"`. `tools/webgpu/jieba_wasm/build.py` does this, then fails if a drive path or the home folder is still in the wasm.
+- **Diagnose:** `grep -a -o -E "[A-Za-z]:[\\/][^\"']{0,80}" file.wasm`.
+
+## 2026-11-22: `TextDecoder` drops a U+FEFF at the start of what it decodes (plan 03, step 3)
+
+- **Symptom:** the jieba wasm wrapper returned `['', 'leading', ...]` where rjieba returns `['\ufeff', 'leading', ...]`. The wasm itself was right.
+- **Cause:** `TextDecoder` treats a leading U+FEFF as a byte order mark and removes it, unless it is built with `ignoreBOM: true`. Decoding each token separately hits this for any token that is a lone U+FEFF.
+- **Fix:** `new TextDecoder("utf-8", { fatal: true, ignoreBOM: true })` in `web/src/text/segment.ts`. Decode any text a port must keep byte-exact that way.
+
+## 2026-11-22: `jieba-wasm` 2.4.0 does not segment like rjieba (plan 03, step 3)
+
+- **Symptom:** `jieba-wasm` splits `x-ray`, `v1.2.3` and `Wi-Fi` where rjieba keeps them whole. 14 of 1,711 Seed-TTS English texts differ, which changes F5-TTS tokens through the space rule (`x-ray` becomes `x- ray`).
+- **Cause:** `jieba-wasm` embeds a fork of jieba-rs 0.7.0. rjieba 0.2.2 embeds jieba-rs 0.11.0 (see its SBOM in `rjieba-*.dist-info/sboms`), whose `skip_match_len` joins alphanumeric runs across `.`, `_` and `-`.
+- **Fix:** our own wasm build of jieba-rs 0.11.0, `tools/webgpu/jieba_wasm/`. When upstream moves rjieba, rebuild at the version its SBOM names.
+
 ## 2026-11-21: `torch.onnx.export` fails with `UnicodeEncodeError` on Windows (plan 02, step 3)
 
 - **Symptom:** the export fails at the end with `UnicodeEncodeError: 'charmap' codec can't encode character '✅'`, raised from a `print("[torch.onnx]", ...)`.

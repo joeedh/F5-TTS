@@ -1,0 +1,7 @@
+{
+ "jieba-rs": "0.11.0",
+ "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+ "dict.txt sha256": "139519822fe8ab9e10d9d07e68ea0451045380aedaf54ecc51e2a28c6b42a13f",
+ "jieba.wasm sha256": "b0bb101596cc6fa6692b87bc53abaf1db3c1b63dc3bf9383fbe2d6121aafb470",
+ "jieba.wasm bytes": 5646468
+}
