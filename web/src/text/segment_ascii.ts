@@ -3,7 +3,7 @@
 // skip splitter cuts the rest of each block. Proven against rjieba and the wasm in test/text/segment.test.ts.
 
 /** jieba-rs's is_cjk: the main CJK Unified Ideographs block and its extensions. */
-const CJK = /[一-鿿㐀-䶿豈-﫿\u{20000}-\u{2a6df}\u{2a700}-\u{2ebef}\u{2f800}-\u{2fa1f}]/u;
+const CJK = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u{20000}-\u{2a6df}\u{2a700}-\u{2ebef}\u{2f800}-\u{2fa1f}]/u;
 /** is_han_default's ASCII part: the characters that stay inside a block. */
 const BLOCK = /[A-Za-z0-9+#&._%-]+/g;
 /** The dictionary words made only of block characters. None can overlap another, so a left-to-right scan

@@ -24,7 +24,7 @@ OUT = REPO / "testdata/webgpu/text/corpus/pinyin_cases.json"
 RANDOM_CASES = 30000
 # non-Han pieces convert_char_to_pinyin can pass: CJK punctuation, kana, bopomofo, 〇 (Han to pypinyin),
 # a compatibility ideograph, an astral ideograph, fullwidth digits, and characters outside every dictionary
-NON_HAN = ["，", "。", "、", "「", "」", "あ", "ア", "ㄅ", "〇", "豈", "𠮶", "１２", "★", "㈠", "䷀", "", "\U0002a6d6"]
+NON_HAN = "， 。 、 「 」 あ ア ㄅ 〇 豈 𠮶 １２ ★ ㈠ ䷀ \ue815 \U0002a6d6".split()
 
 
 def tone3(text: str) -> list[str]:

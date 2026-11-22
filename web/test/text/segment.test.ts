@@ -83,7 +83,7 @@ describe("pure-TS path for text with no CJK (D2)", () => {
       "〇",
       "ㄅ",
       "\u{1f600}",
-      " ",
+      "\u00a0",
       "\t",
     ];
     let seed = 1;

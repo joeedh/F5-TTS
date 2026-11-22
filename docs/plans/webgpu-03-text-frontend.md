@@ -235,6 +235,19 @@ Needed: enough real text to make "zero mismatches" mean something. Proposal:
   - Exact ids for every golden case: their `c*.dit.text_ids`, (1, n) int32 with no padding, through the parity runner's `exact` check.
   - Exact tokens for the edge cases and the corpus.
 - Done when: all match.
+- Result, 2026-11-22: all match.
+  - `web/src/text/tokens.ts`:
+    - `convertCharToPinyin(text, cut, pinyin?)` ports the three branches. It throws where Python would raise: a 3-byte segment with too few pinyin items, or Han text with no dictionary.
+    - `parseVocab` follows Python's text mode: `\r\n` and `\r` become `\n`, each key is `line[:-1]`, and a later duplicate overwrites. So a CRLF checkout reads the same as LF. A test checks CRLF, LF, lone CR and an unterminated last line.
+    - `textToIds` gives an int32 array, with unknown tokens as 0.
+    - `TextFrontend` loads the jieba wasm only for text with a CJK ideograph, and the pinyin dictionary only for text with a `RE_HANS` character. Note that `〇` needs the dictionary but not jieba. Each loads once.
+  - Tests (`web/test/text/tokens.test.ts`):
+    - Vocab: 2545 entries, `" "` at 0, `𠮶` last at 2544.
+    - All 7 golden cases: every chunk's tokens, and its ids through the parity runner's `exact` check against `c*.dit.text_ids`.
+    - Tokens and ids for every edge case and corpus line. `TextFrontend` gives the same tokens on all of them.
+    - A test counts loads, to check that English loads nothing, `〇` loads only pinyin, and Chinese loads each once.
+  - Mutation checks: dropping the segment-length test in the space rule, starting `is_chinese` at U+4E00, or dropping `"` from the no-space set each fails tests.
+  - The vocab is per checkpoint, so its URL comes with the model files (plan 05). The tests read upstream's `src/f5_tts/infer/examples/vocab.txt`, which `load_model` uses when no vocab is given.
 
 ### Step 6. Size and loading
 

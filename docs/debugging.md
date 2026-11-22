@@ -2,6 +2,12 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-22: `\uXXXX` escapes written by an agent become the literal characters (plan 03)
+
+- **Symptom:** source written as `"　"` or `/[-]/` was saved holding the characters themselves. Tests still passed, but the file held invisible private-use, combining and space characters that no reader could see. It happened three times in plan 03 (`strings.test.ts`, `pinyin.ts`, `pinyin_reference.py`). A `\\` typed into a shell command also lost a backslash once.
+- **Cause:** Claude Code's file-writing tools, and sometimes its shell input, decode `\uXXXX` before writing. The 8-digit Python form `\U0002a6d6` survived.
+- **Fix:** after writing code with escapes, scan for invisible characters (Unicode categories Cf, Co, Cn, Mn, Cc, Zs, Zl, Zp, other than space and tab), and re-escape what it finds with a script that builds `\` from `String.fromCharCode(92)`. In tests, `String.fromCodePoint(0x3000)` avoids the problem entirely.
+
 ## 2026-11-22: a Rust wasm build embeds the build machine's paths (plan 03, step 3)
 
 - **Symptom:** `jieba.wasm` held `C:\Users\<name>\.cargo\...` 4 times, so committing it would publish the user name and make the build depend on where it ran.

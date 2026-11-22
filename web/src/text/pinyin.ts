@@ -7,8 +7,12 @@ export const PINYIN_DICT_URL = new URL("./pinyin_dict.txt", import.meta.url);
 
 /** constants.RE_HANS's character class (the UCS-4 build), copied range for range. */
 const HAN =
-  /[〇-礼㐀-䶿一-鿿豈-﫿\u{20000}-\u{2a6df}\u{2a703}-\u{2b73f}\u{2b740}-\u{2b81d}\u{2b825}-\u{2bf6e}\u{2c029}-\u{2ce93}\u{2d016}\u{2d11b}-\u{2ebd9}\u{2f80a}-\u{2fa1f}\u{30000}-\u{3134a}\u{300f7}-\u{31288}\u{30edd}\u{30ede}\u{31350}-\u{32389}]/u;
+  /[\u3007\ue815-\ue864\ufa18\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\u{20000}-\u{2a6df}\u{2a703}-\u{2b73f}\u{2b740}-\u{2b81d}\u{2b825}-\u{2bf6e}\u{2c029}-\u{2ce93}\u{2d016}\u{2d11b}-\u{2ebd9}\u{2f80a}-\u{2fa1f}\u{30000}-\u{3134a}\u{300f7}-\u{31288}\u{30edd}\u{30ede}\u{31350}-\u{32389}]/u;
 const isHan = (c: string) => HAN.test(c);
+/** True if pypinyin would look any character of `text` up (RE_HANS), so the dictionary is needed. */
+export function hasHans(text: string): boolean {
+  return HAN.test(text);
+}
 
 /** Python's \d on str patterns: any Unicode decimal digit. */
 const DIGIT = /\p{Nd}/u;
@@ -19,8 +23,8 @@ const PHONETIC_SYMBOL: [string, string][] = [
   ["ā", "a1"], ["á", "a2"], ["ǎ", "a3"], ["à", "a4"], ["ē", "e1"], ["é", "e2"], ["ě", "e3"], ["è", "e4"],
   ["ō", "o1"], ["ó", "o2"], ["ǒ", "o3"], ["ò", "o4"], ["ī", "i1"], ["í", "i2"], ["ǐ", "i3"], ["ì", "i4"],
   ["ū", "u1"], ["ú", "u2"], ["ǔ", "u3"], ["ù", "u4"], ["ü", "v"], ["ǖ", "v1"], ["ǘ", "v2"], ["ǚ", "v3"],
-  ["ǜ", "v4"], ["ń", "n2"], ["ň", "n3"], ["ǹ", "n4"], ["m̄", "m1"], ["ḿ", "m2"], ["m̀", "m4"],
-  ["ê̄", "ê1"], ["ế", "ê2"], ["ê̌", "ê3"], ["ề", "ê4"],
+  ["ǜ", "v4"], ["ń", "n2"], ["ň", "n3"], ["ǹ", "n4"], ["m\u0304", "m1"], ["ḿ", "m2"], ["m\u0300", "m4"],
+  ["ê\u0304", "ê1"], ["ế", "ê2"], ["ê\u030c", "ê3"], ["ề", "ê4"],
 ]; // prettier-ignore
 const SINGLE_SYMBOL = new Map(PHONETIC_SYMBOL.filter(([k]) => k.length === 1));
 const MULTI_SYMBOL = PHONETIC_SYMBOL.filter(([k]) => k.length > 1);
