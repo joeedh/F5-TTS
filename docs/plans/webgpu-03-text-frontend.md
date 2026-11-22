@@ -159,6 +159,7 @@ Needed: enough real text to make "zero mismatches" mean something. Proposal:
     - U+F900 passes through. Its look-alike U+8C48 is an ordinary ideograph (`qi3`). Both are in the edge cases, and jieba segments them differently next to `㐀`.
     - 66 tokens across the edge cases are not in the vocab and map to 0. Examples: the neutral-tone `ge` and `bu`, tab, CR and `}`.
   - The Seed-TTS corpus: the `BytedanceSpeech/seed-tts-eval` repo has no licence file, and its README states no terms for the test set (a Google Drive download). Per D4, this went back to the user. Decided 2026-11-21: use the Seed-TTS lists anyway, locally and uncommitted, as upstream's own eval code does. The texts go in `testdata/webgpu/text/corpus/`, which git ignores.
+  - The corpus: `tools/webgpu/seedtts_corpus.py <seedtts_testset.tar>` reads `en/meta.lst`, `zh/meta.lst` and `zh/hardcase.lst` from the tar without extracting it. It writes the unique prompt and target texts: 1,711 English (`seedtts_en.txt`) and 2,857 Chinese, hard cases included (`seedtts_zh.txt`). `text_reference.py --no-golden --input ...` dumps them (4 MB and 9.6 MB of JSON). The `len(seg_) == len(seg)` assertion did not fire on the corpus either.
 
 ### Step 2. String functions
 
@@ -171,6 +172,13 @@ Needed: enough real text to make "zero mismatches" mean something. Proposal:
   - Whitespace with Python's set, as above.
 - Tests: the golden cases' `text` stage (7 cases) and the edge-case dump.
 - Done when: every case matches exactly.
+- Result, 2026-11-21:
+  - `web/src/text/strings.ts`: `fixRefText`, `addTrailingSpace`, `maxChars`, `chunkText`, `utf8Length`, and `pyStrip` (Python's `strip()`).
+  - Python's whitespace is 29 code points, the same in Python 3.13 and 3.15. `str.isspace`, `re`'s `\s` and `strip()` all agree on it. The port spells them out in one character class.
+  - Tests (`web/test/text/strings.test.ts`, 228): all 7 golden cases reproduce `prep.ref_text`, `max_chars`, `chunks`, `ref_text_spaced` and every `joined_text`. Every edge-case line matches Python's UTF-8 length, fix-up, trailing-space rule, and `chunk_text` at 10, 25, 50 and 135 bytes.
+  - JS's whitespace would fail them. `trim()` fails the leading-BOM line. `\s` in the split fails the line with U+0085 after a full stop.
+  - JS `split` and Python `re.split` gave the same pieces on every line, including the zero-width splits after CJK punctuation.
+  - The Seed-TTS corpus (local only, skipped where absent) matches too: all 4,568 texts, every rule, all four chunk sizes.
 
 ### Step 3. Segmentation (D1, D2)
 
