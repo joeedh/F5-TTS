@@ -256,6 +256,16 @@ Needed: enough real text to make "zero mismatches" mean something. Proposal:
   - Time per typical sentence.
 - If D2's pure-TS path is exact, text with no CJK characters must not fetch the Chinese assets; show it. Decide the loading strategy with plan 06 (a dynamic import on the first CJK character).
 - Done when: the numbers are in the research doc, and the loading behaviour matches D2's outcome.
+- Result, 2026-11-22: done. The numbers are in `docs/research/webgpu-text-frontend.md`, from `web/bench/text/run.mjs`: a production build served with brotli, in Chrome 158 and Edge 158, with 3 cold runs each.
+  - Transfer: the jieba wasm is 1.70 MB with brotli (5.65 MB raw), and the pinyin dictionary 541 KB (1.60 MB raw). All of `web/src/text/` is 4 KB of JS.
+  - First Chinese sentence, cold, with almost no network time: 225 to 262 ms. That splits into the wasm's dictionary build (78 to 94 ms) and the dictionary parse (52 to 69 ms), each a long task on the main thread, plus the fetches.
+    - The two loads now start together (`Promise.all`), so on a real network the fetches overlap.
+  - After loading: 0.1 to 0.2 ms per typical sentence.
+  - D2 confirmed in the browser: an English sentence fetched neither asset in every run, and the first Chinese sentence loaded each once.
+  - Loading strategy, handed to plan 06:
+    - Keep the code in the main bundle and the two assets on demand.
+    - Start the assets on the first CJK or Han character typed, not at generation.
+    - Consider a worker only if the roughly 200 ms of main-thread work matters to the UI.
 
 ### Step 7. Close out
 

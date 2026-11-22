@@ -84,8 +84,11 @@ export class TextFrontend {
 
   async tokens(text: string): Promise<string[]> {
     const translated = customTranslate(text);
-    const segmenter = hasCjk(translated) ? await this.loadSegmenter() : undefined;
-    const pinyin = hasHans(translated) ? await this.loadPinyin() : undefined;
+    // both start at once, so the first Chinese sentence waits for the slower load, not the sum
+    const [segmenter, pinyin] = await Promise.all([
+      hasCjk(translated) ? this.loadSegmenter() : undefined,
+      hasHans(translated) ? this.loadPinyin() : undefined,
+    ]);
     return convertCharToPinyin(text, segmenter ? (t) => segmenter.cut(t) : cutNoCjk, pinyin);
   }
 

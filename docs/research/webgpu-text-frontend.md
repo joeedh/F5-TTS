@@ -74,3 +74,47 @@ Applied to one word at a time, in this order. Each step converts the word's read
   - and `pinyin_cases.json` (`tools/webgpu/pinyin_reference.py`, local only): every dictionary character, every phrase, and 30,000 random mixes of phrases, characters, `一`, `不`, third tones and non-Han pieces.
 - Every word `mmseg` yields is a phrase or a single character, and all of those are in `pinyin_cases.json`. So the conversion and the sandhi are checked on every input they can receive. Segmenting is checked by the random mixes and the corpus.
 - `pinyin-pro` 3.29.5, for comparison: on all-Han calls, it differs from pypinyin on 4.36% of characters in the Chinese corpus. Examples: `了` alone is `liao3`, `长` is `chang2`, `还给` is `hai2 gei3`, and `可以` stays `ke3 yi3`.
+
+## Size and loading (step 6)
+
+Measured with `web/bench/text/run.mjs`, 2026-11-22, on the laptop.
+- The bench builds `bench/text/` with Vite's production build and serves it as a CDN would: brotli 11 when the browser accepts it, and `application/wasm`.
+- Each of 3 runs uses a fresh browser context, so its HTTP cache starts cold.
+- Results are in `web/bench/text/results/{chrome,msedge}.json`.
+
+### Transfer sizes (the web build's assets)
+
+| Asset | Raw | gzip -9 | brotli 11 (what Chrome received) |
+|---|---|---|---|
+| `jieba-*.wasm` | 5.65 MB | 2.14 MB | 1.70 MB |
+| `pinyin_dict-*.txt` | 1.60 MB | 670 KB | 541 KB |
+| the bench page's JS (all of `web/src/text/`) | 10 KB | 4.6 KB | 4.0 KB |
+
+- Vite emits both assets with hashed names from `new URL("./…", import.meta.url)`, so they can be cached forever.
+- Chrome's resource timing shows `transferSize` at the brotli size, and `decodedBodySize` at the raw size.
+- Over a real link the 2.25 MB is the main cost: about 0.9 s at 20 Mbit/s. That is small next to about 1.3 GB of weights, but it lands on the first Chinese sentence unless it is started earlier.
+
+### Time (Chrome 158 and Edge 158, medians of 3 cold runs)
+
+| | Chrome | Edge |
+|---|---|---|
+| First Chinese sentence, both assets cold (local server, so almost no network time) | 262 ms | 225 ms |
+| Jieba wasm load: fetch, compile, instantiate, dictionary build | 260 ms | 208 ms |
+| of which compile | 4 ms | 3 ms |
+| of which instantiate and build the dictionary | 94 ms | 78 ms |
+| Pinyin dictionary load: fetch and parse | 124 ms | 124 ms |
+| of which parse | 69 ms | 52 ms |
+| A typical sentence after loading (84 to 125 bytes, en, zh or mixed) | 0.1 to 0.2 ms | 0.1 ms |
+
+- The two loads start together (`Promise.all` in `TextFrontend.tokens`). Locally that does not shorten the first sentence, because both finish on the main thread. On a real network the fetches overlap.
+- The main thread sees two long tasks during the first Chinese sentence: about 80 to 110 ms for the dictionary build in the wasm, and 80 to 120 ms around the dictionary parse.
+- After loading, the text front end costs nothing next to one DiT step (400 ms or more).
+
+### Loading behaviour (D2)
+
+- Text with no CJK ideograph and no `RE_HANS` character fetches neither asset. In every run the English sentence left both loaders uncalled, and resource timing listed no Chinese asset.
+- The first Chinese sentence loaded each asset once, and later sentences, including mixed ones, reused them.
+- Plan 06's loading strategy follows from these numbers:
+  - The code is 4 KB, so it stays in the main bundle. Only the two data assets load on demand.
+  - Plan 06 should start them as soon as the text box holds a CJK or Han character, for example by calling `TextFrontend.tokens` on input, rather than when generation starts. That hides the network time.
+  - Running the text front end in a worker would remove the two long tasks, about 200 ms in all, from the main thread. That is worth it only if the UI must stay responsive while it loads.

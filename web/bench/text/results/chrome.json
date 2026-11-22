@@ -1,0 +1,187 @@
+{
+  "channel": "chrome",
+  "built": [
+    {
+      "path": "/assets/index-rDe9Itv0.js",
+      "bytes": 10226,
+      "gzip9": 4603,
+      "brotli11": 4017
+    },
+    {
+      "path": "/assets/jieba-CdnShFme.wasm",
+      "bytes": 5646468,
+      "gzip9": 2142963,
+      "brotli11": 1704264
+    },
+    {
+      "path": "/assets/pinyin_dict-CbPKgLOT.txt",
+      "bytes": 1604066,
+      "gzip9": 669760,
+      "brotli11": 541255
+    },
+    {
+      "path": "/bench/text/index.html",
+      "bytes": 347,
+      "gzip9": 256,
+      "brotli11": 171
+    }
+  ],
+  "results": [
+    {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.0.0 Safari/537.36",
+      "afterEnglish": {
+        "loads": {
+          "segmenter": 0,
+          "pinyin": 0
+        },
+        "assets": []
+      },
+      "afterChinese": {
+        "loads": {
+          "segmenter": 1,
+          "pinyin": 1
+        },
+        "assets": [
+          {
+            "file": "jieba-CdnShFme.wasm",
+            "transferSize": 1704564,
+            "encodedBodySize": 1704264,
+            "decodedBodySize": 5646468,
+            "fetchMs": 147
+          },
+          {
+            "file": "pinyin_dict-CbPKgLOT.txt",
+            "transferSize": 541555,
+            "encodedBodySize": 541255,
+            "decodedBodySize": 1604066,
+            "fetchMs": 13
+          }
+        ]
+      },
+      "timing": {
+        "firstEnglishMs": 0.7,
+        "pinyinLoadMs": 124,
+        "segmenterLoadMs": 260,
+        "firstChineseMs": 262,
+        "wasmCompileMs": 4,
+        "wasmInstantiateAndInitMs": 86,
+        "dictParseMs": 57
+      },
+      "longTasksMs": [95, 111],
+      "perSentenceMs": {
+        "en": 0,
+        "zh": 0.1,
+        "mixed": 0.1
+      },
+      "tokens": {
+        "en": 83,
+        "zh": 70
+      },
+      "pageErrors": []
+    },
+    {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.0.0 Safari/537.36",
+      "afterEnglish": {
+        "loads": {
+          "segmenter": 0,
+          "pinyin": 0
+        },
+        "assets": []
+      },
+      "afterChinese": {
+        "loads": {
+          "segmenter": 1,
+          "pinyin": 1
+        },
+        "assets": [
+          {
+            "file": "jieba-CdnShFme.wasm",
+            "transferSize": 1704564,
+            "encodedBodySize": 1704264,
+            "decodedBodySize": 5646468,
+            "fetchMs": 127
+          },
+          {
+            "file": "pinyin_dict-CbPKgLOT.txt",
+            "transferSize": 541555,
+            "encodedBodySize": 541255,
+            "decodedBodySize": 1604066,
+            "fetchMs": 19
+          }
+        ]
+      },
+      "timing": {
+        "firstEnglishMs": 0.7,
+        "pinyinLoadMs": 119,
+        "segmenterLoadMs": 248,
+        "firstChineseMs": 250,
+        "wasmCompileMs": 4,
+        "wasmInstantiateAndInitMs": 94,
+        "dictParseMs": 69
+      },
+      "longTasksMs": [84, 118],
+      "perSentenceMs": {
+        "en": 0.1,
+        "zh": 0.2,
+        "mixed": 0.1
+      },
+      "tokens": {
+        "en": 83,
+        "zh": 70
+      },
+      "pageErrors": []
+    },
+    {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.0.0 Safari/537.36",
+      "afterEnglish": {
+        "loads": {
+          "segmenter": 0,
+          "pinyin": 0
+        },
+        "assets": []
+      },
+      "afterChinese": {
+        "loads": {
+          "segmenter": 1,
+          "pinyin": 1
+        },
+        "assets": [
+          {
+            "file": "jieba-CdnShFme.wasm",
+            "transferSize": 1704564,
+            "encodedBodySize": 1704264,
+            "decodedBodySize": 5646468,
+            "fetchMs": 48
+          },
+          {
+            "file": "pinyin_dict-CbPKgLOT.txt",
+            "transferSize": 541555,
+            "encodedBodySize": 541255,
+            "decodedBodySize": 1604066,
+            "fetchMs": 22
+          }
+        ]
+      },
+      "timing": {
+        "firstEnglishMs": 0.8,
+        "pinyinLoadMs": 144,
+        "segmenterLoadMs": 264,
+        "firstChineseMs": 265,
+        "wasmCompileMs": 3,
+        "wasmInstantiateAndInitMs": 111,
+        "dictParseMs": 86
+      },
+      "longTasksMs": [101, 117],
+      "perSentenceMs": {
+        "en": 0.1,
+        "zh": 0.2,
+        "mixed": 0.1
+      },
+      "tokens": {
+        "en": 83,
+        "zh": 70
+      },
+      "pageErrors": []
+    }
+  ]
+}
