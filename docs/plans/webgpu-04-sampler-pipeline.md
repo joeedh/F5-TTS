@@ -187,6 +187,15 @@ Per generation, `infer_process` and `infer_batch_process` in `infer/utils_infer.
   - `make_golden.py` records the CPU capability in the manifest. Regenerating is not needed for the existing cases; record what this machine reports, since it made them.
 - Tests: with seed 0, every chunk's draw against `c*.noise.y0`, chunk after chunk, in every golden case, through the new `noise.torch_randn` check. Also seeds 1, 2^31 and 2^32 - 1 against values from Python, for the seeding.
 - Done when: every chunk is within max abs 1e-5, or the fallback is taken after about a day, with the reason recorded.
+- Result, 2026-11-22: bit-exact, so the fallback is not needed. Details in [research/webgpu-torch-randn.md](../research/webgpu-torch-randn.md).
+  - `web/src/pipeline/noise.ts`: `TorchGenerator(seed)` with `randn(size)`, ported from torch 2.15's headers. It follows the AVX2 Box-Muller, with avx_mathfun's Cephes `log` and `sincos` written out lane by lane in float32.
+  - Every chunk of all 7 golden cases equals `c*.noise.y0` exactly, drawn in order from seed 0: 0 of 1,563,200 values differ.
+  - Seeds 0, 1, 12345, 2^31 and 2^32 - 1 match torch exactly over sizes 16 to 1031 (`tools/webgpu/noise_fixtures.py`, `testdata/webgpu/pipeline/randn_cases.json`, 124 KB).
+  - Replacing the Cephes `log`, or the Cephes `sincos`, with `Math`'s, or dropping the tail redraw, fails every golden case.
+  - About 9 ms per 1913-frame chunk in Node.
+  - The `noise.torch_randn` check (max abs 1e-5) was not added to `tolerances.json`. With exact equality there is nothing to tolerate, and the test asserts 0 differences directly.
+  - `make_golden.py` records `cpu_capability` in new manifests. The existing cases were made on this machine, which reports AVX2; they were not regenerated.
+  - Found while reading the source: the noise matches only an AVX2 machine's torch. An AVX-512 CPU takes the scalar Box-Muller, which is about 2e-6 away. D5's PyTorch side runs on this machine, so it is unaffected.
 
 ### Step 3. Conditioning and output (CPU)
 

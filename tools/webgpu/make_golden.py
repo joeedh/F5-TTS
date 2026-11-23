@@ -427,6 +427,8 @@ def write_case(case: Case, rec: Recorder, out: Path, threads: int, elapsed: floa
         "git_commit": git_commit(),
         "python": platform.python_version(),
         "torch": torch.__version__,
+        # torch.randn is vectorized only on AVX2, so the noise depends on the CPU that made it (plan 04 D1)
+        "cpu_capability": torch.backends.cpu.get_cpu_capability(),
         "os": platform.platform(),
         "device": "cpu",
         "dtype": "float32",

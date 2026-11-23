@@ -11,6 +11,7 @@
 | [research/webgpu-audio.md](research/webgpu-audio.md) | Plan 02: reference prep exact with pydub, the Vocos mel and float32 filterbank, the resampler, the vocoder graph on WebGPU, istft timing and D2 |
 | [research/webgpu-dit-export.md](research/webgpu-dit-export.md) | Plan 01 step 4: full DiT step graph on WebGPU; `mha` and dynamic n chosen, graph capture fails in ORT Web 1.31, per-step time and RTF on both GPUs |
 | [research/webgpu-text-frontend.md](research/webgpu-text-frontend.md) | Plan 03: jieba-rs 0.11.0 segmentation and the no-CJK rule, pypinyin's lazy_pinyin path written out exactly (mmseg, TONE3, tone sandhi quirks), and how each part was checked |
+| [research/webgpu-torch-randn.md](research/webgpu-torch-randn.md) | Plan 04: torch 2.15 CPU `manual_seed` and `randn` (mt19937, 24-bit uniforms, AVX2 Box-Muller with Cephes log and sincos) and the bit-exact TypeScript port |
 | [plans/webgpu-port-tasks.md](plans/webgpu-port-tasks.md) | Task list: Python typing/tooling plan (pyright) and the WebGPU port plans |
 | [plans/webgpu-00-scope-and-parity.md](plans/webgpu-00-scope-and-parity.md) | WebGPU plan 00: scope, ORT Web vs WGSL spike, golden-data generator, tolerances, parity runner |
 | [plans/webgpu-01-dit-export.md](plans/webgpu-01-dit-export.md) | WebGPU plan 01: DiT export to ONNX (text and step graphs), attention and sequence-length choices, browser parity |
