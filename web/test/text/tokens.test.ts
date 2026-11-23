@@ -114,6 +114,13 @@ describe("TextFrontend", () => {
     expect(bad.slice(0, 10), `${bad.length} of ${lines.length} lines differ`).toEqual([]);
   });
 
+  it("refuses a lone surrogate on both paths, as Python raises UnicodeEncodeError", async () => {
+    const fe = new TextFrontend({ segmenter: async () => seg, pinyin: async () => pinyin });
+    const lone = String.fromCharCode(0xd800);
+    await expect(fe.tokens(`a${lone}b`)).rejects.toThrow(/surrogate/);
+    await expect(fe.tokens(`你${lone}`)).rejects.toThrow(/surrogate/);
+  });
+
   it("refuses Han text without a dictionary, as no fallback would match", () => {
     expect(() => convertCharToPinyin("你", (t) => seg.cut(t))).toThrow(/pinyin dictionary/);
   });

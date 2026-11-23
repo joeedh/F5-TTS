@@ -8,7 +8,8 @@ dependencies to the SBOM's versions. The dictionary is jieba-rs's own src/data/d
 uncompressed: the default-dict feature unpacks it with zstd, which needs a C compiler for wasm.
 
 Writes web/src/text/jieba.wasm and records the inputs and hashes in build.json. Build paths are remapped,
-and the build fails if a local path is left in the wasm.
+and the build fails if a local path is left in the wasm. Also writes jieba.wasm.LICENSE.txt next to the wasm,
+from licenses/: jieba-rs (MIT) and jieba (MIT), the source of the dictionary and HMM model jieba-rs ships.
 """
 
 from __future__ import annotations
@@ -25,6 +26,11 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 OUT = REPO / "web/src/text/jieba.wasm"
+NOTICE_OUT = REPO / "web/src/text/jieba.wasm.LICENSE.txt"
+NOTICE_HEAD = (
+    "jieba.wasm is jieba-rs {version} built for the browser (tools/webgpu/jieba_wasm). It embeds jieba-rs's\n"
+    "dictionary (src/data/dict.txt), which is derived from jieba's, and its HMM model. Both projects are MIT.\n"
+)
 RECORD = HERE / "build.json"
 TARGET = "wasm32-unknown-unknown"
 JIEBA_RS = "0.11.0"
@@ -57,6 +63,13 @@ def main() -> None:
     assert not leaks, f"local paths left in the wasm: {sorted(leaks)}"
 
     shutil.copyfile(built, OUT)
+    parts = [NOTICE_HEAD.format(version=JIEBA_RS)]
+    for name, title in [
+        ("jieba-rs.txt", "jieba-rs (github.com/messense/jieba-rs)"),
+        ("jieba.txt", "jieba (github.com/fxsjy/jieba)"),
+    ]:
+        parts.append(f"\n==== {title} ====\n\n" + (HERE / "licenses" / name).read_text(encoding="utf-8"))
+    NOTICE_OUT.write_text("".join(parts), encoding="utf-8", newline="\n")
     record = {
         "jieba-rs": JIEBA_RS,
         "rustc": run("rustc", "--version").strip(),

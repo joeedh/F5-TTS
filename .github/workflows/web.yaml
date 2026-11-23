@@ -52,3 +52,7 @@ jobs:
         run: python tools/webgpu/parity.py --case tiny --actual "$RUNNER_TEMP/golden/tiny"
       - name: Parity runner self-tests
         run: python tools/webgpu/parity_selftest.py
+      - name: Text front end dump still matches Python
+        # plan 03 R1: a new rjieba (jieba-rs) or pypinyin release shows up here as changed lines; rebuild
+        # tools/webgpu/jieba_wasm or re-export the pinyin dictionary, then regenerate the dump
+        run: python tools/webgpu/text_reference.py --check

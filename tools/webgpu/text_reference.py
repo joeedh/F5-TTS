@@ -2,6 +2,7 @@
 
   .venv313\\Scripts\\python.exe tools/webgpu/text_reference.py
   .venv313\\Scripts\\python.exe tools/webgpu/text_reference.py --input corpus.txt --out corpus.json
+  python tools/webgpu/text_reference.py --check     (CI: the committed edge-case dump still matches Python)
 
 Reads one input per line (lines starting with # and empty lines are skipped; \\u{XXXX} stands for that
 code point) and writes, per line:
@@ -22,6 +23,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import inspect
+import io
 import json
 import re
 import sys
@@ -184,12 +186,30 @@ def versions() -> dict[str, str]:
     return {"rjieba": version("rjieba"), "jieba-rs": jieba_rs, "pypinyin": version("pypinyin"), "python": sys.version}
 
 
+def check_dump(dump: dict[str, Any], committed: dict[str, Any]) -> int:  # Any: json
+    """Plan 03 R1: a new rjieba or pypinyin shows up as a changed line. Returns the number of differences."""
+    ours = {k: v for k, v in dump["versions"].items() if k != "python"}
+    theirs = {k: v for k, v in committed["versions"].items() if k != "python"}
+    if ours != theirs:
+        print(f"versions differ: now {ours}, committed {theirs}")
+    diffs = [(a, b) for a, b in zip(dump["lines"], committed["lines"], strict=False) if a != b]
+    diffs += [(a, None) for a in dump["lines"][len(committed["lines"]) :]]
+    for a, b in diffs[:10]:
+        keys = [k for k in a if b is None or a[k] != b.get(k)]
+        print(f"differs: {a['text']!r} in {keys}")
+    print(f"dump check: {len(diffs)} of {len(dump['lines'])} lines differ from the committed dump")
+    return len(diffs) + (ours != theirs)
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--input", type=Path, default=EDGE_CASES)
     p.add_argument("--out", type=Path, help="default: the input with .json in place of .txt")
     p.add_argument("--no-golden", action="store_true", help="skip reproducing the golden cases")
+    p.add_argument("--check", action="store_true", help="compare with the existing --out file instead of writing it")
     args = p.parse_args()
+    if isinstance(sys.stdout, io.TextIOWrapper):  # a Windows pipe defaults to cp1252, which has no CJK
+        sys.stdout.reconfigure(encoding="utf-8")
     check_copied()
     vocab, _ = mu.get_tokenizer(str(VOCAB), "custom")
     assert isinstance(vocab, dict)
@@ -200,11 +220,14 @@ def main() -> None:
         "chunk_max_chars": CHUNK_MAX_CHARS,
         "lines": [dump_line(t, vocab) for t in lines],
     }
-    out.write_text(json.dumps(dump, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    print(f"{len(lines)} lines -> {out}; versions {dump['versions']}")
-    if args.no_golden:
-        return
     failed = 0
+    if args.check:
+        failed += check_dump(dump, json.loads(out.read_text(encoding="utf-8")))
+    else:
+        out.write_text(json.dumps(dump, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(f"{len(lines)} lines -> {out}; versions {dump['versions']}")
+    if args.no_golden:
+        sys.exit(1 if failed else 0)
     for folder in sorted(d for d in GOLDEN_ROOT.iterdir() if (d / "manifest.json").exists()):
         errors = check_golden(folder.name, vocab)
         failed += len(errors)

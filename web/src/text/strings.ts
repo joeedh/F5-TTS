@@ -15,8 +15,9 @@ export function pyStrip(s: string): string {
   return s.replace(LEADING, "").replace(TRAILING, "");
 }
 
-/** Bytes in UTF-8, by code point; a lone surrogate counts 3 bytes, as it would encode to U+FFFD. */
+/** len(s.encode("utf-8")). Throws on a lone surrogate, which Python refuses to encode. */
 export function utf8Length(s: string): number {
+  if (!s.isWellFormed()) throw new Error("utf8Length: text has a lone surrogate");
   let n = 0;
   for (const ch of s) {
     const c = ch.codePointAt(0) as number;
@@ -25,10 +26,10 @@ export function utf8Length(s: string): number {
   return n;
 }
 
-/** True if the last code point is 1 byte in UTF-8 (ASCII); false for an empty string. */
+/** len(s[-1].encode("utf-8")) == 1, false for an empty string. Throws if s[-1] is a lone surrogate. */
 function endsInAscii(s: string): boolean {
   const last = Array.from(s).at(-1);
-  return last !== undefined && (last.codePointAt(0) as number) < 0x80;
+  return last !== undefined && utf8Length(last) === 1;
 }
 
 /** The end of preprocess_ref_audio_text: end the reference text with ". " or "。". */

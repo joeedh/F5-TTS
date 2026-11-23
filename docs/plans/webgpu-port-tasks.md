@@ -71,7 +71,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 | 00 | [Scope, runtime decision and parity harness](webgpu-00-scope-and-parity.md) | none | done 2026-11-18 (D3: ORT Web; golden data, tolerances, parity runner and CI in place) |
 | 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | done 2026-11-20 (fp32 text and step graphs; `mha` attention, dynamic n; parity on both GPUs; hand-offs to 04 and 05 in the plan) |
 | 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | done 2026-11-21 (reference prep exact with pydub; mel, resampler and istft at the floor; Vocos graph on WebGPU; hand-offs to 04, 05 and 06 in the plan) |
-| 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | plan pressure-tested 2026-11-18 |
+| 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | done 2026-11-22 (string rules, jieba-rs 0.11.0 in wasm plus a no-CJK TS path, pypinyin port, tokens and ids, all exact against Python on the edge cases and the Seed-TTS corpus; hand-offs to 04, 05 and 06 in the plan) |
 | 04 | [Sampler and generation pipeline](webgpu-04-sampler-pipeline.md) | 01, 02, 03 | plan not written |
 | 05 | [Weight delivery, precision and quantization](webgpu-05-weights-precision.md) | 01, 02 | plan not written |
 | 06 | [Web app and public API](webgpu-06-web-app.md) | 04, 05 | plan not written |
@@ -114,12 +114,12 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [x] Reference-audio prep: mono, resample to 24 kHz, RMS normalise, clip to about 12 s. (Done 2026-11-21: exact with pydub for 16-bit PCM wav, `web/src/audio/prepare.ts`.)
 
 ### 03 Text front end
-- [ ] Specify `convert_char_to_pinyin` behaviour precisely, including polyphones and non-Chinese text.
-- [ ] Choose a JS pinyin and word-segmentation library; measure mismatches against Python on a test corpus.
-- [ ] Port vocab loading (`infer/examples/vocab.txt`; index 0 is space and unknown).
-- [ ] Port `chunk_text` (UTF-8 byte budget, ASCII and CJK sentence punctuation).
-- [ ] Port reference-text punctuation fix-up. Note the double space: `preprocess_ref_audio_text` appends `". "` and `infer_batch_process` adds another space, so the token sequence has two spaces before the generated text (seen in the plan 00 golden data).
-- [ ] Build a corpus test: token ids from JS equal token ids from Python.
+- [x] Specify `convert_char_to_pinyin` behaviour precisely, including polyphones and non-Chinese text. (Done: the plan's "What upstream does", and `../research/webgpu-text-frontend.md`.)
+- [x] Choose a JS pinyin and word-segmentation library; measure mismatches against Python on a test corpus. (Done 2026-11-22: no library matched. Ours instead: jieba-rs 0.11.0 built to wasm, and a pypinyin port. `jieba-wasm` 2.4.0 differs on 14 of 1,711 English texts, and `pinyin-pro` on 4.36% of Chinese characters.)
+- [x] Port vocab loading (`infer/examples/vocab.txt`; index 0 is space and unknown). (Done: `parseVocab`, CRLF-safe.)
+- [x] Port `chunk_text` (UTF-8 byte budget, ASCII and CJK sentence punctuation). (Done: `web/src/text/strings.ts`, with Python's whitespace set.)
+- [x] Port reference-text punctuation fix-up. Note the double space: `preprocess_ref_audio_text` appends `". "` and `infer_batch_process` adds another space, so the token sequence has two spaces before the generated text (seen in the plan 00 golden data). (Done: `fixRefText` and `addTrailingSpace`.)
+- [x] Build a corpus test: token ids from JS equal token ids from Python. (Done 2026-11-22: 219 committed edge cases, the local Seed-TTS corpus of 4,568 texts, and the golden `text_ids`; zero mismatches. CI regenerates the edge-case dump with `text_reference.py --check`.)
 
 ### 04 Sampler and generation pipeline
 - [ ] ODE Euler loop with CFG (`pred + (pred - null) * strength`).
@@ -131,6 +131,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] End-to-end test against golden wav with injected noise.
 - [ ] Start from plan 01's hand-off (`webgpu-01-dit-export.md`, step 5): graph IO, the `cond_mask` restore, the frame-0 off-by-one, `time` shaped (1,), cfg 0 cost, per-step time budget.
 - [ ] And from plan 02's (`webgpu-02-mel-and-vocoder.md`, step 6): the audio functions, the `rms`/`raised` rescale contract, and the mel layout transposes between `logMel`, the DiT and the vocoder.
+- [ ] And from plan 03's (`webgpu-03-text-frontend.md`, step 7): the `strings.ts` and `tokens.ts` API, and UTF-8 byte lengths (`utf8Length`) for the duration rule, the under-10-byte speed rule and the `fix_duration` weights.
 
 ### 05 Weight delivery, precision and quantization
 - [ ] Hugging Face hosting (decided). The browser needs converted ONNX files, so we publish them in our own repo (decided). Derivative of CC-BY-NC weights: repo owner, CC-BY-NC licence tag, model card crediting the F5-TTS authors and the Emilia dataset, link to the original `SWivid/F5-TTS` repo, and a statement that use is non-commercial.
@@ -143,6 +144,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Try int8 and 4-bit quantization; judge quality with listening tests and the eval metrics already in `src/f5_tts/eval/`.
 - [ ] Start from plan 01's hand-off (`webgpu-01-dit-export.md`, step 5): fp32 sizes (1.33 GB step, 39 MB text), no sharding needed, Chrome's HTTP cache does not keep the step file, Cache Storage fills in 25 to 51 s.
 - [ ] And plan 02's: `vocos.onnx` is 54.3 MB fp32, and an fp16 export must keep the exact GELU.
+- [ ] And plan 03's: host each checkpoint's `vocab.txt` with its weights. The jieba wasm and pinyin dictionary are app assets: serve them compressed, and the wasm as `application/wasm`.
 
 ### 06 Web app and public API
 - [ ] Minimal demo page: reference upload or record, reference text, target text, play and download.
@@ -151,6 +153,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Decide on optional reference transcription (transformers.js Whisper) and its cost.
 - [ ] Error handling: no WebGPU, out of memory, download failure.
 - [ ] Start from plan 02's hand-off (`webgpu-02-mel-and-vocoder.md`, step 6): 16-bit PCM wav is exact, other formats are converted to int16, decode without resampling, refuse a silent reference.
+- [ ] And plan 03's (`webgpu-03-text-frontend.md`, step 7): start the jieba wasm (1.70 MB) and pinyin dictionary (541 KB) loads on the first CJK or Han character typed. English loads neither. The two inits take about 200 ms of main-thread time, so put `TextFrontend` in the worker if that matters.
 - [ ] Detect an integrated GPU (`adapter.info`) and tell the user how to switch the browser to the discrete GPU. On Windows the page cannot ask for it: Chrome ignores `powerPreference` there (found in plan 00 step 2, see `../research/webgpu-laptop.md`).
 
 ### 07 Performance and browser validation

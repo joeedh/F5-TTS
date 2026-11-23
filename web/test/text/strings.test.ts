@@ -45,6 +45,16 @@ describe("edge cases against Python", () => {
   });
 });
 
+describe("lone surrogates", () => {
+  const lone = String.fromCharCode(0xdc00);
+  it("throw where Python raises UnicodeEncodeError", () => {
+    expect(() => utf8Length(`a${lone}`)).toThrow(/surrogate/);
+    expect(() => addTrailingSpace(`a${lone}`)).toThrow(/surrogate/);
+    expect(() => chunkText(`a${lone}.`, 135)).toThrow(/surrogate/);
+    expect(utf8Length("\u{20bb6}")).toBe(4); // a surrogate pair is one 4-byte character
+  });
+});
+
 describe("pyStrip", () => {
   const cp = (...codes: number[]) => String.fromCodePoint(...codes);
   it("strips Python's whitespace and keeps the rest", () => {

@@ -2,6 +2,12 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-22: `vocab.txt` has CRLF line endings in a Windows checkout (plan 03)
+
+- **Symptom (avoided):** a JS vocab loader that splits on `\n` keeps a `\r` on every entry. Every lookup misses, so every token id is 0, the unknown id. The tokens still look right.
+- **Cause:** the file is stored with LF, but `core.autocrlf=true` checks it out with CRLF (`git ls-files --eol src/f5_tts/infer/examples/vocab.txt` gives `i/lf w/crlf`). Python never notices: text mode turns `\r\n` into `\n`, and `get_tokenizer` keys each line on `line[:-1]`.
+- **Fix:** `parseVocab` in `web/src/text/tokens.ts` follows Python's text mode (`\r\n` and `\r` become `\n`, then `line[:-1]`), and a test checks that CRLF, LF and CR files give the same map. For generated data that must stay byte-identical, such as `web/src/text/pinyin_dict.txt`, `.gitattributes` marks the file `-text`.
+
 ## 2026-11-22: `\uXXXX` escapes written by an agent become the literal characters (plan 03)
 
 - **Symptom:** source written as `"　"` or `/[-]/` was saved holding the characters themselves. Tests still passed, but the file held invisible private-use, combining and space characters that no reader could see. It happened three times in plan 03 (`strings.test.ts`, `pinyin.ts`, `pinyin_reference.py`). A `\\` typed into a shell command also lost a backslash once.

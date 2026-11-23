@@ -1,6 +1,6 @@
 # Plan 03: Text front end
 
-Status: `plan pressure-tested` (written 2026-11-18; review findings folded in, see the end of this file). D4 (test corpus) decided by the user on 2026-11-18: the Seed-TTS eval lists. Depends on: plan 00 (done). Blocks: plan 04.
+Status: `done` 2026-11-22. Written 2026-11-18 and pressure-tested (findings folded in, see the end of this file). D4 (test corpus) decided by the user on 2026-11-18: the Seed-TTS eval lists. D1 to D3 held as proposed; results under each step. Depends on: plan 00 (done). Blocks: plan 04.
 
 Task list: [webgpu-port-tasks.md](webgpu-port-tasks.md). Golden data: [webgpu-00-scope-and-parity.md](webgpu-00-scope-and-parity.md) (the `text` stage, `manifest.chunks[i]`, and `c*.dit.text_ids`).
 
@@ -273,14 +273,50 @@ Needed: enough real text to make "zero mismatches" mean something. Proposal:
 - Hand off to plan 06: the asset sizes and the loading rule.
 - `docs/debugging.md` entries for anything surprising, at least the CRLF `vocab.txt` and the jieba-rs version gap.
 - Update the task list.
+- Result, 2026-11-22: done. Debugging entries for the CRLF `vocab.txt`, the jieba-rs version gap, `TextDecoder`'s BOM, the embedded build paths and the decoded escapes. The task list is updated. Also done in this step:
+  - R1's check: `text_reference.py --check` regenerates the edge-case dump and the golden text stages, and fails on any difference or a new rjieba or pypinyin version. It runs in the `golden-tiny` job of `.github/workflows/web.yaml`. `pyproject.toml` does not pin either package, so CI sees a new release first.
+  - Licence notices next to the shipped data: `web/src/text/pinyin_dict.LICENSE.txt` (pypinyin, MIT) and `web/src/text/jieba.wasm.LICENSE.txt` (jieba-rs and jieba, both MIT). `build.py` writes the latter from `tools/webgpu/jieba_wasm/licenses/`. jieba-rs's `dict.txt` is derived from jieba's but not identical (5,071,843 bytes against 5,071,852).
+
+### Hand-off to plan 04 (sampler and pipeline)
+
+- The API, all in `web/src/text/`:
+  - `strings.ts`:
+    - `fixRefText(refText)`: the end of `preprocess_ref_audio_text`.
+    - `maxChars(fixedRefText, refSamples, sampleRate, speed)`: `infer_process`'s chunk size. It takes the fixed text before the trailing space, and the prepared reference's sample count and rate.
+    - `chunkText(genText, maxChars)`.
+    - `addTrailingSpace(fixedRefText)`: `infer_batch_process`'s rule.
+    - `utf8Length(s)`.
+  - `tokens.ts`: `TextFrontend.tokens(refTextSpaced + chunk)` gives the tokens of one chunk's joined text. `parseVocab(vocabText)` and `textToIds(tokens, vocab)` give the int32 ids for `DiT.embedText`, which pads them.
+- Every length upstream compares is UTF-8 bytes, so use `utf8Length` and never `.length`. Plan 04 needs it for:
+  - The duration: `ref_audio_len + int(ref_audio_len / ref_text_len * gen_text_len / local_speed)`, where `ref_text_len` is the byte length of the spaced reference text, and `gen_text_len` is that of the chunk (`utils_infer.py:517`).
+  - The short-chunk rule: a chunk under 10 bytes uses `speed * 0.3` (`utils_infer.py:505`).
+  - The `fix_duration` split across chunks, weighted by each chunk's byte length (`utils_infer.py:496`).
+- The golden manifests hold every one of these per chunk (`text.max_chars`, `text.chunks`, `chunks[i].joined_text`, `tokens`), so plan 04's tests can start from them.
+- `TextFrontend.tokens` is async only for the first load; it throws on a lone surrogate, as Python cannot pass one to rjieba.
+
+### Hand-off to plan 05 (weights and hosting)
+
+- The vocab belongs to the checkpoint: host each model's `vocab.txt` with its weights. F5TTS v1 Base uses upstream's `src/f5_tts/infer/examples/vocab.txt` (2545 entries), which `load_model` falls back to.
+- `jieba.wasm` (1.70 MB brotli) and `pinyin_dict.txt` (541 KB brotli) are app assets, MIT, emitted by Vite with hashed names. They need no separate hosting, but they must be served with compression, and the wasm as `application/wasm`.
+
+### Hand-off to plan 06 (web app)
+
+- Sizes and times: see step 6 and `docs/research/webgpu-text-frontend.md`.
+- Loading rule: text with no CJK ideograph and no `RE_HANS` character loads neither asset. `TextFrontend` loads each on the first text that needs it, both at once, and keeps them.
+- Start the load on the first CJK or Han character typed (for example, call `tokens` on input), so the 2.25 MB is fetched before generation. The two inits cost about 200 ms of main-thread time; move `TextFrontend` into the inference worker if that matters.
 
 ## Risks
 
 - **R1. jieba-rs version drift.** If upstream moves to a newer rjieba, our wasm build must follow. The dump records the versions, and a small Python-side CI check regenerates the edge-case dump and compares.
+  - Outcome: the check is `text_reference.py --check`, in CI (step 7).
 - **R2. pypinyin's internals are larger than they look:** phrase priority in mmseg and the sandhi rules. Porting only the path used, line for line, keeps it manageable, but the corpus is what proves it.
+  - Outcome: the port mirrors pypinyin function by function, and every dictionary entry plus 30,000 random mixes match, with zero mismatches (step 4).
 - **R3. Unicode:** UTF-16 surrogates, whitespace classes, and byte length versus code-point length. Each feeds a byte-length comparison in `chunk_text` or in the token branching.
+  - Outcome: Python's 29 whitespace code points are spelled out (step 2); every length is UTF-8 bytes through `utf8Length`; a lone surrogate throws, as it does in Python. The edge cases cover each, with zero mismatches.
 - **R4. Dictionary size.** About 3.3 MB of pinyin JSON plus the jieba dictionary, before compression. Acceptable next to about 1.3 GB of weights, but it needs lazy loading. If D2 fails, the jieba part loads for English too.
+  - Outcome: 541 KB of pinyin data and 1.70 MB of wasm with brotli, both lazy. D2 held, so English loads neither (step 6).
 - **R5. A Rust toolchain for the wasm build.** Only for rebuilding; the built package is kept. If `wasm-bindgen` output does not run in all target browsers, the TS fallback applies.
+  - Outcome: the wasm has a plain C ABI, with no `wasm-bindgen` output, so it runs wherever WebAssembly does. The build is reproducible and committed (step 3).
 
 ## Pressure test, 2026-11-18
 

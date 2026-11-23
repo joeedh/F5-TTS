@@ -22,6 +22,8 @@ function lazyPinyin(pinyin: Pinyin | undefined, text: string): string[] {
  * text with no Han character.
  */
 export function convertCharToPinyin(text: string, cut: (text: string) => string[], pinyin?: Pinyin): string[] {
+  // Python raises UnicodeEncodeError in rjieba.cut; the no-CJK path would not, so check here for both
+  if (!text.isWellFormed()) throw new Error("convertCharToPinyin: text has a lone surrogate");
   const tokens: string[] = [];
   for (const seg of cut(customTranslate(text))) {
     const chars = Array.from(seg);
