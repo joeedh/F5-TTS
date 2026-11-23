@@ -206,6 +206,11 @@ Per generation, `infer_process` and `infer_batch_process` in `infer/utils_infer.
   - `stepCond` from the golden `mel.ref` against `c*.dit.step_cond`: exact.
   - `finishChunk`: build a final `x` whose first `n_ref` frames are arbitrary and whose remaining frames are the golden `mel_out` (from frame `n_ref - ref_audio_len` on). `finishChunk` must give back the golden `mel_out` exactly, with the reference's last frame as frame 0.
 - Done when: exact.
+- Result, 2026-11-22: exact on all 7 golden cases, every chunk.
+  - `web/src/pipeline/cond.ts`: `stepCond(mel, duration)` returns (1, duration, 100) frame-major. `finishChunk(x, mel, refAudioLen)` returns (1, 100, duration - refAudioLen) mel-major, ready for `Vocoder.decode`. Both take plan 02's `LogMel`.
+  - `stepCond` from the golden `mel.ref` is byte-identical to `c*.dit.step_cond`.
+  - `finishChunk`, given an `x` that is NaN in the first n_ref frames and golden output after them, is byte-identical to `c*.mel_out`. So the restored frame 0, the reference's last frame, matches too.
+  - Mutation checks: restoring one frame too few, cropping at n_ref instead of ref_audio_len, dropping the transpose, and a one-ulp change to the mel each fail all 7 cases.
 
 ### Step 4. The ODE loop on WebGPU (D2)
 
