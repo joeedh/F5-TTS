@@ -72,7 +72,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 | 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | done 2026-11-20 (fp32 text and step graphs; `mha` attention, dynamic n; parity on both GPUs; hand-offs to 04 and 05 in the plan) |
 | 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | done 2026-11-21 (reference prep exact with pydub; mel, resampler and istft at the floor; Vocos graph on WebGPU; hand-offs to 04, 05 and 06 in the plan) |
 | 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | done 2026-11-22 (string rules, jieba-rs 0.11.0 in wasm plus a no-CJK TS path, pypinyin port, tokens and ids, all exact against Python on the edge cases and the Seed-TTS corpus; hand-offs to 04, 05 and 06 in the plan) |
-| 04 | [Sampler and generation pipeline](webgpu-04-sampler-pipeline.md) | 01, 02, 03 | plan pressure-tested 2026-11-22 (D5 thresholds accepted) |
+| 04 | [Sampler and generation pipeline](webgpu-04-sampler-pipeline.md) | 01, 02, 03 | done 2026-11-23 (the `TTS` API; torch's CPU noise bit-exact; every golden case passes end to end on both GPUs, within 4 times the CUDA floor; WER and SIM equal to fp32 PyTorch on 200 Seed-TTS utterances; hand-offs to 05, 06 and 07 in the plan) |
 | 05 | [Weight delivery, precision and quantization](webgpu-05-weights-precision.md) | 01, 02 | plan not written |
 | 06 | [Web app and public API](webgpu-06-web-app.md) | 04, 05 | plan not written |
 | 07 | [Performance and browser validation](webgpu-07-perf-validation.md) | 04, 05 | plan not written |
@@ -122,16 +122,17 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [x] Build a corpus test: token ids from JS equal token ids from Python. (Done 2026-11-22: 219 committed edge cases, the local Seed-TTS corpus of 4,568 texts, and the golden `text_ids`; zero mismatches. CI regenerates the edge-case dump with `text_reference.py --check`.)
 
 ### 04 Sampler and generation pipeline
-- [ ] ODE Euler loop with CFG (`pred + (pred - null) * strength`).
-- [ ] Sway sampling and EPSS timestep table.
-- [ ] Duration estimate from reference text and audio, `fix_duration` split, short-chunk speed rule.
-- [ ] Noise generation with seedable RNG; decide whether to match PyTorch noise or accept non-identical output.
-- [ ] Conditioning mel assembly, output crop of reference frames, mel to vocoder.
-- [ ] Per-chunk loop and cross-fade assembly; optional streaming of chunks.
-- [ ] End-to-end test against golden wav with injected noise.
-- [ ] Start from plan 01's hand-off (`webgpu-01-dit-export.md`, step 5): graph IO, the `cond_mask` restore, the frame-0 off-by-one, `time` shaped (1,), cfg 0 cost, per-step time budget.
-- [ ] And from plan 02's (`webgpu-02-mel-and-vocoder.md`, step 6): the audio functions, the `rms`/`raised` rescale contract, and the mel layout transposes between `logMel`, the DiT and the vocoder.
-- [ ] And from plan 03's (`webgpu-03-text-frontend.md`, step 7): the `strings.ts` and `tokens.ts` API, and UTF-8 byte lengths (`utf8Length`) for the duration rule, the under-10-byte speed rule and the `fix_duration` weights.
+- [x] ODE Euler loop with CFG (`pred + (pred - null) * strength`). (Done: `sampleChunk`, with `x` kept on the GPU between steps.)
+- [x] Sway sampling and EPSS timestep table. (Done: `timeGrid`, within one float32 ulp of torch.)
+- [x] Duration estimate from reference text and audio, `fix_duration` split, short-chunk speed rule. (Done: `planChunks`, exact on every golden and synthetic case; chunks past 8192 frames are refused.)
+- [x] Noise generation with seedable RNG; decide whether to match PyTorch noise or accept non-identical output. (Done 2026-11-22: torch's CPU `randn` ported, bit-exact on AVX2 machines. See `../research/webgpu-torch-randn.md`.)
+- [x] Conditioning mel assembly, output crop of reference frames, mel to vocoder. (Done: `stepCond` and `finishChunk`, exact.)
+- [x] Per-chunk loop and cross-fade assembly; optional streaming of chunks. (Done: `generateWith` and `crossFade`, exact against numpy; `onChunk` gives each chunk before the cross-fade.)
+- [x] End-to-end test against golden wav with injected noise. (Done: `final.free_running` on both GPUs, and the tiny model's CI spec, run locally so far because CI has not run since 2026-11-19. Seed 0's noise is the golden noise, so nothing is injected.)
+- [x] Start from plan 01's hand-off (`webgpu-01-dit-export.md`, step 5): graph IO, the `cond_mask` restore, the frame-0 off-by-one, `time` shaped (1,), cfg 0 cost, per-step time budget. (Done.)
+- [x] And from plan 02's (`webgpu-02-mel-and-vocoder.md`, step 6): the audio functions, the `rms`/`raised` rescale contract, and the mel layout transposes between `logMel`, the DiT and the vocoder. (Done.)
+- [x] And from plan 03's (`webgpu-03-text-frontend.md`, step 7): the `strings.ts` and `tokens.ts` API, and UTF-8 byte lengths (`utf8Length`) for the duration rule, the under-10-byte speed rule and the `fix_duration` weights. (Done.)
+- [x] Quality against PyTorch (plan 04 D5). (Done 2026-11-23: identical WER and SIM within 1e-5 on 100 English and 100 Chinese utterances. See `../research/webgpu-quality.md`.)
 
 ### 05 Weight delivery, precision and quantization
 - [ ] Hugging Face hosting (decided). The browser needs converted ONNX files, so we publish them in our own repo (decided). Derivative of CC-BY-NC weights: repo owner, CC-BY-NC licence tag, model card crediting the F5-TTS authors and the Emilia dataset, link to the original `SWivid/F5-TTS` repo, and a statement that use is non-commercial.
@@ -144,6 +145,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Try int8 and 4-bit quantization; judge quality with listening tests and the eval metrics already in `src/f5_tts/eval/`.
 - [ ] Start from plan 01's hand-off (`webgpu-01-dit-export.md`, step 5): fp32 sizes (1.33 GB step, 39 MB text), no sharding needed, Chrome's HTTP cache does not keep the step file, Cache Storage fills in 25 to 51 s.
 - [ ] And plan 02's: `vocos.onnx` is 54.3 MB fp32, and an fp16 export must keep the exact GELU.
+- [ ] And plan 04's (`webgpu-04-sampler-pipeline.md`, step 8): judge fp16 or quantized weights with the D5 quality harness, whose fp32 baseline equals PyTorch's.
 - [ ] And plan 03's: host each checkpoint's `vocab.txt` with its weights. The jieba wasm and pinyin dictionary are app assets: serve them compressed, and the wasm as `application/wasm`.
 
 ### 06 Web app and public API
@@ -154,6 +156,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Error handling: no WebGPU, out of memory, download failure.
 - [ ] Start from plan 02's hand-off (`webgpu-02-mel-and-vocoder.md`, step 6): 16-bit PCM wav is exact, other formats are converted to int16, decode without resampling, refuse a silent reference.
 - [ ] And plan 03's (`webgpu-03-text-frontend.md`, step 7): start the jieba wasm (1.70 MB) and pinyin dictionary (541 KB) loads on the first CJK or Han character typed. English loads neither. The two inits take about 200 ms of main-thread time, so put `TextFrontend` in the worker if that matters.
+- [ ] And plan 04's (`webgpu-04-sampler-pipeline.md`, step 8): the `TTS` API and its refusals, streaming with `onChunk` (the player does the cross-fade), abort within one step, the 8192-frame limit and how slow it is near it, and the worker.
 - [ ] Detect an integrated GPU (`adapter.info`) and tell the user how to switch the browser to the discrete GPU. On Windows the page cannot ask for it: Chrome ignores `powerPreference` there (found in plan 00 step 2, see `../research/webgpu-laptop.md`).
 
 ### 07 Performance and browser validation
@@ -163,6 +166,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 - [ ] Browser and device matrix: Chrome, Edge, Safari, Firefox; desktop GPU, integrated GPU, mobile. On Windows laptops the integrated GPU is what a page gets by default, so it is the main case, not the fallback.
 - [ ] Record limits and known failures in [../debugging.md](../debugging.md).
 - [ ] Retry ORT graph capture with a newer ORT Web (fails in 1.31.1; worth under 10 percent per step at n = 1024). Consider a batch-1 step graph for cfg 0. Extend `web/bench/dit-step/`.
+- [ ] Start from plan 04's hand-off (`webgpu-04-sampler-pipeline.md`, step 8): time per chunk on both GPUs, NVIDIA's unexplained 10-fold jump from n = 4096 to 8192 and its run-to-run variance, the first-run cost, 1.3 to 1.7 times fp32 PyTorch's time, and the D5 harness as a quality guard.
 - [ ] The istft (about 70 ms per long chunk on the CPU) is the vocoder's largest cost: run it in a worker during the next chunk's DiT steps, or use a packed real FFT (plan 02, step 5).
 
 ## Open questions

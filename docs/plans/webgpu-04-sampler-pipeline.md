@@ -261,7 +261,7 @@ Per generation, `infer_process` and `infer_batch_process` in `infer/utils_infer.
 - Browser test, local only: end to end, from `input.wav` and the texts, with the golden noise injected (`final.free_running`). Write each result as a wav for listening.
 - `tools/webgpu/measure_floor.py` gains the vocoder, rescale and cross-fade in its free-running run. Then `tolerances.json` (merged, D4) and both runners get `noise.torch_randn`, `final.crossfade` and `final.free_running`.
 - Done when: both final checks pass on both GPUs, and the en-multi and zh-short results have been listened to.
-- Result, 2026-11-22: both final checks pass on both GPUs. Listening is with the user (files below).
+- Result, 2026-11-22: both final checks pass on both GPUs. The user listened on 2026-11-23 and found them fine.
   - `web/src/pipeline/assemble.ts`: `crossFadeF64` (numpy's values, float64) and `crossFade` (cast to float32 once).
     - The golden chunk waves cross-fade to every golden `final.wav` byte for byte. So `final.crossfade` is the `exact` check, not a measured one.
     - `tools/webgpu/crossfade_fixtures.py` runs upstream's real `infer_batch_process` with a vocoder stub that returns preset waves. That gives 10 cases in `testdata/webgpu/pipeline/crossfade_cases.json`: a wave shorter than the fade, the first wave shorter, fades of 0, -1, 1 and 2 samples, 480.96 samples (truncated), one chunk, five chunks, and the default 0.15 s. All match exactly.
@@ -288,6 +288,7 @@ Per generation, `infer_process` and `infer_batch_process` in `infer/utils_infer.
     - The live-tensor count is 0 at the end of every case.
     - Time: en-multi (33.4 s of audio, 3 chunks) took 77 s on the RTX 5050 and 195 s on the Intel GPU; zh-short (11.9 s) took 49 s and 73 s. The first chunk's wave is ready at 33 s and 85 s for en-multi.
   - For listening: `build/webgpu/listen/` has every case from the Intel GPU, plus en-multi and zh-short from the RTX 5050. Playwright empties `test-results/` on every run, so the spec writes there instead.
+    - The user's verdict, 2026-11-23: they sound fine, and the RTX 5050 and Intel GPU versions of en-multi and zh-short sound identical.
   - Found on the way: ORT Web refuses to create two WebGPU sessions at once (debugging.md, 2026-11-22). Load models one after another.
 
 ### Step 6. The API (D6)
@@ -338,15 +339,66 @@ Per generation, `infer_process` and `infer_batch_process` in `infer/utils_infer.
 - Hand-off to plan 07: time per chunk on both GPUs, the first-run cost, the istft overlap, cfg 0, and the large-n timings.
 - `docs/debugging.md` entries for anything surprising.
 - Update the task list.
+- Result, 2026-11-23: done. The hand-offs are below, and the task list is updated.
+  - No new `docs/debugging.md` entries in this step. Everything surprising was logged when it was found: the GPU memory counters and the n = 8192 results, ORT Web's refusal of two sessions at once (both 2026-11-22), and the eval environment (2026-11-23).
+  - Two findings are open and go to plan 07: NVIDIA's 10-fold jump in step time from n = 4096 to 8192, and its step time varying by up to 1.5 times between runs.
+
+### Hand-off to plan 06 (web app)
+
+- **The API** (`web/src/pipeline/index.ts`, exported from `web/src/index.ts`):
+  - `TTS.create({ dit, vocoder, vocabUrl, text? })` loads the DiT, then the vocoder. Never create two ORT WebGPU sessions at once; ORT refuses (debugging.md, 2026-11-22).
+  - `generate({ refAudio, refText, genText, settings? }, { onProgress, onChunk, signal })` returns `{ wave, sampleRate, seed, chunks }`. `refAudio` is the decoded file at its own rate (`parseWav`, plan 02).
+  - `settings` defaults to upstream's (`DEFAULTS`). A missing seed is drawn at random and returned, so the app can show it and replay a result.
+  - `liveTensors` (0 when idle) and `release()`.
+- **Refusals the app should turn into messages:**
+  - an empty or all-whitespace reference text (upstream would transcribe it; the transcription decision is plan 06's);
+  - a chunk past 8192 frames, with an error that names the chunk;
+  - a second `generate` while one runs;
+  - a seed outside uint32;
+  - a silent reference (plan 02).
+- **Streaming playback:** `onChunk` gives each chunk's wave after the vocoder and rescale, before the cross-fade. A player that starts early must do the cross-fade itself, and must hold back each chunk's last 0.15 s (`crossFadeDuration`) until the next chunk arrives. `crossFade` in `web/src/pipeline/assemble.ts` is the reference. The first chunk was ready after 33 s on the RTX 5050 and 85 s on the Intel GPU (en-multi, 3 chunks).
+- **Abort:** checked between steps, so it lands within one step: about 1 to 3 s at usual lengths on the RTX 5050, 3 to 8 s on the Intel GPU, and up to 30 s at n = 8192. Afterwards every tensor is freed, and the next generation works.
+- **Long chunks:** the limit is 8192 frames on both GPUs (D7). Near it, a chunk is very slow: a full chunk at 8192 takes about 16 minutes on the RTX 5050 and 12 on the Intel GPU. Warn well before that. The frame count is known before generation from `planChunks` (`web/src/pipeline/plan.ts`), which the public API does not export yet.
+- **GPU memory:** about 2.2 GB at n = 2048 and 3.2 GB at 4096 and up, on both GPUs.
+- **The worker:** everything runs on the calling thread today. `TTS` has not been tried in a worker, and plan 03 found the text front end's init costs about 200 ms of main-thread time.
+
+### Hand-off to plan 07 (performance)
+
+- **Time per chunk,** 32 steps at n = 1913: 34 to 46 s on the RTX 5050 (1.1 to 1.4 s per step) and about 84 s on the Intel GPU (2.6 s per step). The RTX 5050 varied by up to 1.5 times between runs of the same case, while 3-step runs stayed at plan 01's speed. Not explained; thermal or power limits are a guess.
+- **Large n,** seconds per step:
+
+  | n | RTX 5050 | Intel GPU |
+  |---|---|---|
+  | 2048 | 1.04 | 2.9 to 3.1 |
+  | 4096 | 2.8 to 3.1 | 7.1 to 8.2 |
+  | 8192 | 30 | 22 |
+
+  NVIDIA's 10-fold jump from 4096 to 8192 is not explained. The runner is `web/test/browser-local/large-n.spec.ts`.
+- **First-run cost:** the first step of a session took 3.7 s against 1.04 s afterwards (RTX 5050, n = 2048). Loading the models took 3.4 to 6 s from a local server.
+- **Against PyTorch:** on the Seed-TTS subset, the port took 1.3 to 1.7 times as long as fp32 PyTorch on CUDA on the same GPU (research/webgpu-quality.md).
+- **cfg 0** still runs the batch-2 graph, which is twice upstream's cost (plan 01). A batch-1 graph is still open.
+- **The vocoder and istft** run after each chunk's last step, in series. Overlapping them with the next chunk's DiT steps is still open (plan 02 step 5's 70 ms istft).
+- **A quality guard for optimisations** such as EPSS 16 steps or fp16: the D5 harness. `web/bench/quality/run.mjs` regenerates the port side, and `tools/webgpu/quality_score.py` scores it against the stored PyTorch run. The baseline is in research/webgpu-quality.md.
+- **Browsers:** only Chrome was run in this plan.
+
+### Hand-off to plan 05 (weights and precision)
+
+- Judge fp16 or quantized weights with the D5 harness, as for plan 07 above. The fp32 port's WER and SIM equal PyTorch fp32's on the subset, so any difference comes from the precision change.
 
 ## Risks
 
 - **R1. WebGPU drift over 32 free-running steps.** Per-step error on WebGPU is larger than CPU against CUDA, and Euler integrates it. Step 4 records it per step. If `mel_out.free_running` fails while the audio sounds right, D4 sends it to the user.
+  - Outcome: did not arise. WebGPU float32 drifts less than CUDA does (step 4).
 - **R2. torch's `randn` is harder to reproduce than it looks.** The pressure test's model came within 4.8e-7, so the structure is known. What remains is detail: the tail redraw, the seeding, and the golden data's dependence on the CPU capability of the machine that made it. Step 2 is bounded, and the fallback costs only D5's pairing.
+  - Outcome: bit-exact on AVX2 machines (step 2). An AVX-512 CPU's torch draws different noise, about 2e-6 away.
 - **R3. GPU memory.** The DiT (1.33 GB fp32), the vocoder (54 MB) and the activations must fit together, on the Intel GPU too, which shares system memory. Plan 01 measured 1.7 GB only at n = 1913; nothing past 2048 has run. Undisposed ORT tensors (`pred` and `v` every step, as well as `x`) would grow it. Step 4 counts live tensors and runs n = 4096 and 8192.
+  - Outcome: about 2.2 GB at n = 2048 and 3.2 GB at 4096 and up, on both GPUs. The live-tensor count is flat, including after errors (step 4).
 - **R4. Test time.** A three-chunk case is about 100 steps: about a minute on the RTX 5050, and three to four on the Intel GPU. The local browser tests need long timeouts and one worker, as plan 01's do.
+  - Outcome: as expected. The local browser specs use long timeouts and one worker.
 - **R5. Quality-check dependencies.** About 4 GB of ASR models, a manual WavLM download, and Python eval dependencies that do not install on Python 3.12 and newer (`av==10.*`; see CLAUDE.md). The check may need its own environment.
+  - Outcome: the eval ran in `.venv313` with faster-whisper 1.2.1 and PyAV 16.1.0, after five fixes (debugging.md, 2026-11-23).
 - **R6. Upstream defaults differ from what we compare against.** Upstream on a modern NVIDIA GPU runs fp16 with CUDA noise. The port is compared with CPU fp32 (golden data) and CUDA fp32 with CPU noise (D5). That is deliberate: it isolates the port's own error. But it means "matches PyTorch" here does not mean "matches what a user of upstream's default CLI hears" sample for sample.
+  - Outcome: unchanged. D5 compared against fp32 with CPU noise only.
 
 ## Pressure test, 2026-11-22
 
