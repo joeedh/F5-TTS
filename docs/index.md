@@ -19,5 +19,6 @@
 | [plans/webgpu-02-mel-and-vocoder.md](plans/webgpu-02-mel-and-vocoder.md) | WebGPU plan 02: reference audio prep, mel, Vocos graph and inverse STFT in TypeScript |
 | [plans/webgpu-03-text-frontend.md](plans/webgpu-03-text-frontend.md) | WebGPU plan 03: chunking, Chinese segmentation and pinyin, token ids, matched against Python |
 | [plans/webgpu-04-sampler-pipeline.md](plans/webgpu-04-sampler-pipeline.md) | WebGPU plan 04: chunk plan, torch-compatible noise, the ODE loop on the GPU, vocoder and cross-fade, the generation API, and a WER/similarity comparison with PyTorch |
+| [plans/webgpu-05-weights-precision.md](plans/webgpu-05-weights-precision.md) | WebGPU plan 05: smaller weight variants (fp16 storage, fp16 compute, 8- and 4-bit matmuls) checked numerically and by WER/similarity, sharded delivery with an OPFS cache, and the Hugging Face repo behind the attribution gate |
 
 Add a row here whenever a doc is added.

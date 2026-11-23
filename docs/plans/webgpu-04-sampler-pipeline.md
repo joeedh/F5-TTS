@@ -287,8 +287,8 @@ Per generation, `infer_process` and `infer_batch_process` in `infer/utils_infer.
     - Two RTX 5050 runs of en-multi and zh-short gave identical numbers.
     - The live-tensor count is 0 at the end of every case.
     - Time: en-multi (33.4 s of audio, 3 chunks) took 77 s on the RTX 5050 and 195 s on the Intel GPU; zh-short (11.9 s) took 49 s and 73 s. The first chunk's wave is ready at 33 s and 85 s for en-multi.
-  - For listening: `build/webgpu/listen/` has every case from the Intel GPU, plus en-multi and zh-short from the RTX 5050. Playwright empties `test-results/` on every run, so the spec writes there instead.
-    - The user's verdict, 2026-11-23: they sound fine, and the RTX 5050 and Intel GPU versions of en-multi and zh-short sound identical.
+  - For listening: `build/webgpu/listen/` has every case from the Intel GPU, plus en-multi and zh-short from the RTX 5050. Playwright empties `test-results/` on every run, so the spec writes there instead. Step 6's rerun through the API added the RTX 5050's version of every case.
+    - The user's verdict, 2026-11-23: they sound fine, and the RTX 5050 and Intel GPU versions sound identical.
   - Found on the way: ORT Web refuses to create two WebGPU sessions at once (debugging.md, 2026-11-22). Load models one after another.
 
 ### Step 6. The API (D6)
