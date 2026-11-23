@@ -231,6 +231,31 @@ ORT's source is not reachable, so this step probes. Write the results to `docs/r
   - `w16`'s and `w8`'s widened data equals the approximated weights bit for bit;
   - the precomputed tables are bit-identical to `fp32`'s in every variant.
 - Done when: every variant step 1 kept is built and passes these checks, and ruff and pyright pass.
+- Result, 2026-11-23: five variants built besides `fp32`, all passing the checks. `mixed` is not built: step 1 found it would have to keep the matmuls in fp32 to help, so it waits for step 4's `fp16` numbers.
+  - `tools/webgpu/convert_precision.py` writes `build/webgpu/variants/<variant>/`: the three graphs, the stored shards, `variant.json` (every shard's tensor table and the check results), `approx_weights.safetensors` for step 4's golden data, and `layout/` (the widened shards, for the ORT CPU checks only).
+  - **Sizes, all three graphs** (text, step and vocoder):
+
+    | Variant | Stored | Step graph | Step prediction against `fp32`, ORT CPU |
+    |---|---|---|---|
+    | `fp32` | 1.43 GB | 1,330 MB in 23 shards | — |
+    | `w16` | 0.73 GB | 667 MB in 23 shards | 1.3e-4 |
+    | `fp16` | 0.73 GB | 668 MB in 11 shards | 3.4e-4 (ORT CPU computes fp16 graphs in fp32; not the WebGPU error) |
+    | `w8` | 0.43 GB | 377 MB in 23 shards | 4.4e-3 |
+    | `q8` | 0.41 GB | 353 MB in 6 shards | 4.0e-3 |
+    | `q4` | 0.27 GB | 223 MB in 4 shards | 4.4e-2 |
+
+    - `q4` is above D1's 0.22 GB estimate: block-32 scales and zero points add 28% to the 4-bit weights, and the vocoder (27 MB at f16) and the fp32 tables (21 MB) come on top.
+    - Shards are cut at 64 MiB of fp32 layout, so a `w16` or `w8` step graph has 23 small shards (29 and 16 MB). Step 7 can cut by stored size instead if that matters.
+  - **Checkpoint tensors are found by value,** directly or transposed: 41 in the text graph, 321 in the step graph and 80 in the vocoder, which is every float tensor of 1 KB or more except the three tables and one all-ones LayerNorm scale. The exporter's `val_*` initializers are transposed checkpoint weights.
+  - **The checks, per variant:**
+    - `onnx.checker` passes, at IR 10;
+    - the loader's widening, written in Python, reproduces the layout bit for bit;
+    - the tables are bit-identical to `fp32`'s;
+    - chunk 0, step 0 of en-short runs through all three graphs on ORT CPU with finite outputs.
+    - The `Gemm` rewrite alone changes the fp32 step's outputs by 4e-7.
+  - **Quantized graphs:** all 25 `Gemm`s rewritten; 159 `MatMulNBits` in the step graph and 8 in the text graph; no `MatMul` with constant weights left.
+  - **`fp16`:** 14 step nodes stay fp32 (the time embedding through `Sin`, `Cos` and `Concat`, the rope table's `Slice`, and the CFG and Euler tail), and the text graph's `freqs_cis` reader.
+  - **The converter needed three fixes** (debugging.md, 2026-11-23). It rounds every float initializer even when only blocked nodes read it. It casts blocked nodes' outputs to fp16 even when only blocked nodes read them. And it declared `v` and `x_next` fp16 despite `keep_io_types`. The table check caught the first; an fp32 `Sin` input in the converted graph confirms the time embedding is fp32 now.
 
 ### Step 3. Load a variant in the browser
 

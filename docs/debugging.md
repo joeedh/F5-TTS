@@ -2,6 +2,21 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-23: onnxconverter-common's fp16 block list does less than it says (plan 05 step 2)
+
+`convert_float_to_float16(..., node_block_list=[...], keep_io_types=True)` (onnxconverter-common 1.16.0) keeps the listed nodes' arithmetic in fp32, but not the values between them. Three effects, each found in the converted DiT step graph:
+
+- **It rounds every float initializer**, even one that only blocked nodes read, and inserts a Cast back to fp32 in front of the reader. The time-embedding frequencies, the rope table and `freqs_cis` came out fp16-rounded behind fp32 nodes.
+  - Found by checking the tables bit for bit against the fp32 export.
+  - Fix: put the original initializer back and drop those Casts (`restore_tables` in `tools/webgpu/convert_precision.py`).
+- **It casts every blocked node's output to fp16,** even when the only readers are other blocked nodes (which it then casts back) or graph outputs.
+  - So `time * freq` was rounded to fp16 between two fp32 nodes, before `Sin` and `Cos`.
+  - ORT CPU refused the graph: `Type parameter (T) of Optype (Mul) bound to different types (tensor(float) and tensor(float16)`.
+  - Fix: blocked readers and casts back to fp32 read the fp32 value, and the fp16 Cast stays only for fp16 readers (`keep_fp32_between_blocked`).
+- **It declared the outputs `v` and `x_next` fp16** despite `keep_io_types`, because a blocked node produced them: `Type (tensor(float16)) of output arg (v) of node (node_add_179) does not match expected type (tensor(float))`. Fix: restore the output types from the source graph.
+- **To diagnose:** walk the producers of a node that must be fp32, and print each Cast's `to`. A Cast with `to` 10 (fp16) between two blocked nodes is this bug.
+- **A related check on the same tooling.** `onnx.checker.check_model(path)` refuses external data files with more than one hard link ("indicating a potential hardlink attack"), so variant folders hold copies, not links.
+
 ## 2026-11-23: four traps while probing weights and storage (plan 05 step 1)
 
 - **The memory sampler failed silently.** `web/bench/dit-load/sample-memory.ps1`, started from Node with `spawn("powershell.exe", ["-File", ...])`, printed nothing, so every memory figure came out `null`. On stderr: "running scripts is disabled on this system". The default execution policy blocks the script when it is not started from an interactive PowerShell. Fix: `-ExecutionPolicy Bypass` on that one process, which changes no system setting. `run.mjs` now forwards the sampler's stderr, so a failure shows.
