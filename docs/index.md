@@ -16,5 +16,6 @@
 | [plans/webgpu-01-dit-export.md](plans/webgpu-01-dit-export.md) | WebGPU plan 01: DiT export to ONNX (text and step graphs), attention and sequence-length choices, browser parity |
 | [plans/webgpu-02-mel-and-vocoder.md](plans/webgpu-02-mel-and-vocoder.md) | WebGPU plan 02: reference audio prep, mel, Vocos graph and inverse STFT in TypeScript |
 | [plans/webgpu-03-text-frontend.md](plans/webgpu-03-text-frontend.md) | WebGPU plan 03: chunking, Chinese segmentation and pinyin, token ids, matched against Python |
+| [plans/webgpu-04-sampler-pipeline.md](plans/webgpu-04-sampler-pipeline.md) | WebGPU plan 04: chunk plan, torch-compatible noise, the ODE loop on the GPU, vocoder and cross-fade, the generation API, and a WER/similarity comparison with PyTorch |
 
 Add a row here whenever a doc is added.

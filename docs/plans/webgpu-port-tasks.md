@@ -72,7 +72,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 | 01 | [DiT export to ONNX](webgpu-01-dit-export.md) | 00 | done 2026-11-20 (fp32 text and step graphs; `mha` attention, dynamic n; parity on both GPUs; hand-offs to 04 and 05 in the plan) |
 | 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | done 2026-11-21 (reference prep exact with pydub; mel, resampler and istft at the floor; Vocos graph on WebGPU; hand-offs to 04, 05 and 06 in the plan) |
 | 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | done 2026-11-22 (string rules, jieba-rs 0.11.0 in wasm plus a no-CJK TS path, pypinyin port, tokens and ids, all exact against Python on the edge cases and the Seed-TTS corpus; hand-offs to 04, 05 and 06 in the plan) |
-| 04 | [Sampler and generation pipeline](webgpu-04-sampler-pipeline.md) | 01, 02, 03 | plan not written |
+| 04 | [Sampler and generation pipeline](webgpu-04-sampler-pipeline.md) | 01, 02, 03 | plan pressure-tested 2026-11-22 (D5 thresholds accepted) |
 | 05 | [Weight delivery, precision and quantization](webgpu-05-weights-precision.md) | 01, 02 | plan not written |
 | 06 | [Web app and public API](webgpu-06-web-app.md) | 04, 05 | plan not written |
 | 07 | [Performance and browser validation](webgpu-07-perf-validation.md) | 04, 05 | plan not written |
