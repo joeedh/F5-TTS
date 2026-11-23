@@ -73,7 +73,7 @@ These are decisions to confirm in plan 00 before anything else builds on them.
 | 02 | [Mel spectrogram and vocoder](webgpu-02-mel-and-vocoder.md) | 00 | done 2026-11-21 (reference prep exact with pydub; mel, resampler and istft at the floor; Vocos graph on WebGPU; hand-offs to 04, 05 and 06 in the plan) |
 | 03 | [Text front end](webgpu-03-text-frontend.md) | 00 | done 2026-11-22 (string rules, jieba-rs 0.11.0 in wasm plus a no-CJK TS path, pypinyin port, tokens and ids, all exact against Python on the edge cases and the Seed-TTS corpus; hand-offs to 04, 05 and 06 in the plan) |
 | 04 | [Sampler and generation pipeline](webgpu-04-sampler-pipeline.md) | 01, 02, 03 | done 2026-11-23 (the `TTS` API; torch's CPU noise bit-exact; every golden case passes end to end on both GPUs, within 4 times the CUDA floor; WER and SIM equal to fp32 PyTorch on 200 Seed-TTS utterances; hand-offs to 05, 06 and 07 in the plan) |
-| 05 | [Weight delivery, precision and quantization](webgpu-05-weights-precision.md) | 01, 02 | plan pressure-tested 2026-11-23 |
+| 05 | [Weight delivery, precision and quantization](webgpu-05-weights-precision.md) | 01, 02 | in progress (step 1 done 2026-11-23) |
 | 06 | [Web app and public API](webgpu-06-web-app.md) | 04, 05 | plan not written |
 | 07 | [Performance and browser validation](webgpu-07-perf-validation.md) | 04, 05 | plan not written |
 

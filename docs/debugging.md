@@ -2,6 +2,13 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-23: four traps while probing weights and storage (plan 05 step 1)
+
+- **The memory sampler failed silently.** `web/bench/dit-load/sample-memory.ps1`, started from Node with `spawn("powershell.exe", ["-File", ...])`, printed nothing, so every memory figure came out `null`. On stderr: "running scripts is disabled on this system". The default execution policy blocks the script when it is not started from an interactive PowerShell. Fix: `-ExecutionPolicy Bypass` on that one process, which changes no system setting. `run.mjs` now forwards the sampler's stderr, so a failure shows.
+- **ORT CPU runs "fp16" graphs in fp32.** A graph that casts to fp16, runs `MatMul`, `Gemm`, `Conv` or `MultiHeadAttention`, and casts back gave outputs that were not even fp16 values. ORT CPU has no fp16 kernel for those ops, so it inserts casts to fp32 and then removes the Cast pairs, even with `graph_optimization_level` set to `ORT_DISABLE_ALL`. To diagnose: check whether the outputs lie on the fp16 grid. Do not use ORT CPU as an fp16 reference; compute the reference in float64 (`tools/webgpu/probe_kernels.py`).
+- **Playwright's `chromium.launch` gives an in-memory OPFS.** It reported a 10 GB quota, and a worker's `createSyncAccessHandle().write` of 64 MiB failed with `QuotaExceededError: No space available for this operation`. Use `launchPersistentContext` with a profile directory for any storage measurement. That reported a 10 GB quota too, with 137 GB free, so check a normal Chrome profile before relying on the figure.
+- **"CPUExecutionProvider" in ORT's verbose log is not a placement.** With optimizations on, each session logs `GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0`, which is the name of an optimizer pass. Only the lines after `Node placements` say where nodes run: `All nodes placed on [WebGpuExecutionProvider]` or a list per provider.
+
 ## 2026-11-23: running upstream's Seed-TTS eval on Windows with Python 3.13 (plan 04)
 
 Five obstacles, each with its fix. `tools/webgpu/quality_score.py` handles them, apart from the environment variables.

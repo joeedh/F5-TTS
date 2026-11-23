@@ -13,6 +13,7 @@
 | [research/webgpu-text-frontend.md](research/webgpu-text-frontend.md) | Plan 03: jieba-rs 0.11.0 segmentation and the no-CJK rule, pypinyin's lazy_pinyin path written out exactly (mmseg, TONE3, tone sandhi quirks), and how each part was checked |
 | [research/webgpu-torch-randn.md](research/webgpu-torch-randn.md) | Plan 04: torch 2.15 CPU `manual_seed` and `randn` (mt19937, 24-bit uniforms, AVX2 Box-Muller with Cephes log and sincos) and the bit-exact TypeScript port |
 | [research/webgpu-quality.md](research/webgpu-quality.md) | Plan 04: WER and speaker similarity of the WebGPU port against fp32 PyTorch on 200 Seed-TTS utterances, paired by seed; identical WER, SIM within 1e-5 |
+| [research/webgpu-weights.md](research/webgpu-weights.md) | Plan 05: ORT Web's fp16 kernels measured (matmuls and convs accumulate in fp16), MatMulNBits exact with fp32 activations, device limits ORT requests, Hugging Face CORS and Range from a page, OPFS and Cache Storage load times |
 | [plans/webgpu-port-tasks.md](plans/webgpu-port-tasks.md) | Task list: Python typing/tooling plan (pyright) and the WebGPU port plans |
 | [plans/webgpu-00-scope-and-parity.md](plans/webgpu-00-scope-and-parity.md) | WebGPU plan 00: scope, ORT Web vs WGSL spike, golden-data generator, tolerances, parity runner |
 | [plans/webgpu-01-dit-export.md](plans/webgpu-01-dit-export.md) | WebGPU plan 01: DiT export to ONNX (text and step graphs), attention and sequence-length choices, browser parity |

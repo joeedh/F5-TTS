@@ -1,6 +1,7 @@
 // Plan 01 step 2: loads the real fp32 DiT graphs in Chrome and records time and memory per scenario.
 // Usage (from web/): node bench/dit-load/run.mjs --gpu nvidia|intel [--channel chrome] [--attention unfused]
 //   [--case en-short] [--scenarios url,url,cache,cache] [--no-text] [--tag name]
+// Scenarios: url, cache, and (plan 05) opfs-blob and opfs-bytes; see LoadOptions.source in main.ts.
 // Each scenario runs in a new page of one persistent profile, so the second "url" run can use the HTTP
 // cache and the second "cache" run reads Cache Storage. Memory is sampled from outside (sample-memory.ps1).
 import { spawn } from "node:child_process";
@@ -45,7 +46,17 @@ rmSync(profile, { recursive: true, force: true });
 mkdirSync(profile, { recursive: true });
 
 const samples = [];
-const sampler = spawn("powershell.exe", ["-NoProfile", "-File", join(here, "sample-memory.ps1"), "-Profile", profile]);
+// -ExecutionPolicy Bypass for this process only: spawned from Node, the default policy refuses the script
+const sampler = spawn("powershell.exe", [
+  "-NoProfile",
+  "-ExecutionPolicy",
+  "Bypass",
+  "-File",
+  join(here, "sample-memory.ps1"),
+  "-Profile",
+  profile,
+]);
+sampler.stderr.on("data", (d) => process.stderr.write(`sample-memory.ps1: ${d}`));
 createInterface({ input: sampler.stdout }).on("line", (line) => {
   try {
     samples.push(JSON.parse(line));

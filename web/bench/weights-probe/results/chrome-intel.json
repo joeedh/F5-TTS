@@ -1,0 +1,853 @@
+{
+  "channel": "chrome",
+  "gpuFlag": "intel",
+  "browserVersion": "158.0.8127.37",
+  "date": "2026-11-23T17:12:54.228Z",
+  "kernels_all": {
+    "adapter": {
+      "vendor": "intel",
+      "architecture": "xe-3lpg"
+    },
+    "requested": [
+      {
+        "features": ["timestamp-query", "shader-f16", "subgroups", "subgroup-size-control"],
+        "limits": {
+          "maxBindGroups": 4,
+          "maxStorageBuffersPerShaderStage": 16,
+          "maxStorageBufferBindingSize": 2147483644,
+          "maxBufferSize": 2147483648,
+          "maxComputeWorkgroupStorageSize": 32768,
+          "maxComputeInvocationsPerWorkgroup": 1024,
+          "maxComputeWorkgroupSizeX": 1024,
+          "maxComputeWorkgroupSizeY": 1024,
+          "maxComputeWorkgroupSizeZ": 64,
+          "maxComputeWorkgroupsPerDimension": 65535
+        }
+      }
+    ],
+    "adapterLimits": {
+      "maxTextureDimension1D": 16384,
+      "maxTextureDimension2D": 16384,
+      "maxTextureDimension3D": 2048,
+      "maxTextureArrayLayers": 2048,
+      "maxBindGroups": 4,
+      "maxBindGroupsPlusVertexBuffers": 24,
+      "maxBindingsPerBindGroup": 1000,
+      "maxDynamicUniformBuffersPerPipelineLayout": 10,
+      "maxDynamicStorageBuffersPerPipelineLayout": 8,
+      "maxSampledTexturesPerShaderStage": 48,
+      "maxSamplersPerShaderStage": 16,
+      "maxStorageBuffersPerShaderStage": 16,
+      "maxStorageTexturesPerShaderStage": 8,
+      "maxUniformBuffersPerShaderStage": 12,
+      "maxUniformBufferBindingSize": 65536,
+      "maxStorageBufferBindingSize": 2147483644,
+      "minUniformBufferOffsetAlignment": 256,
+      "minStorageBufferOffsetAlignment": 256,
+      "maxVertexBuffers": 8,
+      "maxBufferSize": 2147483648,
+      "maxVertexAttributes": 30,
+      "maxVertexBufferArrayStride": 2048,
+      "maxInterStageShaderVariables": 28,
+      "maxColorAttachments": 8,
+      "maxColorAttachmentBytesPerSample": 128,
+      "maxComputeWorkgroupStorageSize": 32768,
+      "maxComputeInvocationsPerWorkgroup": 1024,
+      "maxComputeWorkgroupSizeX": 1024,
+      "maxComputeWorkgroupSizeY": 1024,
+      "maxComputeWorkgroupSizeZ": 64,
+      "maxComputeWorkgroupsPerDimension": 65535,
+      "maxImmediateSize": 64,
+      "maxStorageBuffersInFragmentStage": 16,
+      "maxStorageTexturesInFragmentStage": 8,
+      "maxStorageBuffersInVertexStage": 16,
+      "maxStorageTexturesInVertexStage": 8
+    },
+    "ortVersion": {
+      "common": "1.31.1",
+      "web": "1.31.1"
+    },
+    "results": [
+      {
+        "name": "matmul32_k1024",
+        "ms": 4.9,
+        "relL2": 5.754027093252203e-7,
+        "maxAbs": 0.0000612570805671453,
+        "finite": true,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "matmul16_ones_k4096",
+        "ms": 4.9,
+        "relL2": 0,
+        "maxAbs": 0,
+        "finite": true,
+        "exactFraction": 1,
+        "onGridFraction": 1,
+        "floor": 0,
+        "timesFloor": null,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "matmul16_k1024",
+        "ms": 6.2,
+        "relL2": 0.004695671447502965,
+        "maxAbs": 0.5384957738569938,
+        "finite": true,
+        "exactFraction": 0.052520751953125,
+        "onGridFraction": 1,
+        "floor": 0.00020685947184304995,
+        "timesFloor": 22.699813577140436,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "matmul16_k2048",
+        "ms": 5.6,
+        "relL2": 0.0065932639944672146,
+        "maxAbs": 1.0662772627838422,
+        "finite": true,
+        "exactFraction": 0.037136077880859375,
+        "onGridFraction": 1,
+        "floor": 0.00020769015316941274,
+        "timesFloor": 31.745674476387396,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "gemm16_k1024_n6144",
+        "ms": 6.1,
+        "relL2": 0.0024059253149000498,
+        "maxAbs": 0.2802517468226142,
+        "finite": true,
+        "exactFraction": 0.09973907470703125,
+        "onGridFraction": 1,
+        "floor": 0.00020706585384471963,
+        "timesFloor": 11.619131161549566,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "conv16_convpos",
+        "ms": 13.5,
+        "relL2": 0.006437880421234091,
+        "maxAbs": 0.9016174475837033,
+        "finite": true,
+        "exactFraction": 0.038646697998046875,
+        "onGridFraction": 1,
+        "floor": 0.000206895770422363,
+        "timesFloor": 31.11653954110138,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 5"
+        ]
+      },
+      {
+        "name": "conv16_depthwise",
+        "ms": 4.6,
+        "relL2": 0.0004561425575863409,
+        "maxAbs": 0.004936933517456055,
+        "finite": true,
+        "exactFraction": 0.45691680908203125,
+        "onGridFraction": 1,
+        "floor": 0.00020704289384069062,
+        "timesFloor": 2.203130709413868,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 5"
+        ]
+      },
+      {
+        "name": "mha16_s512",
+        "ms": 10.4,
+        "relL2": 0.0014429171629045967,
+        "maxAbs": 0.03282215809812783,
+        "finite": true,
+        "exactFraction": 0.19138717651367188,
+        "onGridFraction": 1,
+        "floor": 0.0002074318926539658,
+        "timesFloor": 6.956100840827044,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 5"
+        ]
+      },
+      {
+        "name": "layernorm16_mean0",
+        "ms": 3.9,
+        "relL2": 0.00033827444204073215,
+        "maxAbs": 0.004281227858735193,
+        "finite": true,
+        "exactFraction": 0.6376953125,
+        "onGridFraction": 1,
+        "floor": 0.00020736313013718547,
+        "timesFloor": 1.631314312322251,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "layernorm16_mean100",
+        "ms": 4.3,
+        "relL2": 0.00041679048434888516,
+        "maxAbs": 0.004663779942636559,
+        "finite": true,
+        "exactFraction": 0.573028564453125,
+        "onGridFraction": 1,
+        "floor": 0.00020734010754552284,
+        "timesFloor": 2.0101778150055996,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "gelu16_tanh",
+        "ms": 3.1,
+        "relL2": 0.0001879262191795467,
+        "maxAbs": 0.002315753947812471,
+        "finite": true,
+        "exactFraction": 0.5009307861328125,
+        "onGridFraction": 1,
+        "floor": 0.00009396730376734295,
+        "timesFloor": 1.999910731128777,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "gelu16_none",
+        "ms": 2.4,
+        "relL2": 0.0001442953922920474,
+        "maxAbs": 0.0019347484914766788,
+        "finite": true,
+        "exactFraction": 0.4420013427734375,
+        "onGridFraction": 1,
+        "floor": 0.00009750359262028507,
+        "timesFloor": 1.4798982110739944,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "mish16",
+        "ms": 6.5,
+        "relL2": 0.00038485315095898874,
+        "maxAbs": 0.002839401118683308,
+        "finite": true,
+        "exactFraction": 0.3917388916015625,
+        "onGridFraction": 1,
+        "floor": 0.0001781293742830496,
+        "timesFloor": 2.1605260362474112,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 5"
+        ]
+      },
+      {
+        "name": "sigmoid16",
+        "ms": 6.2,
+        "relL2": 0.0003118924402029604,
+        "maxAbs": 0.0007495534086759958,
+        "finite": true,
+        "exactFraction": 0.4712371826171875,
+        "onGridFraction": 1,
+        "floor": 0.00015889029292556658,
+        "timesFloor": 1.9629420681417515,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "sin16",
+        "ms": 2.1,
+        "relL2": 0.00016797239779212661,
+        "maxAbs": 0.00024410997225976505,
+        "finite": true,
+        "exactFraction": 0.9999847412109375,
+        "onGridFraction": 1,
+        "floor": 0.00016797239779181792,
+        "timesFloor": 1.0000000000018379,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "nbits4_b32_f32",
+        "ms": 4.6,
+        "relL2": 2.133130592620271e-7,
+        "maxAbs": 0.000001759607070273006,
+        "finite": true,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "nbits4_b128_f32",
+        "ms": 4.7,
+        "relL2": 1.0730292886407763e-7,
+        "maxAbs": 5.970815806222163e-7,
+        "finite": true,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "nbits8_b32_f32",
+        "ms": 4.8,
+        "relL2": 2.1518361193034607e-7,
+        "maxAbs": 0.0000016976356569387008,
+        "finite": true,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "nbits8_b128_f32",
+        "ms": 6.1,
+        "relL2": 1.0990985340781312e-7,
+        "maxAbs": 6.127129834609946e-7,
+        "finite": true,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "nbits4_b32_sym_f32",
+        "ms": 3.9,
+        "relL2": 2.1505416449949374e-7,
+        "maxAbs": 0.0000018643551586983165,
+        "finite": true,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "nbits4_b32_f16",
+        "ms": 5.2,
+        "relL2": 0.001765438352236016,
+        "maxAbs": 0.01344370208971668,
+        "finite": true,
+        "exactFraction": 0.1318817138671875,
+        "onGridFraction": 1,
+        "floor": 0.00020745955845832871,
+        "timesFloor": 8.509795187820329,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "nbits8_b32_f16",
+        "ms": 4.6,
+        "relL2": 0.0017677279301495361,
+        "maxAbs": 0.014602646804632968,
+        "finite": true,
+        "exactFraction": 0.1316986083984375,
+        "onGridFraction": 1,
+        "floor": 0.0002079131729030081,
+        "timesFloor": 8.502241130119181,
+        "placement": [
+          "Applying graph transformer TransposeOptimizer_CPUExecutionProvider on step 1.",
+          "GraphTransformer TransposeOptimizer_CPUExecutionProvider modified: 0 with status: OK",
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      }
+    ]
+  },
+  "kernels_disabled": {
+    "adapter": {
+      "vendor": "intel",
+      "architecture": "xe-3lpg"
+    },
+    "requested": [
+      {
+        "features": ["timestamp-query", "shader-f16", "subgroups", "subgroup-size-control"],
+        "limits": {
+          "maxBindGroups": 4,
+          "maxStorageBuffersPerShaderStage": 16,
+          "maxStorageBufferBindingSize": 2147483644,
+          "maxBufferSize": 2147483648,
+          "maxComputeWorkgroupStorageSize": 32768,
+          "maxComputeInvocationsPerWorkgroup": 1024,
+          "maxComputeWorkgroupSizeX": 1024,
+          "maxComputeWorkgroupSizeY": 1024,
+          "maxComputeWorkgroupSizeZ": 64,
+          "maxComputeWorkgroupsPerDimension": 65535
+        }
+      }
+    ],
+    "adapterLimits": {
+      "maxTextureDimension1D": 16384,
+      "maxTextureDimension2D": 16384,
+      "maxTextureDimension3D": 2048,
+      "maxTextureArrayLayers": 2048,
+      "maxBindGroups": 4,
+      "maxBindGroupsPlusVertexBuffers": 24,
+      "maxBindingsPerBindGroup": 1000,
+      "maxDynamicUniformBuffersPerPipelineLayout": 10,
+      "maxDynamicStorageBuffersPerPipelineLayout": 8,
+      "maxSampledTexturesPerShaderStage": 48,
+      "maxSamplersPerShaderStage": 16,
+      "maxStorageBuffersPerShaderStage": 16,
+      "maxStorageTexturesPerShaderStage": 8,
+      "maxUniformBuffersPerShaderStage": 12,
+      "maxUniformBufferBindingSize": 65536,
+      "maxStorageBufferBindingSize": 2147483644,
+      "minUniformBufferOffsetAlignment": 256,
+      "minStorageBufferOffsetAlignment": 256,
+      "maxVertexBuffers": 8,
+      "maxBufferSize": 2147483648,
+      "maxVertexAttributes": 30,
+      "maxVertexBufferArrayStride": 2048,
+      "maxInterStageShaderVariables": 28,
+      "maxColorAttachments": 8,
+      "maxColorAttachmentBytesPerSample": 128,
+      "maxComputeWorkgroupStorageSize": 32768,
+      "maxComputeInvocationsPerWorkgroup": 1024,
+      "maxComputeWorkgroupSizeX": 1024,
+      "maxComputeWorkgroupSizeY": 1024,
+      "maxComputeWorkgroupSizeZ": 64,
+      "maxComputeWorkgroupsPerDimension": 65535,
+      "maxImmediateSize": 64,
+      "maxStorageBuffersInFragmentStage": 16,
+      "maxStorageTexturesInFragmentStage": 8,
+      "maxStorageBuffersInVertexStage": 16,
+      "maxStorageTexturesInVertexStage": 8
+    },
+    "ortVersion": {
+      "common": "1.31.1",
+      "web": "1.31.1"
+    },
+    "results": [
+      {
+        "name": "matmul32_k1024",
+        "ms": 6.3,
+        "relL2": 5.754027093252203e-7,
+        "maxAbs": 0.0000612570805671453,
+        "finite": true,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "matmul16_ones_k4096",
+        "ms": 5.6,
+        "relL2": 0,
+        "maxAbs": 0,
+        "finite": true,
+        "exactFraction": 1,
+        "onGridFraction": 1,
+        "floor": 0,
+        "timesFloor": null,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "matmul16_k1024",
+        "ms": 4.8,
+        "relL2": 0.004695671447502965,
+        "maxAbs": 0.5384957738569938,
+        "finite": true,
+        "exactFraction": 0.052520751953125,
+        "onGridFraction": 1,
+        "floor": 0.00020685947184304995,
+        "timesFloor": 22.699813577140436,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "matmul16_k2048",
+        "ms": 5.4,
+        "relL2": 0.0065932639944672146,
+        "maxAbs": 1.0662772627838422,
+        "finite": true,
+        "exactFraction": 0.037136077880859375,
+        "onGridFraction": 1,
+        "floor": 0.00020769015316941274,
+        "timesFloor": 31.745674476387396,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "gemm16_k1024_n6144",
+        "ms": 6.2,
+        "relL2": 0.0024059253149000498,
+        "maxAbs": 0.2802517468226142,
+        "finite": true,
+        "exactFraction": 0.09973907470703125,
+        "onGridFraction": 1,
+        "floor": 0.00020706585384471963,
+        "timesFloor": 11.619131161549566,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "conv16_convpos",
+        "ms": 11.2,
+        "relL2": 0.006437880421234091,
+        "maxAbs": 0.9016174475837033,
+        "finite": true,
+        "exactFraction": 0.038646697998046875,
+        "onGridFraction": 1,
+        "floor": 0.000206895770422363,
+        "timesFloor": 31.11653954110138,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 5"
+        ]
+      },
+      {
+        "name": "conv16_depthwise",
+        "ms": 5.4,
+        "relL2": 0.0004561425575863409,
+        "maxAbs": 0.004936933517456055,
+        "finite": true,
+        "exactFraction": 0.45691680908203125,
+        "onGridFraction": 1,
+        "floor": 0.00020704289384069062,
+        "timesFloor": 2.203130709413868,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 5"
+        ]
+      },
+      {
+        "name": "mha16_s512",
+        "ms": 9.1,
+        "relL2": 0.0014429171629045967,
+        "maxAbs": 0.03282215809812783,
+        "finite": true,
+        "exactFraction": 0.19138717651367188,
+        "onGridFraction": 1,
+        "floor": 0.0002074318926539658,
+        "timesFloor": 6.956100840827044,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 5"
+        ]
+      },
+      {
+        "name": "layernorm16_mean0",
+        "ms": 5.2,
+        "relL2": 0.00033827444204073215,
+        "maxAbs": 0.004281227858735193,
+        "finite": true,
+        "exactFraction": 0.6376953125,
+        "onGridFraction": 1,
+        "floor": 0.00020736313013718547,
+        "timesFloor": 1.631314312322251,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "layernorm16_mean100",
+        "ms": 4.6,
+        "relL2": 0.00041679048434888516,
+        "maxAbs": 0.004663779942636559,
+        "finite": true,
+        "exactFraction": 0.573028564453125,
+        "onGridFraction": 1,
+        "floor": 0.00020734010754552284,
+        "timesFloor": 2.0101778150055996,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "gelu16_tanh",
+        "ms": 5.9,
+        "relL2": 0.0001879262191795467,
+        "maxAbs": 0.002315753947812471,
+        "finite": true,
+        "exactFraction": 0.5009307861328125,
+        "onGridFraction": 1,
+        "floor": 0.00009396730376734295,
+        "timesFloor": 1.999910731128777,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "gelu16_none",
+        "ms": 4.6,
+        "relL2": 0.0001442953922920474,
+        "maxAbs": 0.0019347484914766788,
+        "finite": true,
+        "exactFraction": 0.4420013427734375,
+        "onGridFraction": 1,
+        "floor": 0.00009750359262028507,
+        "timesFloor": 1.4798982110739944,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "mish16",
+        "ms": 5.9,
+        "relL2": 0.00038485315095898874,
+        "maxAbs": 0.002839401118683308,
+        "finite": true,
+        "exactFraction": 0.3917388916015625,
+        "onGridFraction": 1,
+        "floor": 0.0001781293742830496,
+        "timesFloor": 2.1605260362474112,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 5"
+        ]
+      },
+      {
+        "name": "sigmoid16",
+        "ms": 4.6,
+        "relL2": 0.0003118924402029604,
+        "maxAbs": 0.0007495534086759958,
+        "finite": true,
+        "exactFraction": 0.4712371826171875,
+        "onGridFraction": 1,
+        "floor": 0.00015889029292556658,
+        "timesFloor": 1.9629420681417515,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "sin16",
+        "ms": 5.6,
+        "relL2": 0.00016797239779212661,
+        "maxAbs": 0.00024410997225976505,
+        "finite": true,
+        "exactFraction": 0.9999847412109375,
+        "onGridFraction": 1,
+        "floor": 0.00016797239779181792,
+        "timesFloor": 1.0000000000018379,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "nbits4_b32_f32",
+        "ms": 4.2,
+        "relL2": 2.133130592620271e-7,
+        "maxAbs": 0.000001759607070273006,
+        "finite": true,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "nbits4_b128_f32",
+        "ms": 4.2,
+        "relL2": 1.0730292886407763e-7,
+        "maxAbs": 5.970815806222163e-7,
+        "finite": true,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "nbits8_b32_f32",
+        "ms": 4.1,
+        "relL2": 2.1518361193034607e-7,
+        "maxAbs": 0.0000016976356569387008,
+        "finite": true,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "nbits8_b128_f32",
+        "ms": 3.9,
+        "relL2": 1.0990985340781312e-7,
+        "maxAbs": 6.127129834609946e-7,
+        "finite": true,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "nbits4_b32_sym_f32",
+        "ms": 4.3,
+        "relL2": 2.1505416449949374e-7,
+        "maxAbs": 0.0000018643551586983165,
+        "finite": true,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 1"
+        ]
+      },
+      {
+        "name": "nbits4_b32_f16",
+        "ms": 3.9,
+        "relL2": 0.001765438352236016,
+        "maxAbs": 0.01344370208971668,
+        "finite": true,
+        "exactFraction": 0.1318817138671875,
+        "onGridFraction": 1,
+        "floor": 0.00020745955845832871,
+        "timesFloor": 8.509795187820329,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      },
+      {
+        "name": "nbits8_b32_f16",
+        "ms": 4.9,
+        "relL2": 0.0017677279301495361,
+        "maxAbs": 0.014602646804632968,
+        "finite": true,
+        "exactFraction": 0.1316986083984375,
+        "onGridFraction": 1,
+        "floor": 0.0002079131729030081,
+        "timesFloor": 8.502241130119181,
+        "placement": [
+          "GraphTransformer MemcpyTransformer modified: 0 with status: OK",
+          "Node placements",
+          " All nodes placed on [WebGpuExecutionProvider]. Number of nodes: 3"
+        ]
+      }
+    ]
+  },
+  "opfs": {
+    "quotaGB": 10,
+    "usageGB": 0,
+    "persisted": false,
+    "writableMs": 2858,
+    "readMs": 7319,
+    "readGB": 1.3125,
+    "syncHandle": {
+      "writeMs": 6321,
+      "readMs": 355
+    },
+    "estimateAfterWriteGB": 1.3125030994415283
+  }
+}

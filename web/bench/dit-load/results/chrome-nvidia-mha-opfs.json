@@ -1,0 +1,728 @@
+{
+  "channel": "chrome",
+  "gpuFlag": "nvidia",
+  "browserVersion": "158.0.8127.37",
+  "attention": "mha",
+  "caseName": "en-short",
+  "runs": [
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "url",
+      "text.createMs": 1119,
+      "text.transfer": {
+        "transferSize": 38908204,
+        "encodedBodySize": 38907904
+      },
+      "step_mha.createMs": 4884,
+      "step_mha.transfer": {
+        "transferSize": 1330455740,
+        "encodedBodySize": 1330455440
+      },
+      "loadTotalMs": 6740,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "runMs": [1621, 1104, 1031],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003569572728792886,
+          "maxAbs": 0.00001671910285949707,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007801609668032163,
+          "maxAbs": 0.00001659989356994629,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012472956806448457,
+          "maxAbs": 0.00009894371032714844,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.857309045946346e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454149420,
+        "textCreated": 1795454150785,
+        "stepCreated": 1795454156159,
+        "ran": 1795454160093,
+        "released": 1795454160103
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 8,
+        "baseline": null,
+        "privateGB": 2.53,
+        "maxProcessPrivateGB": 2.2,
+        "rendererGB": 1.64,
+        "gpuProcessGB": 2.2,
+        "gpuDedicatedGB": 1.71,
+        "gpuSharedGB": 0.15
+      },
+      "memoryLoad": {
+        "samples": 4,
+        "baseline": {
+          "privateGB": 0.26,
+          "gpuDedicatedGB": 0.05
+        },
+        "privateGB": 2.16,
+        "maxProcessPrivateGB": 1.58,
+        "rendererGB": 1.64,
+        "gpuProcessGB": 0.45,
+        "gpuDedicatedGB": 0.39,
+        "gpuSharedGB": 0.15
+      },
+      "memoryRun": {
+        "samples": 2,
+        "baseline": {
+          "privateGB": 2.05,
+          "gpuDedicatedGB": 0.39
+        },
+        "privateGB": 2.52,
+        "maxProcessPrivateGB": 2.19,
+        "rendererGB": 0.35,
+        "gpuProcessGB": 2.19,
+        "gpuDedicatedGB": 1.71,
+        "gpuSharedGB": 0.11
+      },
+      "pageErrors": [],
+      "scenario": "0:url"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "opfs-blob",
+      "text.onnx.data.opfsHit": false,
+      "text.onnx.data.opfsFillMs": 525,
+      "text.onnx.data.opfsOpenMs": 1,
+      "text.createMs": 478,
+      "step_mha.onnx.data.opfsHit": false,
+      "step_mha.onnx.data.opfsFillMs": 14953,
+      "step_mha.onnx.data.opfsOpenMs": 1,
+      "step_mha.createMs": 1673,
+      "loadTotalMs": 17772,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "runMs": [1620, 1032, 1030],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003569572728792886,
+          "maxAbs": 0.00001671910285949707,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007801609668032163,
+          "maxAbs": 0.00001659989356994629,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012472956806448457,
+          "maxAbs": 0.00009894371032714844,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.857309045946346e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454162903,
+        "textCreated": 1795454163945,
+        "stepCreated": 1795454180675,
+        "ran": 1795454184402,
+        "released": 1795454184413
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 14,
+        "baseline": {
+          "privateGB": 0.63,
+          "gpuDedicatedGB": 0.08
+        },
+        "privateGB": 3.83,
+        "maxProcessPrivateGB": 2.24,
+        "rendererGB": 1.64,
+        "gpuProcessGB": 2.24,
+        "gpuDedicatedGB": 1.74,
+        "gpuSharedGB": 0.11
+      },
+      "memoryLoad": {
+        "samples": 11,
+        "baseline": {
+          "privateGB": 0.63,
+          "gpuDedicatedGB": 0.08
+        },
+        "privateGB": 2.23,
+        "maxProcessPrivateGB": 1.58,
+        "rendererGB": 1.64,
+        "gpuProcessGB": 0.54,
+        "gpuDedicatedGB": 0.32,
+        "gpuSharedGB": 0.08
+      },
+      "memoryRun": {
+        "samples": 2,
+        "baseline": {
+          "privateGB": 2.23,
+          "gpuDedicatedGB": 0.32
+        },
+        "privateGB": 3.82,
+        "maxProcessPrivateGB": 2.19,
+        "rendererGB": 1.55,
+        "gpuProcessGB": 2.19,
+        "gpuDedicatedGB": 1.74,
+        "gpuSharedGB": 0.11
+      },
+      "pageErrors": [],
+      "scenario": "1:opfs-blob"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "opfs-blob",
+      "text.onnx.data.opfsHit": true,
+      "text.onnx.data.opfsOpenMs": 1,
+      "text.createMs": 506,
+      "step_mha.onnx.data.opfsHit": true,
+      "step_mha.onnx.data.opfsOpenMs": 1,
+      "step_mha.createMs": 2199,
+      "loadTotalMs": 2851,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "runMs": [1671, 1112, 1082],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003569572728792886,
+          "maxAbs": 0.00001671910285949707,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007801609668032163,
+          "maxAbs": 0.00001659989356994629,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012472956806448457,
+          "maxAbs": 0.00009894371032714844,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.857309045946346e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454187208,
+        "textCreated": 1795454187733,
+        "stepCreated": 1795454190059,
+        "ran": 1795454193976,
+        "released": 1795454193992
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 4,
+        "baseline": {
+          "privateGB": 0.69,
+          "gpuDedicatedGB": 0.07
+        },
+        "privateGB": 5.41,
+        "maxProcessPrivateGB": 3.1,
+        "rendererGB": 3.16,
+        "gpuProcessGB": 2.19,
+        "gpuDedicatedGB": 1.73,
+        "gpuSharedGB": 0.14
+      },
+      "memoryLoad": {
+        "samples": 1,
+        "baseline": {
+          "privateGB": 0.69,
+          "gpuDedicatedGB": 0.07
+        },
+        "privateGB": 0.9,
+        "maxProcessPrivateGB": 0.53,
+        "rendererGB": 0.3,
+        "gpuProcessGB": 0.53,
+        "gpuDedicatedGB": 0.24,
+        "gpuSharedGB": 0.07
+      },
+      "memoryRun": {
+        "samples": 3,
+        "baseline": {
+          "privateGB": 0.9,
+          "gpuDedicatedGB": 0.24
+        },
+        "privateGB": 5.41,
+        "maxProcessPrivateGB": 3.1,
+        "rendererGB": 3.16,
+        "gpuProcessGB": 2.19,
+        "gpuDedicatedGB": 1.73,
+        "gpuSharedGB": 0.14
+      },
+      "pageErrors": [],
+      "scenario": "2:opfs-blob"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "opfs-bytes",
+      "text.onnx.data.opfsHit": true,
+      "text.onnx.data.opfsReadMs": 92,
+      "text.createMs": 461,
+      "step_mha.onnx.data.opfsHit": true,
+      "step_mha.onnx.data.opfsReadMs": 481,
+      "step_mha.createMs": 650,
+      "loadTotalMs": 1837,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "runMs": [1134, 968, 1011],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003569572728792886,
+          "maxAbs": 0.00001671910285949707,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007801609668032163,
+          "maxAbs": 0.00001659989356994629,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012472956806448457,
+          "maxAbs": 0.00009894371032714844,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.857309045946346e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454196754,
+        "textCreated": 1795454197327,
+        "stepCreated": 1795454198591,
+        "ran": 1795454201753,
+        "released": 1795454201765
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 3,
+        "baseline": {
+          "privateGB": 0.7,
+          "gpuDedicatedGB": 0.08
+        },
+        "privateGB": 5.39,
+        "maxProcessPrivateGB": 3.06,
+        "rendererGB": 3.12,
+        "gpuProcessGB": 2.22,
+        "gpuDedicatedGB": 1.74,
+        "gpuSharedGB": 0.11
+      },
+      "memoryLoad": {
+        "samples": 1,
+        "baseline": {
+          "privateGB": 0.7,
+          "gpuDedicatedGB": 0.08
+        },
+        "privateGB": 1.24,
+        "maxProcessPrivateGB": 0.67,
+        "rendererGB": 0.73,
+        "gpuProcessGB": 0.43,
+        "gpuDedicatedGB": 0.6,
+        "gpuSharedGB": 0.08
+      },
+      "memoryRun": {
+        "samples": 2,
+        "baseline": {
+          "privateGB": 1.24,
+          "gpuDedicatedGB": 0.6
+        },
+        "privateGB": 5.39,
+        "maxProcessPrivateGB": 3.06,
+        "rendererGB": 3.12,
+        "gpuProcessGB": 2.22,
+        "gpuDedicatedGB": 1.74,
+        "gpuSharedGB": 0.11
+      },
+      "pageErrors": [],
+      "scenario": "3:opfs-bytes"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "opfs-bytes",
+      "text.onnx.data.opfsHit": true,
+      "text.onnx.data.opfsReadMs": 22,
+      "text.createMs": 412,
+      "step_mha.onnx.data.opfsHit": true,
+      "step_mha.onnx.data.opfsReadMs": 561,
+      "step_mha.createMs": 716,
+      "loadTotalMs": 1906,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "runMs": [1314, 1110, 1086],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003569572728792886,
+          "maxAbs": 0.00001671910285949707,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007801609668032163,
+          "maxAbs": 0.00001659989356994629,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012472956806448457,
+          "maxAbs": 0.00009894371032714844,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.857309045946346e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454204430,
+        "textCreated": 1795454204874,
+        "stepCreated": 1795454206336,
+        "ran": 1795454209889,
+        "released": 1795454209900
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 4,
+        "baseline": {
+          "privateGB": 3.76,
+          "gpuDedicatedGB": 0.09
+        },
+        "privateGB": 5.49,
+        "maxProcessPrivateGB": 3.13,
+        "rendererGB": 3.19,
+        "gpuProcessGB": 2.24,
+        "gpuDedicatedGB": 1.75,
+        "gpuSharedGB": 0.11
+      },
+      "memoryLoad": {
+        "samples": 1,
+        "baseline": {
+          "privateGB": 3.76,
+          "gpuDedicatedGB": 0.09
+        },
+        "privateGB": 0.72,
+        "maxProcessPrivateGB": 0.56,
+        "rendererGB": 0.09,
+        "gpuProcessGB": 0.56,
+        "gpuDedicatedGB": 0.25,
+        "gpuSharedGB": 0.07
+      },
+      "memoryRun": {
+        "samples": 3,
+        "baseline": {
+          "privateGB": 0.72,
+          "gpuDedicatedGB": 0.25
+        },
+        "privateGB": 5.49,
+        "maxProcessPrivateGB": 3.13,
+        "rendererGB": 3.19,
+        "gpuProcessGB": 2.24,
+        "gpuDedicatedGB": 1.75,
+        "gpuSharedGB": 0.11
+      },
+      "pageErrors": [],
+      "scenario": "4:opfs-bytes"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "cache",
+      "text.onnx.data.cacheHit": false,
+      "text.onnx.data.cacheFillMs": 195,
+      "text.onnx.data.cacheReadMs": 33,
+      "text.createMs": 416,
+      "step_mha.onnx.data.cacheHit": false,
+      "step_mha.onnx.data.cacheFillMs": 22070,
+      "step_mha.onnx.data.cacheReadMs": 1537,
+      "step_mha.createMs": 675,
+      "loadTotalMs": 25075,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "runMs": [1435, 1062, 960],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003569572728792886,
+          "maxAbs": 0.00001671910285949707,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007801609668032163,
+          "maxAbs": 0.00001659989356994629,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012472956806448457,
+          "maxAbs": 0.00009894371032714844,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.857309045946346e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454212651,
+        "textCreated": 1795454213324,
+        "stepCreated": 1795454237726,
+        "ran": 1795454241295,
+        "released": 1795454241305
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 18,
+        "baseline": {
+          "privateGB": 3.83,
+          "gpuDedicatedGB": 0.08
+        },
+        "privateGB": 3.85,
+        "maxProcessPrivateGB": 2.23,
+        "rendererGB": 1.9,
+        "gpuProcessGB": 2.23,
+        "gpuDedicatedGB": 1.74,
+        "gpuSharedGB": 0.11
+      },
+      "memoryLoad": {
+        "samples": 16,
+        "baseline": {
+          "privateGB": 3.83,
+          "gpuDedicatedGB": 0.08
+        },
+        "privateGB": 2.55,
+        "maxProcessPrivateGB": 1.83,
+        "rendererGB": 1.9,
+        "gpuProcessGB": 0.57,
+        "gpuDedicatedGB": 0.58,
+        "gpuSharedGB": 0.11
+      },
+      "memoryRun": {
+        "samples": 2,
+        "baseline": {
+          "privateGB": 2.35,
+          "gpuDedicatedGB": 0.58
+        },
+        "privateGB": 3.85,
+        "maxProcessPrivateGB": 2.23,
+        "rendererGB": 1.53,
+        "gpuProcessGB": 2.23,
+        "gpuDedicatedGB": 1.74,
+        "gpuSharedGB": 0.11
+      },
+      "pageErrors": [],
+      "scenario": "5:cache"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "cache",
+      "text.onnx.data.cacheHit": true,
+      "text.onnx.data.cacheReadMs": 38,
+      "text.createMs": 292,
+      "step_mha.onnx.data.cacheHit": true,
+      "step_mha.onnx.data.cacheReadMs": 1163,
+      "step_mha.createMs": 670,
+      "loadTotalMs": 2308,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "runMs": [1280, 1068, 1103],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003569572728792886,
+          "maxAbs": 0.00001671910285949707,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007801609668032163,
+          "maxAbs": 0.00001659989356994629,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012472956806448457,
+          "maxAbs": 0.00009894371032714844,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.857309045946346e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454243932,
+        "textCreated": 1795454244266,
+        "stepCreated": 1795454246240,
+        "ran": 1795454249720,
+        "released": 1795454249748
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 5,
+        "baseline": {
+          "privateGB": 3.89,
+          "gpuDedicatedGB": 0.08
+        },
+        "privateGB": 3.88,
+        "maxProcessPrivateGB": 2.25,
+        "rendererGB": 1.56,
+        "gpuProcessGB": 2.25,
+        "gpuDedicatedGB": 1.74,
+        "gpuSharedGB": 0.11
+      },
+      "memoryLoad": {
+        "samples": 2,
+        "baseline": {
+          "privateGB": 3.89,
+          "gpuDedicatedGB": 0.08
+        },
+        "privateGB": 1.25,
+        "maxProcessPrivateGB": 0.65,
+        "rendererGB": 0.52,
+        "gpuProcessGB": 0.65,
+        "gpuDedicatedGB": 0.25,
+        "gpuSharedGB": 0.07
+      },
+      "memoryRun": {
+        "samples": 2,
+        "baseline": {
+          "privateGB": 1.25,
+          "gpuDedicatedGB": 0.25
+        },
+        "privateGB": 3.85,
+        "maxProcessPrivateGB": 2.22,
+        "rendererGB": 1.56,
+        "gpuProcessGB": 2.22,
+        "gpuDedicatedGB": 1.74,
+        "gpuSharedGB": 0.11
+      },
+      "pageErrors": [],
+      "scenario": "6:cache"
+    }
+  ]
+}

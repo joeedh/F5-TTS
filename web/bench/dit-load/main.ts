@@ -6,13 +6,20 @@ import { compare, httpReader, loadCase, loadTolerances, type Result, type Tensor
 export interface LoadOptions {
   caseName?: string;
   attention?: "unfused" | "mha" | "onnx23";
-  /** "url": ORT fetches the external data itself. "cache": read from Cache Storage (filled on a miss). */
-  source?: "url" | "cache";
+  /**
+   * "url": ORT fetches the external data itself. "cache": read from Cache Storage (filled on a miss).
+   * "opfs-blob" and "opfs-bytes" (plan 05): stored in OPFS (filled on a miss by streaming the response), then
+   * handed to ORT as the File itself, or as bytes read whole by a worker's sync access handle.
+   */
+  source?: Source;
   withText?: boolean;
   runs?: number;
 }
 
+type Source = "url" | "cache" | "opfs-blob" | "opfs-bytes";
+
 const MODEL = "/model/";
+const OPFS_DIR = "dit-weights";
 const CACHE = "dit-weights";
 
 const ms = (t0: number) => Math.round(performance.now() - t0);
@@ -24,9 +31,41 @@ function transfer(url: string): { transferSize: number; encodedBodySize: number 
 }
 
 /** Returns the external data to hand ORT, and how long getting it took when we fetch it ourselves. */
-async function externalData(file: string, source: "url" | "cache", info: Record<string, unknown>) {
+async function opfsData(file: string, source: Source, info: Record<string, unknown>) {
+  const dir = await (await navigator.storage.getDirectory()).getDirectoryHandle(OPFS_DIR, { create: true });
+  let handle: FileSystemFileHandle;
+  try {
+    handle = await dir.getFileHandle(file);
+    info[`${file}.opfsHit`] = true;
+  } catch {
+    info[`${file}.opfsHit`] = false;
+    const t0 = performance.now();
+    const res = await fetch(MODEL + file, { cache: "no-store" });
+    handle = await dir.getFileHandle(file, { create: true });
+    await res.body!.pipeTo(await handle.createWritable());
+    info[`${file}.opfsFillMs`] = ms(t0);
+  }
+  const t0 = performance.now();
+  if (source === "opfs-blob") {
+    const blob = await handle.getFile();
+    info[`${file}.opfsOpenMs`] = ms(t0);
+    return [{ path: file, data: blob }];
+  }
+  const worker = new Worker(new URL("./opfs-worker.ts", import.meta.url), { type: "module" });
+  const reply = await new Promise<{ buffer?: ArrayBuffer; error?: string }>((resolve) => {
+    worker.onmessage = (e) => resolve(e.data);
+    worker.postMessage({ dir: OPFS_DIR, name: file });
+  });
+  worker.terminate();
+  if (!reply.buffer) throw new Error(`${file}: ${reply.error}`);
+  info[`${file}.opfsReadMs`] = ms(t0);
+  return [{ path: file, data: new Uint8Array(reply.buffer) }];
+}
+
+async function externalData(file: string, source: Source, info: Record<string, unknown>) {
   const url = MODEL + file;
   if (source === "url") return [{ path: file, data: url }];
+  if (source === "opfs-blob" || source === "opfs-bytes") return opfsData(file, source, info);
   const cache = await caches.open(CACHE);
   let hit = await cache.match(url);
   info[`${file}.cacheHit`] = Boolean(hit);
@@ -43,7 +82,7 @@ async function externalData(file: string, source: "url" | "cache", info: Record<
   return [{ path: file, data: bytes }];
 }
 
-async function createSession(stem: string, source: "url" | "cache", info: Record<string, unknown>) {
+async function createSession(stem: string, source: Source, info: Record<string, unknown>) {
   const graph = await (await fetch(`${MODEL}${stem}.onnx`)).arrayBuffer();
   const data = await externalData(`${stem}.onnx.data`, source, info);
   const t0 = performance.now();

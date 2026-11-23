@@ -1,0 +1,725 @@
+{
+  "channel": "chrome",
+  "gpuFlag": "intel",
+  "browserVersion": "158.0.8127.37",
+  "attention": "mha",
+  "caseName": "en-short",
+  "runs": [
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "url",
+      "text.createMs": 819,
+      "text.transfer": {
+        "transferSize": 38908204,
+        "encodedBodySize": 38907904
+      },
+      "step_mha.createMs": 5112,
+      "step_mha.transfer": {
+        "transferSize": 1330455740,
+        "encodedBodySize": 1330455440
+      },
+      "loadTotalMs": 6369,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "runMs": [3579, 2702, 2483],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003584833248682217,
+          "maxAbs": 0.000016957521438598633,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007834945422108581,
+          "maxAbs": 0.000016435980796813965,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012950460157262842,
+          "maxAbs": 0.00009703636169433594,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.136427988617121e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454273980,
+        "textCreated": 1795454274803,
+        "stepCreated": 1795454280349,
+        "ran": 1795454289317,
+        "released": 1795454289328
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 11,
+        "baseline": null,
+        "privateGB": 2.51,
+        "maxProcessPrivateGB": 1.97,
+        "rendererGB": 1.67,
+        "gpuProcessGB": 1.97,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "memoryLoad": {
+        "samples": 4,
+        "baseline": null,
+        "privateGB": 2.14,
+        "maxProcessPrivateGB": 1.57,
+        "rendererGB": 1.64,
+        "gpuProcessGB": 0.43,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 0.19
+      },
+      "memoryRun": {
+        "samples": 6,
+        "baseline": {
+          "privateGB": 2.1,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 2.51,
+        "maxProcessPrivateGB": 1.97,
+        "rendererGB": 1.67,
+        "gpuProcessGB": 1.97,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "pageErrors": [],
+      "scenario": "0:url"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "opfs-blob",
+      "text.onnx.data.opfsHit": false,
+      "text.onnx.data.opfsFillMs": 686,
+      "text.onnx.data.opfsOpenMs": 1,
+      "text.createMs": 403,
+      "step_mha.onnx.data.opfsHit": false,
+      "step_mha.onnx.data.opfsFillMs": 13620,
+      "step_mha.onnx.data.opfsOpenMs": 1,
+      "step_mha.createMs": 1590,
+      "loadTotalMs": 16481,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "runMs": [2812, 2584, 2661],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003584833248682217,
+          "maxAbs": 0.000016957521438598633,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007834945422108581,
+          "maxAbs": 0.000016435980796813965,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012950460157262842,
+          "maxAbs": 0.00009703636169433594,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.136427988617121e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454292080,
+        "textCreated": 1795454293199,
+        "stepCreated": 1795454308561,
+        "ran": 1795454316647,
+        "released": 1795454316656
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 16,
+        "baseline": {
+          "privateGB": 0.8,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 3.54,
+        "maxProcessPrivateGB": 1.96,
+        "rendererGB": 1.53,
+        "gpuProcessGB": 1.96,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "memoryLoad": {
+        "samples": 10,
+        "baseline": {
+          "privateGB": 0.8,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 0.98,
+        "maxProcessPrivateGB": 0.52,
+        "rendererGB": 0.46,
+        "gpuProcessGB": 0.52,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 0.2
+      },
+      "memoryRun": {
+        "samples": 5,
+        "baseline": {
+          "privateGB": 0.97,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 3.54,
+        "maxProcessPrivateGB": 1.96,
+        "rendererGB": 1.53,
+        "gpuProcessGB": 1.96,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "pageErrors": [],
+      "scenario": "1:opfs-blob"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "opfs-blob",
+      "text.onnx.data.opfsHit": true,
+      "text.onnx.data.opfsOpenMs": 0,
+      "text.createMs": 468,
+      "step_mha.onnx.data.opfsHit": true,
+      "step_mha.onnx.data.opfsOpenMs": 353,
+      "step_mha.createMs": 2334,
+      "loadTotalMs": 3697,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "runMs": [3188, 2682, 2639],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003584833248682217,
+          "maxAbs": 0.000016957521438598633,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007834945422108581,
+          "maxAbs": 0.000016435980796813965,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012950460157262842,
+          "maxAbs": 0.00009703636169433594,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.136427988617121e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454319722,
+        "textCreated": 1795454320289,
+        "stepCreated": 1795454323420,
+        "ran": 1795454331990,
+        "released": 1795454332001
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 8,
+        "baseline": {
+          "privateGB": 2.27,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 5.18,
+        "maxProcessPrivateGB": 3.08,
+        "rendererGB": 3.15,
+        "gpuProcessGB": 1.96,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "memoryLoad": {
+        "samples": 2,
+        "baseline": {
+          "privateGB": 2.27,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 1.44,
+        "maxProcessPrivateGB": 0.84,
+        "rendererGB": 0.91,
+        "gpuProcessGB": 0.49,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 0.2
+      },
+      "memoryRun": {
+        "samples": 5,
+        "baseline": {
+          "privateGB": 1.44,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 5.18,
+        "maxProcessPrivateGB": 3.08,
+        "rendererGB": 3.15,
+        "gpuProcessGB": 1.96,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "pageErrors": [],
+      "scenario": "2:opfs-blob"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "opfs-bytes",
+      "text.onnx.data.opfsHit": true,
+      "text.onnx.data.opfsReadMs": 98,
+      "text.createMs": 363,
+      "step_mha.onnx.data.opfsHit": true,
+      "step_mha.onnx.data.opfsReadMs": 428,
+      "step_mha.createMs": 651,
+      "loadTotalMs": 1754,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "runMs": [2803, 2511, 2539],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003584833248682217,
+          "maxAbs": 0.000016957521438598633,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007834945422108581,
+          "maxAbs": 0.000016435980796813965,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012950460157262842,
+          "maxAbs": 0.00009703636169433594,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.136427988617121e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454334711,
+        "textCreated": 1795454335178,
+        "stepCreated": 1795454336465,
+        "ran": 1795454344342,
+        "released": 1795454344352
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 6,
+        "baseline": {
+          "privateGB": 3.06,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 3.54,
+        "maxProcessPrivateGB": 1.97,
+        "rendererGB": 1.51,
+        "gpuProcessGB": 1.97,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.71
+      },
+      "memoryLoad": {
+        "samples": 1,
+        "baseline": {
+          "privateGB": 3.06,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 0.81,
+        "maxProcessPrivateGB": 0.65,
+        "rendererGB": 0.09,
+        "gpuProcessGB": 0.65,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 0.2
+      },
+      "memoryRun": {
+        "samples": 5,
+        "baseline": {
+          "privateGB": 0.81,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 3.54,
+        "maxProcessPrivateGB": 1.97,
+        "rendererGB": 1.51,
+        "gpuProcessGB": 1.97,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.71
+      },
+      "pageErrors": [],
+      "scenario": "3:opfs-bytes"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "opfs-bytes",
+      "text.onnx.data.opfsHit": true,
+      "text.onnx.data.opfsReadMs": 25,
+      "text.createMs": 414,
+      "step_mha.onnx.data.opfsHit": true,
+      "step_mha.onnx.data.opfsReadMs": 420,
+      "step_mha.createMs": 662,
+      "loadTotalMs": 1680,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "runMs": [2792, 2555, 2562],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003584833248682217,
+          "maxAbs": 0.000016957521438598633,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007834945422108581,
+          "maxAbs": 0.000016435980796813965,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012950460157262842,
+          "maxAbs": 0.00009703636169433594,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.136427988617121e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454347073,
+        "textCreated": 1795454347518,
+        "stepCreated": 1795454348753,
+        "ran": 1795454356686,
+        "released": 1795454356696
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 7,
+        "baseline": {
+          "privateGB": 2.75,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 3.55,
+        "maxProcessPrivateGB": 1.97,
+        "rendererGB": 1.51,
+        "gpuProcessGB": 1.97,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "memoryLoad": {
+        "samples": 1,
+        "baseline": {
+          "privateGB": 2.75,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 0.76,
+        "maxProcessPrivateGB": 0.6,
+        "rendererGB": 0.09,
+        "gpuProcessGB": 0.6,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 0.04
+      },
+      "memoryRun": {
+        "samples": 5,
+        "baseline": {
+          "privateGB": 0.76,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 3.55,
+        "maxProcessPrivateGB": 1.97,
+        "rendererGB": 1.51,
+        "gpuProcessGB": 1.97,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "pageErrors": [],
+      "scenario": "4:opfs-bytes"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "cache",
+      "text.onnx.data.cacheHit": false,
+      "text.onnx.data.cacheFillMs": 652,
+      "text.onnx.data.cacheReadMs": 34,
+      "text.createMs": 362,
+      "step_mha.onnx.data.cacheHit": false,
+      "step_mha.onnx.data.cacheFillMs": 44587,
+      "step_mha.onnx.data.cacheReadMs": 1499,
+      "step_mha.createMs": 638,
+      "loadTotalMs": 47952,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "runMs": [3207, 2546, 2563],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003584833248682217,
+          "maxAbs": 0.000016957521438598633,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007834945422108581,
+          "maxAbs": 0.000016435980796813965,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012950460157262842,
+          "maxAbs": 0.00009703636169433594,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.136427988617121e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454359327,
+        "textCreated": 1795454360399,
+        "stepCreated": 1795454407279,
+        "ran": 1795454415629,
+        "released": 1795454415638
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 35,
+        "baseline": {
+          "privateGB": 2.21,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 3.55,
+        "maxProcessPrivateGB": 2.96,
+        "rendererGB": 3.02,
+        "gpuProcessGB": 1.95,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "memoryLoad": {
+        "samples": 29,
+        "baseline": {
+          "privateGB": 2.21,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 2.21,
+        "maxProcessPrivateGB": 1.54,
+        "rendererGB": 1.61,
+        "gpuProcessGB": 0.64,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 0.2
+      },
+      "memoryRun": {
+        "samples": 5,
+        "baseline": {
+          "privateGB": 0.74,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 3.54,
+        "maxProcessPrivateGB": 2.96,
+        "rendererGB": 3.02,
+        "gpuProcessGB": 1.95,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "pageErrors": [],
+      "scenario": "5:cache"
+    },
+    {
+      "caseName": "en-short",
+      "attention": "mha",
+      "source": "cache",
+      "text.onnx.data.cacheHit": true,
+      "text.onnx.data.cacheReadMs": 33,
+      "text.createMs": 273,
+      "step_mha.onnx.data.cacheHit": true,
+      "step_mha.onnx.data.cacheReadMs": 1246,
+      "step_mha.createMs": 632,
+      "loadTotalMs": 2360,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "runMs": [3006, 2823, 2578],
+      "n": 1913,
+      "comparisons": [
+        {
+          "name": "c0.dit_internal.text_embed",
+          "passed": true,
+          "relL2": 0.000003584833248682217,
+          "maxAbs": 0.000016957521438598633,
+          "error": null
+        },
+        {
+          "name": "c0.dit_internal.text_embed_uncond",
+          "passed": true,
+          "relL2": 0.000007834945422108581,
+          "maxAbs": 0.000016435980796813965,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012950460157262842,
+          "maxAbs": 0.00009703636169433594,
+          "error": null
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.136427988617121e-7,
+          "maxAbs": 0.0000152587890625,
+          "error": null
+        }
+      ],
+      "passed": true,
+      "marks": {
+        "start": 1795454418396,
+        "textCreated": 1795454418722,
+        "stepCreated": 1795454420756,
+        "ran": 1795454429190,
+        "released": 1795454429200
+      },
+      "gpuErrors": [],
+      "ortVersion": {
+        "common": "1.31.1",
+        "web": "1.31.1"
+      },
+      "memory": {
+        "samples": 7,
+        "baseline": {
+          "privateGB": 2.26,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 3.53,
+        "maxProcessPrivateGB": 1.96,
+        "rendererGB": 1.5,
+        "gpuProcessGB": 1.96,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "memoryLoad": {
+        "samples": 2,
+        "baseline": {
+          "privateGB": 2.26,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 1.7,
+        "maxProcessPrivateGB": 1.04,
+        "rendererGB": 1.11,
+        "gpuProcessGB": 0.52,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 0.41
+      },
+      "memoryRun": {
+        "samples": 5,
+        "baseline": {
+          "privateGB": 1.7,
+          "gpuDedicatedGB": 0
+        },
+        "privateGB": 3.53,
+        "maxProcessPrivateGB": 1.96,
+        "rendererGB": 1.5,
+        "gpuProcessGB": 1.96,
+        "gpuDedicatedGB": 0,
+        "gpuSharedGB": 1.7
+      },
+      "pageErrors": [],
+      "scenario": "6:cache"
+    }
+  ]
+}

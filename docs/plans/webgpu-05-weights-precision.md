@@ -94,7 +94,7 @@ Nothing is uploaded until the user has settled the model card's attribution word
 | `q4` | the same, 4-bit | the same | step 1's answer | about 0.22 GB |
 
 - **The storage variants (`w16`, `w8`)** use the fp32 graph unchanged. They need no new kernel and run anywhere `fp32` does. `w16` halves the download for the cost of rounding the weights; `w8` nearly quarters it. Their only cost is the weight error, which the quality harness judges.
-- **`fp16` and `mixed`** matter for speed on the Intel GPU, the default GPU on Windows laptops.
+- **`fp16` and `mixed`** matter for speed on the Intel GPU, the default GPU on Windows laptops. Step 1 found ORT's fp16 `MatMul`, `Gemm` and `Conv` accumulate in fp16 (12 to 32 times the rounding floor), so `mixed` would have to keep them in fp32 to help, which leaves it little speed to gain.
 - **`q8` and `q4`** need the kernel to work as step 1 finds. Their quantized activations stay fp32, with `accuracy_level` 0 or unset: level 4 selects the DP4A path, which quantizes the activations to int8. They are not put through the fp16 converter.
   - **Their sizes depend on `Gemm`.** The estimates above assume step 2 rewrites the `Gemm` nodes as `MatMul` plus `Add` so they are quantized too. Without that, the 142M `Gemm` weights stay 16-bit, and `q8` and `q4` come to about 0.52 and 0.42 GB.
   - **The AdaLN modulation weights** (`attn_norm.linear`, 141M of them) may be the most sensitive to quantization. Step 5 tries `q4` with those kept at 8 bits if plain `q4` fails.
@@ -140,7 +140,7 @@ A variant's error has two sources: the weights it approximates, and the kernels 
   - the ORT Web version each variant was validated with;
   - the commit of this repo that built it.
 - **A pinned revision**: the app loads the manifest from a fixed Hugging Face commit, and the app build embeds the manifest's SHA-256. A published file can never change under a cached copy. A new export means a new commit and a new app build.
-- **No `Range` requests.** Plain GETs of whole shards work through Hugging Face's redirects. A forum report (2026-01) says `Range` fails CORS preflight after the redirect to `cas-bridge.xethub.hf.co`. Resume works by shard: a shard cut off partway is fetched again whole.
+- **Resume by shard.** A shard cut off partway is fetched again whole. Step 1 found `Range` working through Hugging Face's redirect today, but a forum report (2026-01) says it fails CORS on the Xet bridge (`cas-bridge.xethub.hf.co`). So `Range` resume inside a shard is an optional extra, never needed.
 
 ### D5. Cache (proposal: OPFS, verified on write)
 
@@ -148,7 +148,7 @@ A variant's error has two sources: the weights it approximates, and the kernels 
 - **Browser support**:
   - `createWritable` exists in Chrome 86, Firefox 111 and Safari 26, on the main thread too.
   - `createSyncAccessHandle` (workers only) and `move()` exist in Chrome 102, Firefox 111 and Safari 15.2.
-  - Step 1 picks one, and the write runs in a worker either way.
+  - Step 1 picked them: write with `createWritable`, piping the fetch body into it, which took about 3 s per 1.31 GiB. Read with a sync access handle in a worker, which took 0.4 s against 4 to 7 s for `File.arrayBuffer()`, and hand ORT the bytes.
   - OPFS and `crypto.subtle` both need a secure context, so testing from another device on the LAN needs HTTPS.
 - **Verification**:
   - Every file is hashed once, when it is written.
@@ -198,6 +198,25 @@ ORT's source is not reachable, so this step probes. Write the results to `docs/r
   - writing 1.4 GB in 64 MiB files and reading it back, timed;
   - passing OPFS `File` objects (Blobs) straight to `externalData`, against `Uint8Array`s.
 - Done when: the research doc answers each question with the probe result. Any answer that rules out a variant updates D1 before step 2.
+- Result, 2026-11-23: done; details in [research/webgpu-weights.md](../research/webgpu-weights.md). Nothing rules out a variant.
+  - **fp16 compute** is the same on both GPUs:
+    - `MatMul`, `Gemm` and the convpos `Conv` accumulate in fp16, at 12 to 32 times the fp16 rounding floor, and more as K grows.
+    - `MultiHeadAttention` is at 5 to 7 times. LayerNorm (statistics in fp32), Gelu, Mish, Sigmoid, Sin and the depthwise conv are at 1 to 2 times.
+    - So `mixed` with the matmuls in fp32 would keep most of the compute in fp32; step 4 decides whether it is worth building.
+  - **`MatMulNBits` with fp32 activations is exact on WebGPU:** within 2e-7 of `A @ deq`, at 4 and 8 bits, blocks 32 and 128, symmetric or not, on both GPUs.
+    - `q8` and `q4` stay, and need no `shader-f16`.
+    - With fp16 activations it accumulates in fp16 (8.5 times the floor).
+    - The read-back dequantization D2 needs matches both ORT CPU and WebGPU.
+  - **Device limits:** ORT asks for the adapter's maximum on ten limits, 2 GiB buffers included, and for `shader-f16` and subgroups when present.
+  - **Hugging Face:** from a page, a GET through the redirect to `us.aws.cdn.hf.co` works with CORS. `Range` requests work too (206), every header is exposed, and the ETag is the SHA-256. The `Range` problem the pressure test found reported does not occur today.
+  - **OPFS:**
+    - Writing with `createWritable` took about 3 s per 1.31 GiB; a worker's sync handle took 6 to 18 s to write.
+    - Reading through the sync handle took 0.4 s, against 4 to 7 s for `File.arrayBuffer()`.
+    - Through ORT, the step graph loaded from OPFS bytes in 1.7 to 1.9 s, against 2.3 to 2.4 s from Cache Storage and 6.4 to 6.7 s from a URL. Filling OPFS took 17 s, against 25 to 48 s for Cache Storage.
+    - Peak browser memory was 1 to 3 GB above the URL path's 2.5 GB, which is R4. Steps 3 and 7 measure it with tensor-aligned shards.
+    - The quota was 10 GB in Playwright's Chrome profile, with 137 GB free.
+  - **Tools:** `convert_float_to_float16` clamps constants to 1e4 and 1e-7, which step 2 checks the graphs for. Tensor-aligned shards need our own external-data writer.
+  - **New:** `tools/webgpu/probe_kernels.py`, `web/bench/weights-probe/`, and OPFS scenarios in `web/bench/dit-load/`. The memory sampler there had been failing silently and now works (debugging.md, 2026-11-23).
 
 ### Step 2. Build the variants
 
