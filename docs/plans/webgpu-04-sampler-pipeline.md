@@ -165,6 +165,20 @@ Per generation, `infer_process` and `infer_batch_process` in `infer/utils_infer.
     - an `nfe_step` outside the EPSS table;
     - a chunk past 8192 frames, which must be refused.
 - Done when: all pass.
+- Result, 2026-11-22: all pass.
+  - `web/src/pipeline/plan.ts`: `planChunks` and `timeGrid`, and `MAX_FRAMES` (8192). `planChunks` takes `tokenCounts` (each joined text's token count) rather than ids. `linspaceF32` is now exported from `audio/mel.ts`.
+  - Golden cases (`web/test/pipeline/plan.test.ts`): all 7 give the exact `duration`, `ref_audio_len` and `local_speed` of every chunk, and pass `plan.t` through the parity runner.
+  - The time grid is exact without sway. With sway, one point of each grid is one float32 ulp off (6e-8), always the same point, which is the CPU against CUDA floor and well inside 1e-6. torch's vectorized `cos` rounds that one value differently from `Math.cos` after `fround`.
+  - Synthetic cases: `tools/webgpu/plan_fixtures.py` runs upstream's real `infer_batch_process` and `CFM.sample`, with a stub transformer and vocoder, and records each chunk's duration as asked, its token count, its final duration and its time grid. That gives 13 cases in `testdata/webgpu/pipeline/plan_cases.json`, which is committed (a `.gitignore` exception):
+    - the minimum-duration rule, which fires (185 frames asked, 407 tokens, 408 frames);
+    - chunks of 8 and exactly 10 bytes, and a 4-character Chinese chunk of 12 bytes;
+    - speed 0.7;
+    - `fix_duration` with one chunk, and with three chunks and a 0.25 s cross-fade;
+    - EPSS at 7 and 16 steps, linspace at 20, no sway, positive sway;
+    - Chinese, and an odd sample count.
+    - Every case's token counts (from `convertCharToPinyin`) and durations match. Every time grid is within 6e-8, one float32 ulp.
+  - D7: a chunk is refused past 8192 frames, whether from `fix_duration` (90 s gives 8437 frames) or from an unpunctuated long text. The error names the chunk and the fix.
+  - Mutation checks: dropping the minimum-duration rule, `<= 10` for the short-chunk rule, and counting UTF-16 units instead of bytes each fail tests. The last two needed the 10-byte and 12-byte cases, which were added for that. Two mutants survive, both equivalent on any realistic input: the other order of operations in the `fix_duration` split, and float64 `pi / 2`.
 
 ### Step 2. Noise (D1)
 

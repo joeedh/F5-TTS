@@ -186,6 +186,8 @@ testdata/webgpu/*
 # plan 03: the edge cases and their dump are committed; a downloaded corpus goes in corpus/ and is not
 !testdata/webgpu/text/
 testdata/webgpu/text/corpus/
+# plan 04: synthetic chunk-plan fixtures from upstream's code (tools/webgpu/plan_fixtures.py)
+!testdata/webgpu/pipeline/
 web/test-results/
 web/playwright-report/
 !testdata/webgpu/tolerances.json

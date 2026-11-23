@@ -20,7 +20,7 @@ export function hannWindow(n: number): Float64Array {
 const f32 = Math.fround;
 
 /** `torch.linspace(start, end, steps)` in float32: the CPU kernel fills each half from its own end. */
-function linspaceF32(start: number, end: number, steps: number): Float64Array {
+export function linspaceF32(start: number, end: number, steps: number): Float64Array {
   const s = f32(start);
   const e = f32(end);
   const step = f32((e - s) / (steps - 1));
