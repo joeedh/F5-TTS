@@ -324,6 +324,13 @@ Per generation, `infer_process` and `infer_batch_process` in `infer/utils_infer.
 - `web/bench/quality/`: generates the same subset with the port in Chrome on the RTX 5050, and writes the wavs.
 - Score both with upstream's `eval/` scripts, one job at a time. Compare WER, similarity and optionally UTMOS, per language.
 - Done when: the comparison is recorded in `docs/research/` and judged against D5's thresholds.
+- Result, 2026-11-23: passed by a wide margin. Details in [research/webgpu-quality.md](../research/webgpu-quality.md).
+  - Mean WER is identical on both sides in both languages: 3.289% English, 1.430% Chinese. All 200 utterances get the same transcript.
+  - Mean SIM: 0.68915 against 0.68914 (English) and 0.75352 against 0.75352 (Chinese). Bounds were 0.5 points and 0.01.
+  - Pairing held: equal lengths everywhere, and a median waveform difference of 5e-4 (English) and 3e-4 (Chinese).
+  - New: `tools/webgpu/quality_set.py`, `quality_torch.py`, `quality_score.py`, `dll_dirs.py`, and `web/bench/quality/` (`run.mjs`, `main.ts`, `index.html`). The Vite dev server serves `data/seedtts_testset/` at `/seedtts/`.
+  - Environment: the eval packages went into `.venv313`, with torch, torchaudio and numpy pinned. That is faster-whisper 1.2.1 (upstream's 0.10.1 has no Python 3.13 install), PyAV 16.1.0, funasr, the CUDA 12 cuBLAS and cuDNN wheels, and s3prl trusted in torch.hub (all approved by the user). The five problems on the way are in debugging.md, 2026-11-23.
+  - The port took 1.3 to 1.7 times PyTorch fp32's time on the RTX 5050: 10.5 s and 13.3 s median per utterance, against 7.1 s and 7.5 s.
 
 ### Step 8. Close out
 

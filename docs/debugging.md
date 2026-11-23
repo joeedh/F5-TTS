@@ -2,6 +2,17 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-23: running upstream's Seed-TTS eval on Windows with Python 3.13 (plan 04)
+
+Five obstacles, each with its fix. `tools/webgpu/quality_score.py` handles them, apart from the environment variables.
+
+- **faster-whisper against PyAV 19:** `TypeError: open() got an unexpected keyword argument 'metadata_errors'`. faster-whisper 1.2.1 passes an argument PyAV 19 removed. Fix: `pip install av==16.1.0`, which accepts it. (Upstream pins faster-whisper 0.10.1, which needs `av==10.*`, with no wheel for Python 3.12 and newer.)
+- **CTranslate2 needs CUDA 12:** `RuntimeError: Library cublas64_12.dll is not found or cannot be loaded`. faster-whisper's backend wants CUDA 12's cuBLAS and cuDNN 9, but `.venv313`'s torch ships CUDA 13. Fix: `pip install nvidia-cublas-cu12 "nvidia-cudnn-cu12>=9,<10"`, and register their `bin` folders with `os.add_dll_directory` and on `PATH` (`dll_dirs.register_cuda12`). torch keeps its own CUDA 13 libraries.
+- **`get_seed_tts_test` reads `meta.lst` as cp1252:** `UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d`. Upstream's `open(metalst)` has no encoding, so on Windows the Chinese list fails. Fix without touching upstream: run with `PYTHONUTF8=1`.
+- **torch.hub asks before trusting s3prl:** `EOFError: EOF when reading a line` from `_check_repo_is_trusted`, when the run has no console. Upstream's ECAPA-TDNN loads WavLM through `torch.hub.load("s3prl/s3prl", ...)`, which runs code from s3prl's main branch. Once trusted (by the user, 2026-11-23), add `s3prl_s3prl` to `~/.cache/torch/hub/trusted_list`.
+- **s3prl's hubconf against torchaudio 2.9 and newer:** `AttributeError: module 'torchaudio' has no attribute 'set_audio_backend'`, then `ModuleNotFoundError: No module named 'torchaudio.sox_effects'`. The hubconf imports every model s3prl has, and some call removed APIs at import time. Fix: `stub_torchaudio_for_s3prl()` makes `set_audio_backend` a no-op (backend selection no longer exists) and stubs `sox_effects` with a function that raises if called. WavLM uses neither. Other removed APIs (`info`, `load_wav`) are used only inside other models' functions, so they need nothing.
+- **Same family, from plan 04's PyTorch generation:** upstream prints the texts, and a redirected stdout on Windows is cp1252. `quality_torch.py` reconfigures stdout to UTF-8, as `text_reference.py` does.
+
 ## 2026-11-22: ORT Web cannot create two WebGPU sessions at once (plan 04)
 
 - **Symptom:** `Error: another WebGPU EP inference session is being created.` from `InferenceSession.create`, thrown at once, when the DiT and the vocoder were loaded together with `Promise.all`.

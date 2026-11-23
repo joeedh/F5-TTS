@@ -11,6 +11,7 @@ export default defineConfig({
       "/model/dit/": join(repo, "build/webgpu/dit"), // the real DiT exports (tools/webgpu/export_dit.py)
       "/model/vocos/": join(repo, "build/webgpu/vocos"), // the real Vocos export (tools/webgpu/export_vocos.py)
       "/vocab/": join(repo, "src/f5_tts/infer/examples"), // vocab.txt, for the pipeline tests (plan 04)
+      "/seedtts/": join(repo, "data/seedtts_testset"), // the quality subset (tools/webgpu/quality_set.py)
     }),
   ],
   // as in the plan 00 spike: ORT Web finds its .wasm files relative to its own module, so it is not pre-bundled
