@@ -160,6 +160,12 @@
       "floor_rel_l2": 2.7566380865480426e-05,
       "floor_rel_l2_at": "zh-short/c0.mel_out"
     },
+    "final.free_running": {
+      "note": "final wav from the free-running ODE with golden noise: vocoder, output rescale and cross-fade (plan 04)",
+      "rel_l2": 0.1,
+      "floor_rel_l2": 0.006416947935265704,
+      "floor_rel_l2_at": "zh-short/final.wav"
+    },
     "vocoder.istft": {
       "note": "inverse STFT and output rescale from the golden head_out, against vocoder.wav; set to catch a wrong window or envelope, which vocoder.wav's tolerance would miss (plan 02, step 4)",
       "rel_l2": 1e-05

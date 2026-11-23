@@ -48,7 +48,7 @@ export interface Reference {
 }
 
 /** infer_batch_process's reference handling: mean of channels, raise to RMS 0.1 if quieter, resample. */
-export function downmixRmsResample(prepared: Pcm): Reference {
+export function downmixRmsResample(prepared: Pcm, targetRms = TARGET_RMS): Reference {
   const { samples, channels, sampleRate } = prepared;
   const frames = samples.length / channels;
   const mono = new Float32Array(frames);
@@ -60,10 +60,10 @@ export function downmixRmsResample(prepared: Pcm): Reference {
   let sum = 0;
   for (const v of mono) sum += v * v;
   const rms = Math.fround(Math.sqrt(sum / frames));
-  const raised = rms < TARGET_RMS;
+  const raised = rms < targetRms;
   if (raised) {
     // audio * target_rms / rms in float32
-    const k = Math.fround(TARGET_RMS);
+    const k = Math.fround(targetRms);
     for (let i = 0; i < frames; i++) mono[i] = Math.fround(Math.fround((mono[i] as number) * k) / rms);
   }
   return { audio: resample(mono, sampleRate, SAMPLE_RATE), rms, raised };

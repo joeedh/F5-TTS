@@ -5,6 +5,10 @@ compares with the CPU golden outputs. The floor of a check is the worst differen
 chunk and step; its tolerance is 10 times that, rounded up to a power of ten.
 
   .venv313\\Scripts\\python.exe tools/webgpu/measure_floor.py
+  .venv313/Scripts/python.exe tools/webgpu/measure_floor.py --merge final.free_running
+
+--merge reruns only the free-running stage, replaces only the named checks' rows in floors.json, and
+rebuilds tolerances.json from that, so a new check does not shift the existing tolerances.
 
 Writes testdata/webgpu/floors.json (every measurement) and testdata/webgpu/tolerances.json (the
 table both parity runners read). The tiny case is measured and reported, but its random weights do not
@@ -203,8 +207,33 @@ def measure_case(name: str, model: Any, vocoder: Any, dev: torch.device, fl: Flo
         fl.add("vocoder.stft_complex", name, f"c{c}.vocoder.head_out", metrics(complex_stft(ho), complex_stft(gho)))
         fl.add("vocoder.wav", name, f"c{c}.vocoder.wav", metrics(wav.squeeze(), g.np(f"c{c}.vocoder.wav")), wav)
     head_hook.remove()
+    measure_free_running(g, model, vocoder, dev, fl)
 
-    # free-running ODE with the golden noise injected; also gives the time grid
+
+def cross_fade(waves: list[np.ndarray], seconds: float) -> np.ndarray:
+    """infer_batch_process's cross-fade (utils_infer.py:575), copied; main checks it against final.wav."""
+    if seconds <= 0:
+        return np.concatenate(waves)
+    final = waves[0]
+    for nxt in waves[1:]:
+        n = min(int(seconds * 24000), len(final), len(nxt))
+        if n <= 0:
+            final = np.concatenate([final, nxt])
+            continue
+        overlap = final[-n:] * np.linspace(1, 0, n) + nxt[:n] * np.linspace(0, 1, n)
+        final = np.concatenate([final[:-n], overlap, nxt[n:]])
+    return final
+
+
+def measure_free_running(g: Golden, model: Any, vocoder: Any, dev: torch.device, fl: Floors) -> None:  # Any: CFM, Vocos
+    """Free-running ODE with the golden noise injected, then the vocoder, rescale and cross-fade."""
+    name, man = g.dir.name, g.manifest
+    nfe = man["settings"]["nfe_step"]
+    raised, rms = man["audio"]["raised"], man["audio"]["rms"]
+    golden_waves = [g.np(f"c{c}.vocoder.wav") for c in range(len(man["chunks"]))]
+    fade = man["settings"]["cross_fade_duration"]
+    assert np.array_equal(cross_fade(golden_waves, fade).astype(np.float32), g.np("final.wav")), "cross_fade copy"
+    waves: list[np.ndarray] = []
     real_odeint = cfm_module.odeint
     for c, chunk in enumerate(man["chunks"]):
         y0 = g.t(f"c{c}.noise.y0", dev)
@@ -230,6 +259,13 @@ def measure_case(name: str, model: Any, vocoder: Any, dev: torch.device, fl: Flo
         fl.add("plan.t", name, f"c{c}.plan.t", metrics(grid[0], g.np(f"c{c}.plan.t")), grid[0])
         mel_out = out[:, chunk["ref_audio_len"] :, :].permute(0, 2, 1)
         fl.add("mel_out.free_running", name, f"c{c}.mel_out", metrics(mel_out, g.np(f"c{c}.mel_out")), mel_out)
+        with torch.inference_mode():
+            wav = vocoder.decode(mel_out)
+        if raised:
+            wav = wav * rms / 0.1
+        waves.append(wav.squeeze().float().cpu().numpy())
+    final = cross_fade(waves, fade).astype(np.float32)
+    fl.add("final.free_running", name, "final.wav", metrics(final, g.np("final.wav")), torch.from_numpy(final))
 
 
 # check -> (metrics the pass check uses, how to read it)
@@ -254,6 +290,10 @@ CHECKS: dict[str, tuple[list[str], str]] = {
     "vocoder.stft_complex": (["rel_l2"], "complex STFT from the head output"),
     "vocoder.wav": (["rel_l2", "max_abs"], "chunk wav after output RMS rescale, golden mel"),
     "mel_out.free_running": (["rel_l2"], "free-running ODE with golden noise, cropped mel"),
+    "final.free_running": (
+        ["rel_l2"],
+        "final wav from the free-running ODE with golden noise: vocoder, output rescale and cross-fade (plan 04)",
+    ),
 }
 
 
@@ -276,9 +316,21 @@ def main() -> None:
     p.add_argument("--case", action="append", choices=sorted(CASES), default=[])
     p.add_argument("--from-floors", action="store_true", help="rebuild tolerances.json from floors.json, no GPU")
     p.add_argument("--dump", action="store_true", help="save the CUDA outputs to <case>/cuda/ (parity smoke test)")
+    p.add_argument("--merge", action="append", default=[], metavar="CHECK", help="see above; repeatable")
     args = p.parse_args()
 
-    if args.from_floors:
+    if args.merge:
+        old = json.loads((OUT_ROOT / "floors.json").read_text())["rows"]
+        names = args.case or sorted({r["case"] for r in old})
+        new = measure(names, args.dump, free_running_only=True)
+        report_remeasured(old, new.rows, set(args.merge))
+        fl = Floors(
+            rows=[r for r in old if r["check"] not in args.merge] + [r for r in new.rows if r["check"] in args.merge]
+        )
+        gpu = json.loads((OUT_ROOT / "tolerances.json").read_text())["measured_with"]["gpu"]
+        (OUT_ROOT / "floors.json").write_text(json.dumps({"rows": fl.rows}, indent=1))
+        names = sorted({r["case"] for r in fl.rows})
+    elif args.from_floors:
         fl = Floors(rows=json.loads((OUT_ROOT / "floors.json").read_text())["rows"])
         names = sorted({r["case"] for r in fl.rows})
         gpu = json.loads((OUT_ROOT / "tolerances.json").read_text())["measured_with"]["gpu"]
@@ -289,7 +341,16 @@ def main() -> None:
     write_tolerances(fl, names, gpu)
 
 
-def measure(names: list[str], dump: bool = False) -> Floors:
+def report_remeasured(old: list[dict[str, Any]], new: list[dict[str, Any]], merged: set[str]) -> None:  # Any: rows
+    """For the checks a merge keeps, how far the rerun moved; CUDA should repeat itself closely."""
+    before = {(r["check"], r["case"], r["tensor"]): r for r in old}
+    for r in new:
+        o = before.get((r["check"], r["case"], r["tensor"]))
+        if r["check"] not in merged and o is not None:
+            print(f"rerun {r['check']} {r['case']}/{r['tensor']}: rel_l2 {o['rel_l2']} -> {r['rel_l2']} (kept)")
+
+
+def measure(names: list[str], dump: bool = False, free_running_only: bool = False) -> Floors:
     assert torch.cuda.is_available(), "needs CUDA (run in .venv313)"
     dev = torch.device("cuda")
     torch.backends.cuda.matmul.allow_tf32 = False
@@ -305,7 +366,10 @@ def measure(names: list[str], dump: bool = False) -> Floors:
             models[case.model] = (model.to(dev).eval(), vocoder.to(dev).eval())
         model, vocoder = models[case.model]
         n0 = len(fl.rows)
-        measure_case(name, model, vocoder, dev, fl)
+        if free_running_only:
+            measure_free_running(Golden(name), model, vocoder, dev, fl)
+        else:
+            measure_case(name, model, vocoder, dev, fl)
         print(f"{name}: {len(fl.rows) - n0} comparisons", flush=True)
     return fl
 

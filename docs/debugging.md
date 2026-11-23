@@ -2,6 +2,12 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-22: ORT Web cannot create two WebGPU sessions at once (plan 04)
+
+- **Symptom:** `Error: another WebGPU EP inference session is being created.` from `InferenceSession.create`, thrown at once, when the DiT and the vocoder were loaded together with `Promise.all`.
+- **Cause:** the error is thrown from `webgpuRegisterDevice` in ORT Web's bundle, inside `InferenceSession.create`, so it is a guard on overlapping session creation. (Read from the stack trace, not from ORT's source.) Sessions created one after another run together without trouble, as plan 04's runs show.
+- **Fix:** create sessions one after another (`web/test/pipeline/run-final.ts`). Anything that loads several models, such as plan 04's `TTS.create` and plan 06's loader, must do the same. Fetching the weights can still overlap; only the `create` calls must not.
+
 ## 2026-11-22: measuring GPU memory of a WebGPU page on Windows, and the DiT at n = 8192 (plan 04)
 
 - **Problem:** WebGPU has no memory query, so a test cannot see how much GPU memory the page holds, and reading Chrome's task manager by hand does not fit a scripted run.

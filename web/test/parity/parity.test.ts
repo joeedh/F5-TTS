@@ -170,3 +170,25 @@ describe.skipIf(dumped.length === 0)("smoke: CUDA rerun as a port", () => {
     120_000,
   ); // hundreds of .npy files per case; the default 5 s is too short
 });
+
+describe("final.wav's check is chosen by mode (plan 04, D4)", () => {
+  it("is an input without an explicit check", async () => {
+    await expect(compare(golden, tolerances, "final.wav", await golden.tensor("final.wav"))).rejects.toThrow(/input/);
+  });
+
+  it("is exact for the cross-fade of the golden chunk waves", async () => {
+    const wav = copy(await golden.tensor("final.wav"));
+    expect((await compare(golden, tolerances, "final.wav", wav, ["exact"]))[0]?.pass).toBe(true);
+    wav.data[100] = (wav.data[100] as number) + 1e-6;
+    expect((await compare(golden, tolerances, "final.wav", wav, ["exact"]))[0]?.pass).toBe(false);
+  });
+
+  it("has a measured tolerance end to end", async () => {
+    const wav = copy(await golden.tensor("final.wav"));
+    const [ok] = await compare(golden, tolerances, "final.wav", wav, ["final.free_running"]);
+    expect(ok?.pass).toBe(true);
+    wav.data.reverse();
+    const [bad] = await compare(golden, tolerances, "final.wav", wav, ["final.free_running"]);
+    expect(bad?.pass).toBe(false);
+  });
+});

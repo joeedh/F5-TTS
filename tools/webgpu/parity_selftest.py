@@ -107,6 +107,21 @@ def main() -> None:
     except ValueError:
         check(True, "input refused")
 
+    # plan 04, D4: final.wav's check is chosen by mode, not by name
+    wav = g.tensor("final.wav").copy()
+    try:
+        compare(g, tol, "final.wav", wav)
+        check(False, "final.wav refused without a check")
+    except ValueError:
+        check(True, "final.wav refused without a check")
+    check(compare(g, tol, "final.wav", wav, ["exact"])[0].passed, "final.wav exact against itself")
+    wav2 = wav.copy()
+    wav2[100] += np.float32(1e-6)
+    check(not compare(g, tol, "final.wav", wav2, ["exact"])[0].passed, "final.wav exact catches one sample")
+    check(compare(g, tol, "final.wav", wav, ["final.free_running"])[0].passed, "final.free_running against itself")
+    rev = np.ascontiguousarray(wav[::-1])
+    check(not compare(g, tol, "final.wav", rev, ["final.free_running"])[0].passed, "final.free_running catches junk")
+
     for case in REAL:
         dump = GOLDEN_ROOT / case / "cuda"
         if not dump.exists():

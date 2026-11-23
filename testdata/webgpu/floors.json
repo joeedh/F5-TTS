@@ -15002,6 +15002,69 @@
    "rel_l2": 2.7566380865480426e-05,
    "cos": 0.9999999996201192,
    "ref_abs_max": 12.95133113861084
+  },
+  {
+   "check": "final.free_running",
+   "case": "en-epss16",
+   "tensor": "final.wav",
+   "max_abs": 0.011154816951602697,
+   "rel_l2": 0.0011077996820946937,
+   "cos": 0.9999993864327409,
+   "ref_abs_max": 1.0859729051589966
+  },
+  {
+   "check": "final.free_running",
+   "case": "en-multi",
+   "tensor": "final.wav",
+   "max_abs": 0.007769569754600525,
+   "rel_l2": 0.0005543374290024025,
+   "cos": 0.9999998463553468,
+   "ref_abs_max": 1.2507245540618896
+  },
+  {
+   "check": "final.free_running",
+   "case": "en-multi-fixdur",
+   "tensor": "final.wav",
+   "max_abs": 0.006183095276355743,
+   "rel_l2": 0.000685092975015731,
+   "cos": 0.9999997653246038,
+   "ref_abs_max": 1.2413867712020874
+  },
+  {
+   "check": "final.free_running",
+   "case": "en-prep",
+   "tensor": "final.wav",
+   "max_abs": 0.0010611489415168762,
+   "rel_l2": 0.0009687686721325707,
+   "cos": 0.9999995308610515,
+   "ref_abs_max": 0.1656818985939026
+  },
+  {
+   "check": "final.free_running",
+   "case": "en-short",
+   "tensor": "final.wav",
+   "max_abs": 0.007769569754600525,
+   "rel_l2": 0.0007616246411464927,
+   "cos": 0.9999997099639123,
+   "ref_abs_max": 1.2507245540618896
+  },
+  {
+   "check": "final.free_running",
+   "case": "tiny",
+   "tensor": "final.wav",
+   "max_abs": 6.949994713068008e-08,
+   "rel_l2": 4.230014953872482e-06,
+   "cos": 0.9999999999910624,
+   "ref_abs_max": 0.0025586208794265985
+  },
+  {
+   "check": "final.free_running",
+   "case": "zh-short",
+   "tensor": "final.wav",
+   "max_abs": 0.04077962413430214,
+   "rel_l2": 0.006416947935265704,
+   "cos": 0.9999794115593309,
+   "ref_abs_max": 1.2504521608352661
   }
  ]
 }

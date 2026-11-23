@@ -261,6 +261,34 @@ Per generation, `infer_process` and `infer_batch_process` in `infer/utils_infer.
 - Browser test, local only: end to end, from `input.wav` and the texts, with the golden noise injected (`final.free_running`). Write each result as a wav for listening.
 - `tools/webgpu/measure_floor.py` gains the vocoder, rescale and cross-fade in its free-running run. Then `tolerances.json` (merged, D4) and both runners get `noise.torch_randn`, `final.crossfade` and `final.free_running`.
 - Done when: both final checks pass on both GPUs, and the en-multi and zh-short results have been listened to.
+- Result, 2026-11-22: both final checks pass on both GPUs. Listening is with the user (files below).
+  - `web/src/pipeline/assemble.ts`: `crossFadeF64` (numpy's values, float64) and `crossFade` (cast to float32 once).
+    - The golden chunk waves cross-fade to every golden `final.wav` byte for byte. So `final.crossfade` is the `exact` check, not a measured one.
+    - `tools/webgpu/crossfade_fixtures.py` runs upstream's real `infer_batch_process` with a vocoder stub that returns preset waves. That gives 10 cases in `testdata/webgpu/pipeline/crossfade_cases.json`: a wave shorter than the fade, the first wave shorter, fades of 0, -1, 1 and 2 samples, 480.96 samples (truncated), one chunk, five chunks, and the default 0.15 s. All match exactly.
+    - Mutation checks: no exact endpoint in `linspace`, another `linspace` formula, a float32 fade, rounding instead of truncating, and the wrong one-point `linspace` each fail. Rounding survived until the 480.96-sample case was added.
+  - `web/src/pipeline/generate.ts`: `generateWith(models, input, settings, hooks)` is the whole pipeline. It runs from the decoded reference file and the texts, through reference prep, text fix-up and chunking, tokens, the plan, noise from the seed, `sampleChunk`, `finishChunk`, the vocoder and the rescale, to the cross-fade. Step 6 wraps it in the API. It already refuses an empty reference text and takes `targetRms`: `downmixRmsResample` and `rescaleOutput` gained an optional `targetRms` argument, which defaults to 0.1.
+  - Runner choice: `final.wav`'s check is chosen by mode (D4). `compare` in both runners takes an optional list of checks, and `final.wav` without one is still refused as an input. Self-tests were added to both runners.
+  - `measure_floor.py`: the free-running stage now goes on through the vocoder, rescale and cross-fade. `--merge CHECK` reruns only that stage and replaces only the named check's rows in `floors.json`.
+    - The rerun reproduced every existing `plan.t` and `mel_out.free_running` row bit for bit, and only `final.free_running` was added to `tolerances.json`.
+    - Its floor is high: relL2 6.4e-3 (`zh-short`), so its tolerance is 0.1. The vocoder amplifies mel differences. For `zh-short`, a 2.8e-5 mel difference becomes 6.4e-3 in the wave, while the vocoder alone, from the same mel, differs by at most 7e-4. A tolerance of 0.1 catches only gross errors; quality is D5's to judge.
+  - `noise.torch_randn` was not added to `tolerances.json`: the noise is exact (step 2).
+  - End to end in Chrome (`web/test/browser-local/final.spec.ts`), seed 0, from `input.wav` and the texts. Seed 0's noise is bit-identical to the golden noise, so no injection is needed. Results, `final.free_running` relL2:
+
+    | Case | RTX 5050 | Intel GPU | CUDA floor |
+    |---|---|---|---|
+    | en-epss16 | 8.3e-4 | 1.1e-3 | 1.1e-3 |
+    | en-multi | 5.7e-4 | 3.4e-4 | 5.5e-4 |
+    | en-multi-fixdur | 1.2e-3 | 7.4e-4 | 6.9e-4 |
+    | en-prep | 3.6e-3 | 3.0e-3 | 9.7e-4 |
+    | en-short | 7.8e-4 | 8.4e-4 | 7.6e-4 |
+    | zh-short | 2.1e-3 | 1.2e-3 | 6.4e-3 |
+
+    - The port is as close to the CPU golden data as CUDA is. `en-prep` is about 3 times CUDA's. It is the one case that resamples (44.1 kHz), and plan 02's resampler is within its own tolerance there.
+    - Two RTX 5050 runs of en-multi and zh-short gave identical numbers.
+    - The live-tensor count is 0 at the end of every case.
+    - Time: en-multi (33.4 s of audio, 3 chunks) took 77 s on the RTX 5050 and 195 s on the Intel GPU; zh-short (11.9 s) took 49 s and 73 s. The first chunk's wave is ready at 33 s and 85 s for en-multi.
+  - For listening: `build/webgpu/listen/` has every case from the Intel GPU, plus en-multi and zh-short from the RTX 5050. Playwright empties `test-results/` on every run, so the spec writes there instead.
+  - Found on the way: ORT Web refuses to create two WebGPU sessions at once (debugging.md, 2026-11-22). Load models one after another.
 
 ### Step 6. The API (D6)
 

@@ -113,15 +113,19 @@ function sameShape(a: number[], b: number[]): boolean {
   return a.length === b.length && a.every((v, i) => v === b[i]);
 }
 
-/** Compares one port output with the golden tensor of the same name; one Result per applicable check. */
+/**
+ * Compares one port output with the golden tensor of the same name; one Result per applicable check.
+ * `checks` overrides checksFor where the check depends on how the output was made, not on its name:
+ * final.wav is "exact" from the golden chunk waves and "final.free_running" end to end (plan 04, D4).
+ */
 export async function compare(
   golden: GoldenCase,
   tolerances: Tolerances,
   name: string,
   actual: Tensor,
+  checks: string[] = checksFor(name),
 ): Promise<Result[]> {
   const entry = golden.entry(name);
-  const checks = checksFor(name);
   if (checks.length === 0) throw new Error(`${name} is an input; there is no check for it`);
   const base = { stage: entry.stage, name };
   if (!sameShape(actual.shape, entry.shape)) {

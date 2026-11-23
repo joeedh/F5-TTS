@@ -138,11 +138,18 @@ def load_tolerances(root: Path = GOLDEN_ROOT) -> dict[str, Any]:  # Any: json
     return json.loads((root / "tolerances.json").read_text())
 
 
-def compare(golden: GoldenCase, tolerances: dict[str, Any], name: str, actual: np.ndarray) -> list[Result]:  # Any: json
+def compare(
+    golden: GoldenCase,
+    tolerances: dict[str, Any],  # Any: json
+    name: str,
+    actual: np.ndarray,
+    checks: list[str] | None = None,
+) -> list[Result]:
+    """`checks` overrides checks_for where the check depends on how the output was made (see compare.ts)."""
     entry = golden.entries.get(name)
     if entry is None:
         raise KeyError(f"{golden.manifest['case']}: no golden tensor {name}")
-    checks = checks_for(name)
+    checks = checks_for(name) if checks is None else checks
     if not checks:
         raise ValueError(f"{name} is an input; there is no check for it")
     stage = entry["stage"]
