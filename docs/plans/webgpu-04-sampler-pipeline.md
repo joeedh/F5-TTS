@@ -300,6 +300,20 @@ Per generation, `infer_process` and `infer_batch_process` in `infer/utils_infer.
   - In CI, on the tiny model (SwiftShader): with seed 0 and the tiny case's settings, `generate` reproduces the tiny case's `final.wav` within `final.free_running` (or the tiny variant that plan 00 used for other checks). That is an end-to-end regression check in CI, not just a smoke test. It holds only if D1 holds; otherwise inject the golden noise.
   - Locally, the same for every real golden case on the RTX 5050.
 - Done when: all pass.
+- Result, 2026-11-22: all pass.
+  - `web/src/pipeline/index.ts`: `TTS.create({ dit, vocoder, vocabUrl, text? })`, `generate({ refAudio, refText, genText, settings? }, { onProgress, onChunk, signal })`, `liveTensors` and `release()`. `web/src/index.ts` exports `TTS`, `DEFAULTS` and `parseWav`.
+    - `create` loads the DiT and then the vocoder, never both at once (debugging.md, 2026-11-22).
+    - A missing seed is a random uint32, returned with the result; a seed outside uint32 is refused. One generation runs at a time, and a second call meanwhile is refused.
+    - D6's `vocab` became `vocabUrl`, and `TTS.create` fetches it.
+  - Defaults (`web/test/pipeline/defaults.test.ts`): `DEFAULTS` equals `utils_infer.py`'s module constants, and both `infer_process` and `infer_batch_process` default to them. Changing a default fails the test.
+  - Tiny model in CI (`web/test/browser/tts-tiny.spec.ts`, also run locally in Chrome): `TTS` from the tiny `input.wav` with seed 0 reproduces the tiny `final.wav` at relL2 3.5e-6 (CUDA: 4.2e-6). The same run checks 10 behaviours:
+    - same seed, same wave; a missing seed is drawn and returned;
+    - cfg -0.5 and 5e-6 give exactly cfg 0's wave, and cfg 0 differs from cfg 2;
+    - an all-whitespace reference text is refused; a second call while one runs is refused;
+    - abort after step 2 stops after that step, frees every tensor, and the next generation gives the same wave again.
+  - Every real case on the RTX 5050, through `TTS` (`web/test/browser-local/final.spec.ts` now uses the API): the same relL2 values as step 5, to the last digit.
+  - Weak spot: tiny's `final.free_running` tolerance is the shared 0.1, since plan 00's rule gives tiny its own tolerance only where tiny's floor is higher. At 3.5e-6, the CI check would miss anything short of a gross error. The API behaviour checks are exact, so they are the stronger CI guard.
+  - CI has not run since 2026-11-19 (the Actions settings question is with the user), so the tiny spec has been run only locally so far.
 
 ### Step 7. Quality against PyTorch (D5)
 
