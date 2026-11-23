@@ -2,6 +2,15 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-22: measuring GPU memory of a WebGPU page on Windows, and the DiT at n = 8192 (plan 04)
+
+- **Problem:** WebGPU has no memory query, so a test cannot see how much GPU memory the page holds, and reading Chrome's task manager by hand does not fit a scripted run.
+- **Technique:** Windows' `GPU Process Memory` performance counters give per-process `Dedicated Usage` (a discrete GPU) and `Shared Usage` (an integrated GPU, which uses system memory). Poll `Get-Counter '\GPU Process Memory(*)\Dedicated Usage','\GPU Process Memory(*)\Shared Usage'` every 2 s, keep the instances whose `pid_<n>_` is a `chrome.exe` process, and take the maximum. The GPU process is the one that holds the memory.
+- **Finding:** the DiT with `step_mha.onnx` peaks at about 3.2 GB at n = 4096 and the same at 8192, on both laptop GPUs (dedicated on the RTX 5050, shared on the Intel GPU).
+- **Finding:** at n = 8192 a step takes 30 s on the RTX 5050 but 22 s on the Intel GPU. NVIDIA's step time grows 10 times from n = 4096 (2.9 s) to 8192, Intel's 3 times. Not diagnosed; handed to plan 07.
+- **Finding:** the unfused-attention graph (`step.onnx`) fails at n = 8192 with ORT's `SafeIntOnOverflow ... Integer overflow`: its attention matrix, 2 x 16 heads x 8192^2 floats, is over 2^32 bytes. It is also 4 times slower than `step_mha.onnx` at 4096. Use `step_mha.onnx`.
+- **How to reproduce:** `PW_GPU=nvidia npx playwright test -c playwright.local.config.ts large-n` from `web/`, with `LARGE_N`, `LARGE_N_STEPS` and `LARGE_N_STEP_FILE` to choose sizes, steps and graph.
+
 ## 2026-11-22: `vocab.txt` has CRLF line endings in a Windows checkout (plan 03)
 
 - **Symptom (avoided):** a JS vocab loader that splits on `\n` keeps a `\r` on every entry. Every lookup misses, so every token id is 0, the unknown id. The tokens still look right.

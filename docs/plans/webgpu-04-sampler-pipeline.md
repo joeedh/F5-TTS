@@ -223,6 +223,34 @@ Per generation, `infer_process` and `infer_batch_process` in `infer/utils_infer.
 - Once per GPU, run single steps at n = 4096 and 8192 with random inputs: does it fit, how long does it take, and what does the task manager show (D7).
 - Record time per chunk, and the first-run cost.
 - Done when: every chunk passes on both GPUs, or the numbers are with the user (D4); the tensor count is flat; and D7's limit is set.
+- Result, 2026-11-22: every chunk passes on both GPUs, by a wide margin; the tensor count is flat; D7's limit stays 8192 on both.
+  - `web/src/pipeline/sample.ts`: `sampleChunk(dit, device, ledger, inputs, hooks)` and `TensorLedger`. Each step feeds the step graph's `x_next` straight back as `x`; no copy is needed. `step_cond` and the noise are uploaded once per chunk with `uploadF32`. Each step waits for `onSubmittedWorkDone` before `onStep`. `signal` is checked between steps. cfg below 1e-5 becomes 0.
+  - Runner: `web/test/pipeline/run-sample.ts`, with `web/test/browser-local/sample.spec.ts` (`SAMPLE_MODE=golden|chain`, `SAMPLE_DRIFT=0`).
+  - `mel_out.free_running`, relL2 against the tolerance of 1e-3:
+
+    | Run | Chunks | relL2 |
+    |---|---|---|
+    | RTX 5050, golden noise and step_cond | 10 of 10 pass | 1.1e-6 to 6.9e-6 |
+    | RTX 5050, this plan's noise, step_cond and time grid | 10 of 10 pass | 9.5e-7 to 7.1e-6 |
+    | Intel GPU, golden noise and step_cond | 10 of 10 pass | 6.1e-7 to 5.5e-6 |
+
+    That is below the CPU against CUDA floor (2.8e-5). WebGPU float32 drifts less than CUDA did, so D4's concern did not arise.
+  - Drift per step grows smoothly, from 2.1e-8 to 2.9e-8 after the first step to its final value; nothing jumps.
+  - The live-tensor count is 0 after every chunk and at the end, on both GPUs. It is also 0 after a step that failed (the n = 8192 overflow below), so the error path frees its tensors.
+  - GPU memory, from Windows' `GPU Process Memory` counters (debugging.md, 2026-11-22), in place of Chrome's task manager: about 2.2 GB at n = 2048 and 3.2 GB at 4096 and 8192, the same on both GPUs.
+  - Large n (`web/test/browser-local/large-n.spec.ts`, random inputs), seconds per step:
+
+    | n | RTX 5050 | Intel GPU |
+    |---|---|---|
+    | 2048 | 1.04 | 2.9 to 3.1 |
+    | 4096 | 2.8 to 3.1 | 7.1 to 8.2 |
+    | 8192 | 30 | 22 |
+
+    - Both fit and give finite output at 8192, so D7's limit stays at 8192 on both GPUs. But a full 32-step chunk at 8192 takes about 16 minutes on the RTX 5050 and 12 on the Intel GPU. Plan 06 should warn well before that.
+    - NVIDIA's 10-fold jump from 4096 to 8192 is not explained. It goes to plan 07.
+    - The unfused-attention graph (`step.onnx`) overflows at 8192 and is 4 times slower at 4096. `step_mha.onnx` stays the graph to use.
+  - Time per chunk, 32 steps at n = 1913: 34 to 46 s on the RTX 5050 (1.1 to 1.4 s per step), and about 84 s on the Intel GPU (2.6 s per step). The RTX 5050's step time varied by up to 1.5 times between runs of the same case, while short runs (3 steps) stayed at plan 01's speed. The cause is not known; thermal or power limits are a guess, not checked. It goes to plan 07.
+  - First-run cost: the first step of a session took 3.7 s on the RTX 5050 against 1.04 s after it (n = 2048, including the text graph), in line with plan 01. Model load took 3.4 to 6 s from a local server.
 
 ### Step 5. Vocoder, rescale and cross-fade
 
