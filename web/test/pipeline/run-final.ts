@@ -13,6 +13,8 @@ export interface FinalRunOptions {
   ditBase: string;
   stepFile?: string;
   vocoderUrl: string;
+  /** A weight variant's folder, used instead of ditBase, stepFile and vocoderUrl. */
+  variantUrl?: string;
   apiChecks?: boolean;
 }
 
@@ -85,14 +87,16 @@ export async function runFinal(options: FinalRunOptions) {
     targetRms: s.target_rms as number,
     seed: 0,
   };
-  const tts = await TTS.create({
-    dit: {
-      textUrl: `${options.ditBase}text.onnx`,
-      stepUrl: `${options.ditBase}${options.stepFile ?? "step_mha.onnx"}`,
-    },
-    vocoder: { url: options.vocoderUrl },
-    vocabUrl: "/vocab/vocab.txt",
-  });
+  const models = options.variantUrl
+    ? { variantUrl: options.variantUrl }
+    : {
+        dit: {
+          textUrl: `${options.ditBase}text.onnx`,
+          stepUrl: `${options.ditBase}${options.stepFile ?? "step_mha.onnx"}`,
+        },
+        vocoder: { url: options.vocoderUrl },
+      };
+  const tts = await TTS.create({ ...models, vocabUrl: "/vocab/vocab.txt" });
   const wavBuf = await fetch(`/testdata/webgpu/${options.caseName}/input.wav`).then((r) => r.arrayBuffer());
   const request: GenerateRequest = {
     refAudio: parseWav(wavBuf),

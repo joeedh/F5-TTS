@@ -1,0 +1,275 @@
+{
+  "gpuFlag": "intel",
+  "runs": [
+    {
+      "variant": "fp32",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.09
+      },
+      "ditMs": 3506,
+      "loadMs": 3778,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "peaksLoad": {
+        "rendererGB": 1.65,
+        "gpuProcessGB": 1.62
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [2674, 2525, 2503],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012950460157262842
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.136427988617121e-7
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.00039216988064606225
+        }
+      ],
+      "gpuDedicatedRunGB": 0,
+      "maxProcessSampledGB": 2.03,
+      "peaksRun": {
+        "rendererGB": 1.65,
+        "gpuProcessGB": 2.07
+      }
+    },
+    {
+      "variant": "w16",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.09
+      },
+      "ditMs": 4519,
+      "loadMs": 4719,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "peaksLoad": {
+        "rendererGB": 1.6,
+        "gpuProcessGB": 1.62
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [2679, 2506, 2501],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": false,
+          "relL2": 0.00014673143354512055
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": false,
+          "relL2": 0.00010467644445254794
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.005061525955314666
+        }
+      ],
+      "gpuDedicatedRunGB": 0,
+      "maxProcessSampledGB": 2,
+      "peaksRun": {
+        "rendererGB": 1.6,
+        "gpuProcessGB": 2.02
+      }
+    },
+    {
+      "variant": "w8",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.1
+      },
+      "ditMs": 4244,
+      "loadMs": 4444,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "peaksLoad": {
+        "rendererGB": 1.75,
+        "gpuProcessGB": 1.62
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [2660, 2520, 2491],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": false,
+          "relL2": 0.004839362855506067
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": false,
+          "relL2": 0.0037522202087013146
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.005061525955314666
+        }
+      ],
+      "gpuDedicatedRunGB": 0,
+      "maxProcessSampledGB": 2,
+      "peaksRun": {
+        "rendererGB": 1.75,
+        "gpuProcessGB": 2.01
+      }
+    },
+    {
+      "variant": "fp16",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.09
+      },
+      "ditMs": 2992,
+      "loadMs": 3204,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "peaksLoad": {
+        "rendererGB": 0.95,
+        "gpuProcessGB": 0.99
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [2440, 2023, 2029],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": false,
+          "relL2": 0.005565641611946741
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": false,
+          "relL2": 0.0044345664997467605
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.005061525955314666
+        }
+      ],
+      "gpuDedicatedRunGB": 0,
+      "maxProcessSampledGB": 1.93,
+      "peaksRun": {
+        "rendererGB": 0.95,
+        "gpuProcessGB": 1.93
+      }
+    },
+    {
+      "variant": "q8",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.1
+      },
+      "ditMs": 1888,
+      "loadMs": 2091,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "peaksLoad": {
+        "rendererGB": 0.77,
+        "gpuProcessGB": 0.75
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [9288, 9085, 9167],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": false,
+          "relL2": 0.0046661588121789345
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": false,
+          "relL2": 0.0031405994790954755
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.005061525955314666
+        }
+      ],
+      "gpuDedicatedRunGB": 0,
+      "maxProcessSampledGB": 1.1,
+      "peaksRun": {
+        "rendererGB": 0.77,
+        "gpuProcessGB": 1.13
+      }
+    },
+    {
+      "variant": "q4",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.09
+      },
+      "ditMs": 1885,
+      "loadMs": 2057,
+      "adapter": {
+        "vendor": "intel",
+        "architecture": "xe-3lpg"
+      },
+      "peaksLoad": {
+        "rendererGB": 0.62,
+        "gpuProcessGB": 0.61
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [2771, 2566, 2572],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": false,
+          "relL2": 0.0491747710525032
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": false,
+          "relL2": 0.036230577342032826
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.005061525955314666
+        }
+      ],
+      "gpuDedicatedRunGB": 0,
+      "maxProcessSampledGB": 0.99,
+      "peaksRun": {
+        "rendererGB": 0.62,
+        "gpuProcessGB": 1.02
+      }
+    }
+  ]
+}

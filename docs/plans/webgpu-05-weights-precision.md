@@ -265,6 +265,39 @@ ORT's source is not reachable, so this step probes. Write the results to `docs/r
 - Node tests: `widenShard` on every fp16 bit pattern, and on int8 with scales, against a numpy reference.
 - Record per variant and GPU: load time from a local server, and peak browser RAM while loading.
 - Done when: every variant loads on both GPUs, or its failure is recorded with the reason.
+- Result, 2026-11-24: all six variants load and run on both GPUs.
+  - `web/src/weights/variant.ts` reads `variant.json`, widens shards and checks GPU features. `DiT.create` and `Vocoder.create` take a source (graph and data) or a URL.
+  - `TTS.create` takes `variantUrl`, the variant's folder, not a name. Names come with step 7's manifest.
+  - **Load time from a local server, and peak memory while loading.** Chrome 158, headless, a fresh browser per variant, one run per GPU (the last of two on the RTX 5050, whose load times differed by up to 11%). Memory is Windows' own peak of committed memory for each process, so the sum is an upper bound. The GPU process figure includes memory for GPU buffers.
+
+    | Variant | RTX 5050: load | renderer + GPU process | Intel: load | renderer + GPU process |
+    |---|---|---|---|---|
+    | `fp32` | 3.6 s | 1.65 + 1.72 GB | 3.8 s | 1.65 + 1.62 GB |
+    | `w16` | 4.9 s | 1.60 + 1.66 GB | 4.7 s | 1.60 + 1.62 GB |
+    | `w8` | 4.4 s | 1.79 + 1.69 GB | 4.4 s | 1.75 + 1.62 GB |
+    | `fp16` | 3.1 s | 0.95 + 1.02 GB | 3.2 s | 0.95 + 0.99 GB |
+    | `q8` | 2.1 s | 0.78 + 0.70 GB | 2.1 s | 0.77 + 0.75 GB |
+    | `q4` | 2.2 s | 0.62 + 0.56 GB | 2.1 s | 0.62 + 0.61 GB |
+
+  - **The storage variants cost no extra peak memory over `fp32`,** although the loader holds every widened shard of a graph at once (ORT takes a graph's data all together, so R4's "one at a time" is not possible). They cost about 1 s more to load.
+  - **One step at n = 1913 (en-short, the later of three runs):**
+
+    | Variant | RTX 5050 | Intel |
+    |---|---|---|
+    | `fp32` | 0.88 s | 2.5 s |
+    | `w16`, `w8` | 0.89 to 0.90 s | 2.5 s |
+    | `fp16` | 0.76 s | 2.0 s |
+    | `q8` | **3.3 s** | **9.2 s** |
+    | `q4` | 0.89 s | 2.6 s |
+
+    - `q8` is 3.7 times slower per step than `fp32` on both GPUs, and `q4` is no faster than `fp32`. The cause is not known: `q8` differs from `q4` in bits and in block size (128 against 32). Step 4 should find out which before it spends quality runs on `q8`.
+    - `fp16` is 14% faster on the RTX 5050 and 19% faster on the Intel GPU.
+  - **Against the fp32 golden data, informational** (step 4 compares the approximated variants with their own). Step 0's conditional output, relative L2, RTX 5050: `fp32` 1.2e-6, `w16` 1.5e-4, `q8` 4.7e-3, `w8` 4.8e-3, `fp16` 6.1e-3, `q4` 4.9e-2. The approximated weights match their ORT CPU figures from step 2; `fp16` is 18 times its ORT CPU figure, as step 1's kernel probe predicted. The vocoder gives 5.0e-3 for every variant with an fp16-stored vocoder, against 4.3e-4 for `fp32`.
+  - **Through `TTS.create({ variantUrl })`, RTX 5050, en-short:** the `fp32` variant passes `final.free_running` at 7.8e-4 (tolerance 0.1). `w8` generates audio, and differs from the `fp32` golden audio by 0.38; step 4 compares it with its own golden data. `WEIGHT_VARIANT=<v>` on `final.spec.ts` runs this.
+  - **Tests:** 11 Node tests on fixtures from `convert_precision.save()` (`tools/webgpu/weights_fixtures.py`): all 65,536 fp16 values, every stored dtype byte for byte, misaligned input, wrong sizes, which shards need widening, and the `shader-f16` refusal with a fake adapter. Both real GPUs have `shader-f16`, so the refusal has not run in a browser.
+  - **Step 1's OPFS memory figures are in doubt.** `dit-load` takes them from the same 1.5 s sampler, with every scenario in one browser. Step 7 should measure again, with the peak counters and a fresh browser, before choosing bytes or `Blob`s. `dit-load` now uses the shared `bench/memory-sampler.mjs`, and has not been rerun since.
+  - **A loader bug found by `q4`** (debugging.md, 2026-11-24): the loader decided by dtype alone whether a shard needed widening.
+  - The rebuild for the new `features` field was stopped partway for low memory. `fp16` was rebuilt on its own; `q8` and `q4` are step 2's builds and have no `features` field, which the loader reads as none needed.
 
 ### Step 4. Numeric checks (D2)
 
@@ -352,7 +385,7 @@ ORT's source is not reachable, so this step probes. Write the results to `docs/r
 - **R1. fp16 on the WebGPU EP is too inaccurate, and no block list fixes it cheaply.** Then `fp16` and `mixed` are dropped, a storage variant ships, and the Intel GPU stays at fp32 speed. Plan 07 could still try an fp32-accumulating matmul kernel.
 - **R2. `MatMulNBits` on WebGPU is CPU-only, fp16-only or inexact.** Then `q8` and `q4` are dropped, and `w8` is the small variant. Step 1 finds out before anything is built.
 - **R3. Weight error that the metrics miss.** WER and SIM may not catch prosody or noise-floor changes from 4-bit or 8-bit weights. Listening is the backstop, which is why step 5 gives the user the worst cases.
-- **R4. Memory while loading.** Tensor-aligned shards avoid one big buffer, but ORT may still hold the data in wasm memory while it uploads. For the storage variants, the loader also needs each widened shard, one at a time. Step 3 measures peak browser RAM on the Intel GPU, which shares system memory. If `Blob`s from OPFS beat `Uint8Array`s there, the cache hands over `Blob`s.
+- **R4. Memory while loading.** Tensor-aligned shards avoid one big buffer, but ORT may still hold the data in wasm memory while it uploads. For the storage variants, the loader also holds every widened shard of a graph at once. Step 3 measures peak browser RAM on the Intel GPU, which shares system memory. If `Blob`s from OPFS beat `Uint8Array`s there, the cache hands over `Blob`s.
 - **R5. Hugging Face's CDN behaviour changes**, for example around Xet storage, redirects or CORS. The shards don't depend on `Range`, the sizes come from the manifest, and the pinned revision keeps contents fixed. Step 9 tests against the real host.
 - **R6. Golden data disk use.** About 3 GB per approximated variant, on top of about 9 GB today. Only two cases per variant, and variants dropped in step 5 can have theirs deleted.
 - **R7. The gate does not close.** Delivery is built and tested against a local server, so only the final upload and the real-host test wait on it.

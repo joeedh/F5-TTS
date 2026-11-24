@@ -9,6 +9,7 @@ export default defineConfig({
     serveData({
       "/testdata/webgpu/": join(repo, "testdata/webgpu"), // golden data and the tiny model's graphs
       "/model/dit/": join(repo, "build/webgpu/dit"), // the real DiT exports (tools/webgpu/export_dit.py)
+      "/model/variants/": join(repo, "build/webgpu/variants"), // weight variants (tools/webgpu/convert_precision.py)
       "/model/vocos/": join(repo, "build/webgpu/vocos"), // the real Vocos export (tools/webgpu/export_vocos.py)
       "/vocab/": join(repo, "src/f5_tts/infer/examples"), // vocab.txt, for the pipeline tests (plan 04)
       "/seedtts/": join(repo, "data/seedtts_testset"), // the quality subset (tools/webgpu/quality_set.py)

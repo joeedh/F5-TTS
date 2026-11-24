@@ -3,10 +3,13 @@
 // also gives the backbone output.
 import * as ort from "onnxruntime-web/webgpu";
 import { istft } from "../audio/istft";
+import type { GraphSource } from "../weights/variant";
 
 export interface VocoderOptions {
   /** URL of vocos.onnx or vocos_debug.onnx; one file, no external data. */
-  url: string;
+  url?: string;
+  /** The graph and its data, from a weight variant (weights/variant.ts); used instead of url. */
+  source?: GraphSource;
   /** ORT log severity while creating the session: 0 is verbose, which prints node placement. */
   logSeverityLevel?: 0 | 1 | 2 | 3 | 4;
 }
@@ -24,12 +27,21 @@ export class Vocoder {
   private constructor(readonly session: ort.InferenceSession) {}
 
   static async create(options: VocoderOptions): Promise<Vocoder> {
-    const res = await fetch(options.url);
-    if (!res.ok) throw new Error(`${options.url}: HTTP ${res.status}`);
-    const graph = new Uint8Array(await res.arrayBuffer());
+    let source = options.source;
+    if (!source) {
+      const url = options.url;
+      if (!url) throw new Error("Vocoder.create: no url or source");
+      source = async () => {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
+        return { graph: new Uint8Array(await res.arrayBuffer()), externalData: [] };
+      };
+    }
+    const { graph, externalData } = await source();
     const session = await ort.InferenceSession.create(graph, {
       executionProviders: ["webgpu"],
       preferredOutputLocation: "gpu-buffer",
+      externalData,
       logSeverityLevel: options.logSeverityLevel ?? 2,
       logVerbosityLevel: 0,
     });

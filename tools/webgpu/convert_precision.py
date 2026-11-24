@@ -461,7 +461,8 @@ def build(variant: str, idx: dict[tuple[tuple[int, ...], bytes], Match]) -> dict
         notes[f"{key}.ops"] = ops
     if approx and variant != "fp16":
         save_file(approx, str(out / "approx_weights.safetensors"))
-    return {"variant": variant, "graphs": graphs, "notes": notes}
+    features = ["shader-f16"] if variant == "fp16" else []  # what the browser must offer (TTS.create checks)
+    return {"variant": variant, "features": features, "graphs": graphs, "notes": notes}
 
 
 def read_layout(out: Path, graph: dict[str, Any], name: str) -> np.ndarray:  # Any: json

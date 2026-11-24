@@ -9,3 +9,4 @@ export {
   type Settings,
   type TTSOptions,
 } from "./pipeline";
+export { checkFeatures, type GraphSource, type VariantInfo, variantSources } from "./weights/variant";

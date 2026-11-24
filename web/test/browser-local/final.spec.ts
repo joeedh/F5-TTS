@@ -1,7 +1,8 @@
 // Plan 04 step 5: end to end on WebGPU, from each golden case's input.wav and texts to final.wav. Local only:
 // needs build/webgpu/dit/base/, build/webgpu/vocos/ and the golden cases. Run from web/:
 //   PW_GPU=nvidia npx playwright test -c playwright.local.config.ts final
-// DIT_CASES=en-multi,zh-short limits the cases. Each result is written to build/webgpu/listen/ for listening.
+// DIT_CASES=en-multi,zh-short limits the cases. WEIGHT_VARIANT=fp32 loads a plan 05 weight variant instead;
+// the others differ from the fp32 golden data by their own weight error. Each result is written to build/webgpu/listen/ for listening.
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
@@ -11,6 +12,7 @@ const repo = join(import.meta.dirname, "../../..");
 const goldenDir = join(repo, "testdata/webgpu");
 // not test-results/, which Playwright empties at the start of every run
 const outDir = join(repo, "build/webgpu/listen");
+const variant = process.env.WEIGHT_VARIANT;
 const cases = (
   process.env.DIT_CASES?.split(",") ??
   readdirSync(goldenDir).filter((d) => d !== "tiny" && existsSync(join(goldenDir, d, "manifest.json")))
@@ -50,11 +52,16 @@ for (const caseName of cases) {
         const m = await import(/* @vite-ignore */ url);
         return m.runFinal(opts);
       },
-      { caseName, ditBase: "/model/dit/base/", vocoderUrl: "/model/vocos/vocos.onnx" },
+      {
+        caseName,
+        ditBase: "/model/dit/base/",
+        vocoderUrl: "/model/vocos/vocos.onnx",
+        variantUrl: variant && `/model/variants/${variant}/`,
+      },
     );
     const { wave, lines, ...rest } = r;
     mkdirSync(outDir, { recursive: true });
-    const file = join(outDir, `${caseName}-${r.adapter}.wav`);
+    const file = join(outDir, `${caseName}-${r.adapter}${variant ? `-${variant}` : ""}.wav`);
     writeFileSync(file, wavFile(wave, 24000));
     testInfo.annotations.push({ type: "result", description: JSON.stringify(rest) });
     console.log(

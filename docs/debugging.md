@@ -2,6 +2,19 @@
 
 Running log. Add an entry for each bug or useful technique: symptom, cause, fix or diagnosis steps.
 
+## 2026-11-24: loading weight variants in Chrome (plan 05 step 3)
+
+- **A shard can need rewriting even when no tensor changes dtype.** `q4` failed with `Deserialize tensor val_2372_scales failed. Failed to load external data file ""step.data.3"", error: Out of bounds.`
+  - Cause: in a widened graph, stored shards are packed at 64 bytes and the layout at 4096. `needsWidening` looked only at dtypes, so a shard of raw tensors was passed to ORT as stored.
+  - It was caught only because the sizes differed. With equal sizes and different offsets, ORT would have read wrong weights silently.
+  - The unit test followed the same wrong rule, so it passed.
+  - Fix: compare sizes and every tensor's offsets too.
+- **The memory sampler missed the peak of a short load.** It gave `fp32` a 1.11 GB peak while loading 1.4 GB of weights: 1 to 3 samples per load, about 1.5 s apart.
+  - Fix: read `PeakPageFileUsage` from `Win32_Process`, which Windows tracks per process (`sample-memory.ps1`). To check it, compare with the largest live sample, which must not be higher.
+- **Pages in one browser inflate each other's memory.** In a shared browser, `w8`'s renderer sampled 3.4 GB and the next variant's baseline was 1.8 GB. With a fresh browser per variant, `w8`'s peak is 1.8 GB. Measure each variant in its own browser.
+- **`ort.env.webgpu.device` is not always a promise.** After a session exists, `ort.env.webgpu.device.catch` is not a function. Use `await`, which handles both.
+- **`npx` outside `web/` downloads packages.** The repo root has no `package.json`, so `npx tsc` there fetched and ran an unrelated package of that name from the registry. Use `web/node_modules/.bin/`, or `npx --no-install`.
+
 ## 2026-11-23: onnxconverter-common's fp16 block list does less than it says (plan 05 step 2)
 
 `convert_float_to_float16(..., node_block_list=[...], keep_io_types=True)` (onnxconverter-common 1.16.0) keeps the listed nodes' arithmetic in fp32, but not the values between them. Three effects, each found in the converted DiT step graph:

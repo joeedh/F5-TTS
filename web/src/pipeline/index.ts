@@ -5,14 +5,18 @@ import type { Pcm } from "../audio/pydub";
 import { DiT, type DiTOptions } from "../dit";
 import { parseVocab, TextFrontend, type TextFrontendLoaders } from "../text/tokens";
 import { Vocoder, type VocoderOptions } from "../vocoder";
+import { checkFeatures, variantSources } from "../weights/variant";
 import { DEFAULTS, generateWith, type Generated, type GenerateHooks, type Models, type Settings } from "./generate";
 import { TensorLedger } from "./sample";
 
 export { DEFAULTS, type Generated, type GenerateHooks, type Progress, type Settings } from "./generate";
 
+/** The models come from a weight variant (plan 05), or from the DiT and vocoder options. */
 export interface TTSOptions {
-  dit: DiTOptions;
-  vocoder: VocoderOptions;
+  /** URL of a weight variant's folder (tools/webgpu/convert_precision.py); used instead of dit and vocoder. */
+  variantUrl?: string;
+  dit?: DiTOptions;
+  vocoder?: VocoderOptions;
   /** URL of vocab.txt. */
   vocabUrl: string;
   /** Loaders for the jieba wasm and the pinyin dictionary; by default the files next to src/text/. */
@@ -44,11 +48,20 @@ export class TTS {
       if (!r.ok) throw new Error(`${options.vocabUrl}: HTTP ${r.status}`);
       return r.text();
     });
+    let ditOptions = options.dit;
+    let vocoderOptions = options.vocoder;
+    if (options.variantUrl) {
+      const { info, sources } = await variantSources(options.variantUrl);
+      await checkFeatures(info); // before any download of the weights
+      ditOptions = { text: sources.text, step: sources.step };
+      vocoderOptions = { source: sources.vocos };
+    }
+    if (!ditOptions || !vocoderOptions) throw new Error("TTS.create: give variantUrl, or dit and vocoder");
     // one after another: ORT Web refuses to create two WebGPU sessions at once (docs/debugging.md)
-    const dit = await DiT.create(options.dit);
+    const dit = await DiT.create(ditOptions);
     let vocoder: Vocoder;
     try {
-      vocoder = await Vocoder.create(options.vocoder);
+      vocoder = await Vocoder.create(vocoderOptions);
     } catch (e) {
       await dit.release();
       throw e;

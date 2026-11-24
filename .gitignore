@@ -188,6 +188,8 @@ testdata/webgpu/*
 testdata/webgpu/text/corpus/
 # plan 04: synthetic chunk-plan fixtures from upstream's code (tools/webgpu/plan_fixtures.py)
 !testdata/webgpu/pipeline/
+# plan 05: the weight-widening fixtures (tools/webgpu/weights_fixtures.py)
+!testdata/webgpu/weights/
 web/test-results/
 web/playwright-report/
 !testdata/webgpu/tolerances.json

@@ -1,0 +1,139 @@
+{
+ "graph": "tiny.onnx",
+ "graphSize": 614,
+ "shards": [
+  {
+   "file": "tiny.data.0",
+   "tensors": [
+    {
+     "name": "a_f16",
+     "dtype": "f16",
+     "count": 703,
+     "shape": [
+      37,
+      19
+     ],
+     "layoutOffset": 0,
+     "layoutLength": 2812,
+     "storedOffset": 0,
+     "storedLength": 1406
+    },
+    {
+     "name": "b_f16_edges",
+     "dtype": "f16",
+     "count": 500,
+     "shape": [
+      500
+     ],
+     "layoutOffset": 4096,
+     "layoutLength": 2000,
+     "storedOffset": 1408,
+     "storedLength": 1000
+    },
+    {
+     "name": "c_i8_partial",
+     "dtype": "i8",
+     "count": 1025,
+     "shape": [
+      1025
+     ],
+     "layoutOffset": 8192,
+     "layoutLength": 4100,
+     "storedOffset": 2432,
+     "storedLength": 1160,
+     "scalesOffset": 1028,
+     "block": 32
+    }
+   ],
+   "layoutSize": 12292,
+   "storedSize": 3592
+  },
+  {
+   "file": "tiny.data.1",
+   "tensors": [
+    {
+     "name": "d_i8_zeros",
+     "dtype": "i8",
+     "count": 512,
+     "shape": [
+      512
+     ],
+     "layoutOffset": 0,
+     "layoutLength": 2048,
+     "storedOffset": 0,
+     "storedLength": 576,
+     "scalesOffset": 512,
+     "block": 32
+    },
+    {
+     "name": "e_i8",
+     "dtype": "i8",
+     "count": 3000,
+     "shape": [
+      30,
+      100
+     ],
+     "layoutOffset": 4096,
+     "layoutLength": 12000,
+     "storedOffset": 576,
+     "storedLength": 3376,
+     "scalesOffset": 3000,
+     "block": 32
+    }
+   ],
+   "layoutSize": 16096,
+   "storedSize": 3952
+  },
+  {
+   "file": "tiny.data.2",
+   "tensors": [
+    {
+     "name": "f_f32",
+     "dtype": "f32",
+     "count": 300,
+     "shape": [
+      300
+     ],
+     "layoutOffset": 0,
+     "layoutLength": 1200,
+     "storedOffset": 0,
+     "storedLength": 1200
+    },
+    {
+     "name": "g_raw",
+     "dtype": "raw",
+     "count": 200,
+     "shape": [
+      200
+     ],
+     "layoutOffset": 4096,
+     "layoutLength": 1600,
+     "storedOffset": 1216,
+     "storedLength": 1600
+    }
+   ],
+   "layoutSize": 5696,
+   "storedSize": 2816
+  },
+  {
+   "file": "tiny.data.3",
+   "tensors": [
+    {
+     "name": "h_f16_big",
+     "dtype": "f16",
+     "count": 5000,
+     "shape": [
+      5000
+     ],
+     "layoutOffset": 0,
+     "layoutLength": 20000,
+     "storedOffset": 0,
+     "storedLength": 10000
+    }
+   ],
+   "layoutSize": 20000,
+   "storedSize": 10000
+  }
+ ],
+ "layoutDir": "layout"
+}

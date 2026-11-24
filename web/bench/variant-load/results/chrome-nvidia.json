@@ -1,0 +1,275 @@
+{
+  "gpuFlag": "nvidia",
+  "runs": [
+    {
+      "variant": "fp32",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.11
+      },
+      "ditMs": 3391,
+      "loadMs": 3643,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "peaksLoad": {
+        "rendererGB": 1.65,
+        "gpuProcessGB": 1.72
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [1061, 867, 883],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": true,
+          "relL2": 0.0000012472956806448457
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": true,
+          "relL2": 8.857309045946346e-7
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.0004315384332805814
+        }
+      ],
+      "gpuDedicatedRunGB": 1.78,
+      "maxProcessSampledGB": 2.15,
+      "peaksRun": {
+        "rendererGB": 1.65,
+        "gpuProcessGB": 2.2
+      }
+    },
+    {
+      "variant": "w16",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.11
+      },
+      "ditMs": 4695,
+      "loadMs": 4928,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "peaksLoad": {
+        "rendererGB": 1.6,
+        "gpuProcessGB": 1.66
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [1074, 880, 897],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": false,
+          "relL2": 0.00014663196506457433
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": false,
+          "relL2": 0.00010467297799402946
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.005014290060486624
+        }
+      ],
+      "gpuDedicatedRunGB": 1.78,
+      "maxProcessSampledGB": 2.1,
+      "peaksRun": {
+        "rendererGB": 1.6,
+        "gpuProcessGB": 2.16
+      }
+    },
+    {
+      "variant": "w8",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.11
+      },
+      "ditMs": 4122,
+      "loadMs": 4364,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "peaksLoad": {
+        "rendererGB": 1.79,
+        "gpuProcessGB": 1.69
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [1061, 885, 888],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": false,
+          "relL2": 0.0048393611358829676
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": false,
+          "relL2": 0.003752215980980232
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.005014290060486624
+        }
+      ],
+      "gpuDedicatedRunGB": 1.78,
+      "maxProcessSampledGB": 2.18,
+      "peaksRun": {
+        "rendererGB": 1.79,
+        "gpuProcessGB": 2.2
+      }
+    },
+    {
+      "variant": "fp16",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.11
+      },
+      "ditMs": 2881,
+      "loadMs": 3131,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "peaksLoad": {
+        "rendererGB": 0.95,
+        "gpuProcessGB": 1.02
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [890, 711, 759],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": false,
+          "relL2": 0.006094856609651189
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": false,
+          "relL2": 0.005225654557021338
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.005014290060486624
+        }
+      ],
+      "gpuDedicatedRunGB": 1.61,
+      "maxProcessSampledGB": 1.18,
+      "peaksRun": {
+        "rendererGB": 0.95,
+        "gpuProcessGB": 2.14
+      }
+    },
+    {
+      "variant": "q8",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.11
+      },
+      "ditMs": 1940,
+      "loadMs": 2128,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "peaksLoad": {
+        "rendererGB": 0.78,
+        "gpuProcessGB": 0.7
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [3460, 3253, 3267],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": false,
+          "relL2": 0.0046662067877572735
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": false,
+          "relL2": 0.0031406170960503895
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.005014290060486624
+        }
+      ],
+      "gpuDedicatedRunGB": 0.88,
+      "maxProcessSampledGB": 1.16,
+      "peaksRun": {
+        "rendererGB": 0.78,
+        "gpuProcessGB": 1.16
+      }
+    },
+    {
+      "variant": "q4",
+      "pageErrors": [],
+      "browserVersion": "158.0.8127.38",
+      "peaksBefore": {
+        "rendererGB": 0.03,
+        "gpuProcessGB": 0.11
+      },
+      "ditMs": 1973,
+      "loadMs": 2152,
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell"
+      },
+      "peaksLoad": {
+        "rendererGB": 0.62,
+        "gpuProcessGB": 0.56
+      },
+      "caseName": "en-short",
+      "n": 1913,
+      "stepMs": [1182, 880, 890],
+      "comparisons": [
+        {
+          "name": "c0.dit.s00.out_cond",
+          "passed": false,
+          "relL2": 0.04917478935063501
+        },
+        {
+          "name": "c0.dit.s00.out_uncond",
+          "passed": false,
+          "relL2": 0.03623057668542365
+        },
+        {
+          "name": "c0.vocoder.wav",
+          "passed": true,
+          "relL2": 0.005014290060486624
+        }
+      ],
+      "gpuDedicatedRunGB": 0.77,
+      "maxProcessSampledGB": 1.01,
+      "peaksRun": {
+        "rendererGB": 0.62,
+        "gpuProcessGB": 1.02
+      }
+    }
+  ]
+}

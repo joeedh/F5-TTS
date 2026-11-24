@@ -4,14 +4,13 @@
 // Scenarios: url, cache, and (plan 05) opfs-blob and opfs-bytes; see LoadOptions.source in main.ts.
 // Each scenario runs in a new page of one persistent profile, so the second "url" run can use the HTTP
 // cache and the second "cache" run reads Cache Storage. Memory is sampled from outside (sample-memory.ps1).
-import { spawn } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { createServer } from "vite";
 import { serveData } from "../../serve-data.ts";
+import { startSampler } from "../memory-sampler.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, "../../..");
@@ -45,25 +44,7 @@ const profile = join(repo, "build/webgpu/dit-load-profile", tag);
 rmSync(profile, { recursive: true, force: true });
 mkdirSync(profile, { recursive: true });
 
-const samples = [];
-// -ExecutionPolicy Bypass for this process only: spawned from Node, the default policy refuses the script
-const sampler = spawn("powershell.exe", [
-  "-NoProfile",
-  "-ExecutionPolicy",
-  "Bypass",
-  "-File",
-  join(here, "sample-memory.ps1"),
-  "-Profile",
-  profile,
-]);
-sampler.stderr.on("data", (d) => process.stderr.write(`sample-memory.ps1: ${d}`));
-createInterface({ input: sampler.stdout }).on("line", (line) => {
-  try {
-    samples.push(JSON.parse(line));
-  } catch {
-    // not a sample
-  }
-});
+const sampler = startSampler(profile);
 
 const flags = ["--enable-unsafe-webgpu"];
 if (gpu === "nvidia") flags.push("--force_high_performance_gpu");
@@ -72,25 +53,6 @@ const context = await chromium.launchPersistentContext(profile, {
   headless: process.env.SPIKE_HEADED !== "1",
   args: flags,
 });
-
-const GB = 1024 ** 3;
-const peak = (from, to) => {
-  const inside = samples.filter((s) => s.t >= from && s.t <= to);
-  const before = samples.filter((s) => s.t < from).at(-1);
-  const max = (k) => Math.max(...inside.map((s) => s[k]));
-  const gb = (x) => Math.round((x / GB) * 100) / 100;
-  if (!inside.length) return null;
-  return {
-    samples: inside.length,
-    baseline: before ? { privateGB: gb(before.private), gpuDedicatedGB: gb(before.gpuDedicated) } : null,
-    privateGB: gb(max("private")),
-    maxProcessPrivateGB: gb(max("maxPrivate")),
-    rendererGB: gb(max("renderer")),
-    gpuProcessGB: gb(max("gpuProcess")),
-    gpuDedicatedGB: gb(max("gpuDedicated")),
-    gpuSharedGB: gb(max("gpuShared")),
-  };
-};
 
 const runs = [];
 for (const [i, source] of scenarios.entries()) {
@@ -109,9 +71,9 @@ for (const [i, source] of scenarios.entries()) {
   }
   await new Promise((r) => setTimeout(r, 1000));
   const m = result.marks ?? {};
-  result.memory = peak(from, Date.now());
-  result.memoryLoad = m.stepCreated ? peak(m.start, m.stepCreated) : null;
-  result.memoryRun = m.ran ? peak(m.stepCreated, m.ran) : null;
+  result.memory = sampler.peak(from, Date.now());
+  result.memoryLoad = m.stepCreated ? sampler.peak(m.start, m.stepCreated) : null;
+  result.memoryRun = m.ran ? sampler.peak(m.stepCreated, m.ran) : null;
   result.pageErrors = pageErrors;
   result.scenario = `${i}:${source}`;
   runs.push(result);
@@ -141,5 +103,5 @@ const outDir = join(here, "results");
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, `${tag}.json`), JSON.stringify(out, null, 2));
 await context.close();
-sampler.kill();
+sampler.stop();
 await server.close();

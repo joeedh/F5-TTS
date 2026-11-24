@@ -2,12 +2,17 @@
 // graph once per ODE step. Outputs stay on the GPU; callers read them back only when they need to.
 // Graph inputs and outputs are described in docs/plans/webgpu-01-dit-export.md, D1.
 import * as ort from "onnxruntime-web/webgpu";
+import type { GraphSource } from "../weights/variant";
 
+/** Each graph comes from a URL (its weights at the same URL plus ".data") or from a source (plan 05). */
 export interface DiTOptions {
-  /** URL of text.onnx; its weights are expected at the same URL plus ".data". */
-  textUrl: string;
+  /** URL of text.onnx. */
+  textUrl?: string;
   /** URL of step.onnx (or a variant such as step_mha.onnx, or step_debug.onnx for internal outputs). */
-  stepUrl: string;
+  stepUrl?: string;
+  /** The text graph and its data, from a weight variant (weights/variant.ts); used instead of textUrl. */
+  text?: GraphSource;
+  step?: GraphSource;
   /** ORT log severity while creating the sessions: 0 is verbose, which prints node placement. */
   logSeverityLevel?: 0 | 1 | 2 | 3 | 4;
 }
@@ -31,18 +36,37 @@ export interface StepInputs {
 /** pred (2, n, 100), v and x_next (1, n, 100); the debug graph adds its internal outputs. */
 export type StepOutputs = Record<string, ort.Tensor> & { pred: ort.Tensor; v: ort.Tensor; x_next: ort.Tensor };
 
-async function loadSession(url: string, logSeverityLevel: 0 | 1 | 2 | 3 | 4): Promise<ort.InferenceSession> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
-  const graph = new Uint8Array(await res.arrayBuffer());
-  const file = url.split("/").pop() ?? url;
+/** A URL's graph, with its data at the URL plus ".data". */
+export function urlSource(url: string): GraphSource {
+  return async () => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
+    const file = url.split("/").pop() ?? url;
+    return {
+      graph: new Uint8Array(await res.arrayBuffer()),
+      externalData: [{ path: `${file}.data`, data: `${url}.data` }],
+    };
+  };
+}
+
+export async function loadSession(
+  source: GraphSource,
+  logSeverityLevel: 0 | 1 | 2 | 3 | 4,
+): Promise<ort.InferenceSession> {
+  const { graph, externalData } = await source(); // dropped once ORT has its copy
   return ort.InferenceSession.create(graph, {
     executionProviders: ["webgpu"],
     preferredOutputLocation: "gpu-buffer",
-    externalData: [{ path: `${file}.data`, data: `${url}.data` }],
+    externalData,
     logSeverityLevel,
     logVerbosityLevel: 0,
   });
+}
+
+function pick(source: GraphSource | undefined, url: string | undefined, name: string): GraphSource {
+  if (source) return source;
+  if (url) return urlSource(url);
+  throw new Error(`DiT.create: no ${name} graph`);
 }
 
 function scalar(v: number): ort.Tensor {
@@ -57,9 +81,9 @@ export class DiT {
 
   static async create(options: DiTOptions): Promise<DiT> {
     const level = options.logSeverityLevel ?? 2;
-    const text = await loadSession(options.textUrl, level);
+    const text = await loadSession(pick(options.text, options.textUrl, "text"), level);
     try {
-      return new DiT(text, await loadSession(options.stepUrl, level));
+      return new DiT(text, await loadSession(pick(options.step, options.stepUrl, "step"), level));
     } catch (e) {
       await text.release();
       throw e;
